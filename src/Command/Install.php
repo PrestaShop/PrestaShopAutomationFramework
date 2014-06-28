@@ -13,11 +13,14 @@ class Install extends Command
 	{
 		$this->setName('install')
 		->setDescription('Install PrestaShop')
-		->addArgument('language', InputArgument::OPTIONAL, 'Which install language do you want to use?');
+		->addOption('language', 'l', InputOption::VALUE_REQUIRED, 'Installation language (e.g. en)');
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
+		$conf = \PrestaShop\ConfigurationFile::getFromCWD();
+		$shop = new \PrestaShop\Shop(getcwd(), $conf->get('shop'));
 
+		$shop->install();
 	}
 }

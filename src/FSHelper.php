@@ -16,4 +16,9 @@ class FSHelper
 		}
 		return $base;
 	}
+
+	public static function exists()
+	{
+		return file_exists(call_user_func_array(__NAMESPACE__.'\FSHelper::join', func_get_args()));
+	}
 }

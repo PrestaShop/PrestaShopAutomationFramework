@@ -31,4 +31,17 @@ class ConfigurationFile
 	{
 		file_put_contents($this->path, json_encode($this->options, JSON_PRETTY_PRINT));
 	}
+
+	public function get($value)
+	{
+		return $this->options[$value];
+	}
+
+	public static function getFromCWD()
+	{
+		static $instance = null;
+		if (!$instance)
+			$instance = new ConfigurationFile('pstaf.conf.json');
+		return $instance;
+	}
 }

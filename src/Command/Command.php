@@ -43,8 +43,13 @@ class Command extends \Symfony\Component\Console\Command\Command
 		foreach ($this->options as $name => $unused)
 		{
 			$value = $input->getOption($name);
+
+			if (!$value && isset($guessed[$name]))
+				$value = $guessed[$name];
+
 			if (!$value && !$accept_defaults)
 				$value = $helper->ask($input, $output, $this->questions[$name]);
+				
 			if ($value)
 				$this->options[$name] = $value;
 		}
