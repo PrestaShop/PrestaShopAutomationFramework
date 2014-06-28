@@ -11,7 +11,7 @@ use Symfony\Component\Console\Question\Question;
 class Command extends \Symfony\Component\Console\Command\Command
 {
 	protected $options = [];
-	protected $questions = [];
+	private $questions = [];
 
 	public function addQuoption($name, $shortcut, $mode, $description, $default = null, $completions = [], $prompt = null) {
 		$this->addOption($name, $shortcut, $mode, $description);
@@ -36,14 +36,14 @@ class Command extends \Symfony\Component\Console\Command\Command
 		return $this;
 	}
 
-	public function quoptparse($input, $output)
+	public function quoptparse($input, $output, $guessed = [], $accept_defaults = false)
 	{
 		$helper = $this->getHelperSet()->get('question');
 
 		foreach ($this->options as $name => $unused)
 		{
 			$value = $input->getOption($name);
-			if (!$value)
+			if (!$value && !$accept_defaults)
 				$value = $helper->ask($input, $output, $this->questions[$name]);
 			if ($value)
 				$this->options[$name] = $value;
