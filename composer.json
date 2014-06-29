@@ -3,6 +3,9 @@
 		"facebook/webdriver": "dev-master",
 		"symfony/console": "*"
 	},
+	"require-dev": {
+        "phpdocumentor/phpdocumentor": "2.*"
+    },
 	"autoload": {
 		"psr-4": {
 			"PrestaShop\\": "src/"

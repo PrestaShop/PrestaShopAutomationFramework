@@ -25,7 +25,7 @@ class Shop
 	protected $mysql_pass;
 
 	/**
-	* Mysql database
+	* Mysql database name
 	*/
 	protected $mysql_database;
 
@@ -103,5 +103,37 @@ class Shop
 	public function getInstallerURL()
 	{
 		return rtrim($this->front_office_url, '/').'/'.trim($this->install_folder_name, '/').'/';
+	}
+
+	public function getPDO()
+	{
+		static $pdo;
+
+		try {
+			if (!$pdo)
+				$pdo = new \PDO('mysql:host='.$this->mysql_host.';port='.$this->mysql_port.';dbname='.$this->mysql_database,
+					$this->mysql_user,
+					$this->mysql_pass
+				);
+		} catch (\Exception $e) {
+			$pdo = null;
+		}
+
+		return $pdo;
+	}
+
+	/**
+	* Drop the database if it exists
+	* @return returns true if the database existed, false otherwise
+	*/
+	public function dropDatabaseIfExists()
+	{
+		$h = $this->getPDO();
+		if ($h) {
+			$sql = 'DROP DATABASE '.$this->mysql_database;
+			$h->exec($sql);
+			return true;
+		}
+		return false;
 	}
 }

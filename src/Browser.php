@@ -41,16 +41,10 @@ class Browser
 	*/
 	protected function find($selector, $options = [])
 	{
-		$unique = (isset($options['unique']) && !$options['unique']);
+		$unique = !isset($options['unique']) || $options['unique'];
 		$tos = 'cssSelector';
-		$e =  $this->driver->findElement(\WebDriverBy::$tos($selector));
-
-		if (count($e) > 1 && $unique)
-			throw new AmbiguousMatchException();
-
-		if ($unique && count($e) === 1)
-			return $e[0];
-
+		$method = $unique ? 'findElement' : 'findElements';
+		$e =  $this->driver->$method(\WebDriverBy::$tos($selector));
 		return $e;
 	}
 
@@ -74,5 +68,75 @@ class Browser
 		$element->click();
 		$element->clear();
 		$this->driver->getKeyboard()->sendKeys($value);
+		return $this;
+	}
+
+	/**
+	* Select by value in a select.
+	*/
+	public function select($selector, $value)
+	{
+		if (!$value)
+			return $this;
+
+		$select = new \WebDriverSelect($this->find($selector));
+		$select->selectByValue($value);
+		return $this;
+	}
+
+	/**
+	* Select by value in a JQuery chosen select.
+	*/
+	public function jqcSelect($selector, $value)
+	{
+		if (!$value)
+			return $this;
+
+		$select = $this->find($selector);
+		$chosen = $select->findElement(\WebDriverBy::xpath("./following-sibling::div[contains(concat(' ',normalize-space(@class),' '),' chosen-container ')]"));
+		$chosen->click();
+
+		$optionElements = $select->findElements(\WebDriverBy::tagName('option'));
+
+		foreach ($optionElements as $n => $element)
+		{
+			$v = $element->getAttribute('value');
+			if ($v == $value)
+			{
+				$chosen->findElement(\WebDriverBy::cssSelector('*[data-option-array-index="'.$n.'"]'))->click();
+				return $this;
+			}
+		}
+
+		throw new \PrestaShop\Exception\SelectValueNotFound();
+	}
+
+	/**
+	* Check or uncheck a checkbox
+	*/
+	public function checkbox($selector, $on_off)
+	{
+		$cb = $this->find($selector);
+		if (($on_off && !$cb->isSelected()) || (!$on_off && $cb->isSelected()))
+			$cb->click();
+		return $this;
+	}
+
+	/**
+	* Wait for element to appear
+	*/
+	public function waitFor($selector, $timeout_in_second = null, $interval_in_millisecond = null)
+	{
+		$wait = new \WebDriverWait($this->driver, $timeout_in_second, $interval_in_millisecond);
+		$wait->until(function($driver) use ($selector) {
+			try {
+				$e = $this->find($selector);
+				return $e->isDisplayed();
+			} catch (\Exception $e) {
+				return false;
+			}
+			return true;
+		});
+		return $this;
 	}
 }

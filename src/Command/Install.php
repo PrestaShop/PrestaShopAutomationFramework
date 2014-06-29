@@ -12,8 +12,14 @@ class Install extends Command
 	protected function configure()
 	{
 		$this->setName('install')
-		->setDescription('Install PrestaShop')
-		->addOption('language', 'l', InputOption::VALUE_REQUIRED, 'Installation language (e.g. en)');
+		->setDescription('Install PrestaShop');
+
+		$optionDescriptions = \PrestaShop\Action\OptionProvider::getDescriptions('ShopInstallation');
+
+		foreach ($optionDescriptions as $name => $data)
+		{
+			$this->addOption($name, $data['short'], $data['type'], $data['description'], $data['default']);
+		}
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output)
@@ -21,6 +27,6 @@ class Install extends Command
 		$conf = \PrestaShop\ConfigurationFile::getFromCWD();
 		$shop = new \PrestaShop\Shop(getcwd(), $conf->get('shop'));
 
-		$shop->install();
+		$shop->install(\PrestaShop\Action\OptionProvider::fromInput('ShopInstallation', $input));
 	}
 }
