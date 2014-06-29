@@ -14,8 +14,7 @@ class InitShop extends Command
 	protected function configure()
 	{
 		$this->setName('init:shop')
-		->setDescription('Create a new PrestaShop installation folder or setup a pstaf project in an existing one.')
-		->addArgument('folder', InputArgument::OPTIONAL, 'Where do you want to install your shop?')
+		->setDescription('Setup a pstaf project in the current directory.')
 		->addQuoption('mysql_host', null, InputOption::VALUE_REQUIRED, 'Mysql server address', 'localhost')
 		->addQuoption('mysql_port', null, InputOption::VALUE_REQUIRED, 'Mysql server port', '3306')
 		->addQuoption('mysql_user', null, InputOption::VALUE_REQUIRED, 'Mysql server user', 'root')
@@ -92,16 +91,9 @@ class InitShop extends Command
 
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
-		$folder = $input->getArgument('folder');
-		if (!$folder)
-			$folder = '.';
-		$this->quoptparse($input, $output, $this->guessShopSettings($folder), $input->getOption('accept_defaults'));
+		$this->quoptparse($input, $output, $this->guessShopSettings('.'), $input->getOption('accept_defaults'));
 
-		if (!is_dir($folder))
-		{
-			mkdir($folder);
-		}
-		$conf = new \PrestaShop\ConfigurationFile(\PrestaShop\FSHelper::join($folder, 'pstaf.conf.json'));
+		$conf = new \PrestaShop\ConfigurationFile('pstaf.conf.json');
 		$conf->update(['shop' => $this->options])->save();
 	}
 }
