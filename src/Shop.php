@@ -124,7 +124,7 @@ class Shop
 
 	/**
 	* Drop the database if it exists
-	* @return returns true if the database existed, false otherwise
+	* @return true if the database existed, false otherwise
 	*/
 	public function dropDatabaseIfExists()
 	{
