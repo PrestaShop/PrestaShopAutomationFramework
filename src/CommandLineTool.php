@@ -14,5 +14,6 @@ class CommandLineTool extends Application
 		$this->add(new Command\Install());
 		$this->add(new Command\StartSelenium());
 		$this->add(new Command\StopSelenium());
+		$this->add(new Command\RunTest());
 	}
 }

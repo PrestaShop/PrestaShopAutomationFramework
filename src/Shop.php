@@ -139,4 +139,11 @@ class Shop
 		}
 		return false;
 	}
+
+	public static function getFromCWD()
+	{
+		$conf = ConfigurationFile::getFromCWD();
+		$shop = new Shop('.', $conf->get('shop'), SeleniumManager::getMyPort());
+		return $shop;
+	}
 }

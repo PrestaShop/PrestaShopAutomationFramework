@@ -1,7 +1,8 @@
 {
 	"require": {
 		"facebook/webdriver": "dev-master",
-		"symfony/console": "*"
+		"symfony/console": "*",
+		"phpunit/phpunit": "4.1.*"
 	},
 	"require-dev": {
         "phpdocumentor/phpdocumentor": "2.*"

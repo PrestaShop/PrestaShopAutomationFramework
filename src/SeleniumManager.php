@@ -64,6 +64,7 @@ class SeleniumManager
 
 	public static function startSelenium()
 	{
+		// TODO Windows
 		if (static::isSeleniumStarted() !== false)
 			return;
 
@@ -91,6 +92,7 @@ class SeleniumManager
 
 	public static function stopSelenium()
 	{
+		// TODO Windows
 		$pid = static::isSeleniumStarted();
 		if (false !== $pid)
 		{
