@@ -11,7 +11,7 @@ class Install extends Command
 {
 	protected function configure()
 	{
-		$this->setName('install')
+		$this->setName('shop:install')
 		->setDescription('Install PrestaShop');
 
 		$optionDescriptions = \PrestaShop\Action\OptionProvider::getDescriptions('ShopInstallation');
@@ -24,8 +24,10 @@ class Install extends Command
 
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
+		\PrestaShop\SeleniumManager::ensureSeleniumIsRunning();
+
 		$conf = \PrestaShop\ConfigurationFile::getFromCWD();
-		$shop = new \PrestaShop\Shop(getcwd(), $conf->get('shop'));
+		$shop = new \PrestaShop\Shop(getcwd(), $conf->get('shop'), \PrestaShop\SeleniumManager::getMyPort());
 
 		$shop->install(\PrestaShop\Action\OptionProvider::fromInput('ShopInstallation', $input));
 	}

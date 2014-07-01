@@ -71,9 +71,9 @@ class Shop
 	* Settings come from the "shop" property of the configuration file.
 	* Filesystem path is the root of the installation, e.g. /var/www/prestashop
 	*/
-	public function __construct($filesystem_path, $shop_settings)
+	public function __construct($filesystem_path, $shop_settings, $seleniumPort)
 	{
-		$this->browser = new Browser();
+		$this->browser = new Browser($seleniumPort);
 
 		$import = [
 			'mysql_host',
@@ -130,8 +130,11 @@ class Shop
 	{
 		$h = $this->getPDO();
 		if ($h) {
-			$sql = 'DROP DATABASE '.$this->mysql_database;
-			$h->exec($sql);
+			$sql = 'DROP DATABASE `'.$this->mysql_database.'`';
+			$res = $h->exec($sql);
+			if (!$res) {
+				throw new \Exception($h->errorInfo()[2]);
+			}
 			return true;
 		}
 		return false;

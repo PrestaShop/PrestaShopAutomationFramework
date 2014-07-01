@@ -6,9 +6,9 @@ class Browser
 {
 	private $driver;
 
-	public function __construct()
+	public function __construct($seleniumPort)
 	{
-		$host = 'http://localhost:4444/wd/hub';
+		$host = 'http://localhost:'.(int)$seleniumPort.'/wd/hub';
 
 		$this->driver = \RemoteWebDriver::create($host, \DesiredCapabilities::firefox());
 	}
