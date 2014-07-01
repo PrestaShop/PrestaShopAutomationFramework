@@ -9,6 +9,11 @@ class TestCase extends \PHPUnit_Framework_TestCase
 		SeleniumManager::ensureSeleniumIsRunning();
 	}
 
+	public static function tearDownAfterClass()
+	{
+		
+	}
+
 	public function setUp()
 	{
 		$this->shop = Shop::getFromCWD();
@@ -16,6 +21,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
 
 	public function tearDown()
 	{
+		$this->shop->getBrowser()->quit();
 	}
 
 	public function seed()

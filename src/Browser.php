@@ -13,7 +13,7 @@ class Browser
 		$this->driver = \RemoteWebDriver::create($host, \DesiredCapabilities::firefox());
 	}
 
-	public function __destruct()
+	public function quit()
 	{
 		$this->driver->quit();
 	}

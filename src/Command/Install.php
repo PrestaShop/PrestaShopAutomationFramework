@@ -30,5 +30,6 @@ class Install extends Command
 		$shop = new \PrestaShop\Shop(getcwd(), $conf->get('shop'), \PrestaShop\SeleniumManager::getMyPort());
 
 		$shop->install(\PrestaShop\Action\OptionProvider::fromInput('ShopInstallation', $input));
+		$shop->getBrowser()->quit();
 	}
 }

@@ -97,6 +97,11 @@ class Shop
 		$this->filesystem_path = $filesystem_path;
 	}
 
+	public function getBrowser()
+	{
+		return $this->browser;
+	}
+
 	/**
 	* Get the installer URL
 	*/
