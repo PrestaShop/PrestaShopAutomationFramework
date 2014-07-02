@@ -18,6 +18,9 @@ class BackOfficeNavigationTest extends \PrestaShop\TestCase\LazyTestCase
 		$this->assertArrayHasKey('AdminCustomers', $links);
 		$this->assertArrayHasKey('AdminOrders', $links);
 		$this->assertArrayHasKey('AdminModules', $links);
+		$this->assertArrayHasKey('AdminCartRules', $links);
+		$this->assertArrayHasKey('AdminPreferences', $links);
+		$this->assertArrayHasKey('AdminPPreferences', $links);
 
 		$this->shop->getBackOfficeNavigator()->visit('AdminProducts');
 	}
@@ -25,7 +28,7 @@ class BackOfficeNavigationTest extends \PrestaShop\TestCase\LazyTestCase
 	/**
 	* @expectedException PrestaShop\Exception\AdminControllerNotFoundException
 	*/
-	public function testNonExistingMenuLink()
+	public function testNonExistingMenuLinkIsNotFound()
 	{
 		$this->shop->getBackOfficeNavigator()->visit('ThisControllerIsVeryUnlikelyToExist');
 	}
