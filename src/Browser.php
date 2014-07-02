@@ -121,7 +121,7 @@ class Browser
 			}
 		}
 
-		throw new \PrestaShop\Exception\SelectValueNotFound();
+		throw new \PrestaShop\Exception\SelectValueNotFoundException();
 	}
 
 	/**

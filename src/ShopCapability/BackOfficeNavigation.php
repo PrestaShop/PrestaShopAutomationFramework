@@ -16,7 +16,16 @@ class BackOfficeNavigation extends ShopCapability
 		$maintabs = $browser->find('li.maintab', ['unique' => false]);
 		foreach ($maintabs as $maintab)
 		{
-			echo "hi\n";
+			$as = $maintab->findElements(\WebDriverBy::tagName('a'));
+			foreach ($as as $a)
+			{
+				$href = $a->getAttribute('href');
+				$m = [];
+				if (preg_match('/\?controller=(\w+)\b/', $href, $m))
+				{
+					$links[$m[1]] = $href;
+				}
+			}
 		}
 
 		return $links;
@@ -38,5 +47,22 @@ class BackOfficeNavigation extends ShopCapability
 		->checkbox('#stay_logged_in', $options['stay_logged_in'])
 		->click('button[name=submitLogin]')
 		->ensureElementShowsUpOnPage('#maintab-AdminDashboard', 5);
+	}
+
+	/**
+	* Visit a controller page
+	* e.g. AdminDashboard
+	* Preconditions: be on a back-office page
+	*/
+	public function visit($controller_name)
+	{
+		$links = $this->getMenuLinks();
+		$browser = $this->getShop()->getBrowser();
+		if (isset($links[$controller_name]))
+		{
+			$browser->visit($links[$controller_name]);
+		}
+		else
+			throw new \PrestaShop\Exception\AdminControllerNotFoundException();
 	}
 }
