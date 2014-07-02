@@ -2,9 +2,9 @@
 
 require_once __DIR__.'/../vendor/autoload.php';
 
-class InstallationTest extends \PrestaShop\TestCase
+class InstallationTest extends \PrestaShop\TestCase\TestCase
 {
-	public function seed()
+	public function languageAndCountryPairs()
 	{
 		return [
 			['fr', 'fr'],
@@ -12,7 +12,10 @@ class InstallationTest extends \PrestaShop\TestCase
 		];
 	}
 
-	public function execute($language, $country)
+	/**
+	* @dataProvider languageAndCountryPairs
+	*/
+	public function testInstallationForLanguageAndCountry($language, $country)
 	{
 		$this->shop->getInstaller()->install(['language' => $language, 'country' => $country]);
 	}

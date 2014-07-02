@@ -5,6 +5,7 @@ namespace PrestaShop;
 class Browser
 {
 	private $driver;
+	private $quitted = false;
 
 	public function __construct($seleniumPort)
 	{
@@ -13,8 +14,15 @@ class Browser
 		$this->driver = \RemoteWebDriver::create($host, \DesiredCapabilities::firefox());
 	}
 
+	public function __destruct()
+	{
+		if (!$this->quitted)
+			$this->quit();
+	}
+
 	public function quit()
 	{
+		$this->quitted = true;
 		$this->driver->quit();
 	}
 
@@ -46,6 +54,11 @@ class Browser
 		$method = $unique ? 'findElement' : 'findElements';
 		$e =  $this->driver->$method(\WebDriverBy::$tos($selector));
 		return $e;
+	}
+
+	public function ensureElementIsOnPage($selector)
+	{
+		$this->find($selector);
 	}
 
 	public function click($selector)
@@ -137,6 +150,19 @@ class Browser
 			}
 			return true;
 		});
+		return $this;
+	}
+
+	public function ensureElementShowsUpOnPage($selector, $timeout_in_second = null, $interval_in_millisecond = null)
+	{
+		$this->waitFor($selector, $timeout_in_second, $interval_in_millisecond);
+
+		return $this;
+	}
+
+	public function sleep($seconds)
+	{
+		sleep($seconds);
 		return $this;
 	}
 }

@@ -21,6 +21,11 @@ class OptionProvider
 				'admin_email' => ['description' => 'Email/Login of the main shop administrator account'],
 				'admin_password' => ['description' => 'Password of the main shop administrator account'],
 				'newsletter' => ['description' => 'Sign-up to the newsletter', 'type' => InputOption::VALUE_NONE],
+			],
+			'BackOfficeLogin' => [
+				'admin_email' => [],
+				'admin_password' => [],
+				'stay_logged_in' => ['description' => 'Stay logged in (Back-Office)', 'default' => true]
 			]
 		];
 
