@@ -12,16 +12,25 @@ use \PrestaShop\Shop;
 
 class LazyTestCase extends TestCase
 {
+	private static $shops = [];
+
 	public function setUp()
 	{
 		if (!$this->shop)
 		{
 			$this->shop = Shop::getFromCWD();
+			self::$shops[get_called_class()] = $this->shop;
 		}
 	}
 
 	public function tearDown()
 	{
 		// Do nothing
+	}
+
+	public static function tearDownAfterClass()
+	{
+		if (isset(self::$shops[get_called_class()]))
+			self::$shops[get_called_class()]->getBrowser()->quit();
 	}
 }
