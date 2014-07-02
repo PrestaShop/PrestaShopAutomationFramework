@@ -8,9 +8,18 @@ class BackOfficeNavigation extends ShopCapability
 	* Returns an array with controller names as key and URLs as values.
 	* Assumes the browser is on a Back-Office page
 	*/
-	public function getBackOfficeMenuLinks()
+	public function getMenuLinks()
 	{
+		$links = [];
 
+		$browser = $this->getShop()->getBrowser();
+		$maintabs = $browser->find('li.maintab', ['unique' => false]);
+		foreach ($maintabs as $maintab)
+		{
+			echo "hi\n";
+		}
+
+		return $links;
 	}
 
 	/**

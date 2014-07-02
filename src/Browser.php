@@ -47,7 +47,7 @@ class Browser
 	/**
 	* Find element(s)
 	*/
-	protected function find($selector, $options = [])
+	public function find($selector, $options = [])
 	{
 		$unique = !isset($options['unique']) || $options['unique'];
 		$tos = 'cssSelector';

@@ -8,4 +8,10 @@ class BackOfficeNavigationTest extends \PrestaShop\TestCase\LazyTestCase
 	{
 		$this->shop->getBackOfficeNavigator()->login();
 	}
+
+	public function testMenuLinks()
+	{
+		$links = $this->shop->getBackOfficeNavigator()->getMenuLinks();
+		print_r($links);
+	}
 }
