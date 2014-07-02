@@ -3,3 +3,5 @@ vendor
 output
 tmp.php
 tests-available/OD*
+selenium.log
+selenium.pid
