@@ -6,6 +6,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\Question;
 
 use PrestaShop\FSHelper;
 
@@ -21,12 +22,31 @@ class RunTest extends Command
 
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
-		// TODO: windows
+		// TODO: windows?
 		$test_name = $input->getArgument('test_name');
-		$class_path = realpath(__DIR__.'/../../tests-available/'.$test_name.'Test.php');
 
+		if (!$test_name)
+		{
+			$tests = [];
+			foreach (scandir(__DIR__.'/../../tests-available/') as $entry)
+			{
+				$m = [];
+				if (preg_match('/^(\w+?)Test\.php$/', $entry, $m))
+					$tests[] = $m[1];
+			}
+
+			$question = new Question('Which test do you want to run? ');
+			$question->setAutocompleterValues($tests);
+			$helper = $this->getHelperSet()->get('question');
+			$test_name = $helper->ask($input, $output, $question);
+		}
+
+		$class_path = realpath(__DIR__.'/../../tests-available/'.$test_name.'Test.php');
 		$phpunit_path = realpath(__DIR__.'/../../vendor/bin/phpunit');
 
-		pcntl_exec($phpunit_path, [$class_path]);
+		if ($class_path && $phpunit_path)
+			pcntl_exec($phpunit_path, [$class_path]);
+		else
+			$output->writeln('<error>Could not find either test case or phphunit itself.</error>');
 	}
 }
