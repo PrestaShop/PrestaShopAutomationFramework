@@ -1,6 +1,6 @@
 <?php
 
-namespace PrestaShop\Action;
+namespace PrestaShop\ShopCapability;
 
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;

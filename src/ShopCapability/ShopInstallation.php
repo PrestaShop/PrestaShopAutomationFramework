@@ -1,17 +1,17 @@
 <?php
 
-namespace PrestaShop\Action;
+namespace PrestaShop\ShopCapability;
 
-trait ShopInstallation
+class ShopInstallation extends ShopCapability
 {
 	public function install($options=[])
 	{
-		$options = \PrestaShop\Action\OptionProvider::addDefaults('ShopInstallation', $options);
+		$options = OptionProvider::addDefaults('ShopInstallation', $options);
 
-		$this->dropDatabaseIfExists();
+		$this->getShop()->getDatabaseManager()->dropDatabaseIfExists();
 
-		$this->browser
-		->visit($this->getInstallerURL())
+		$this->getShop()->getBrowser()
+		->visit($this->getShop()->getInstallerURL())
 		->select('#langList', $options['language'])
 		->click('#btNext')
 		->checkbox('#set_license', true)
@@ -27,11 +27,11 @@ trait ShopInstallation
 		->fillIn('#infosPasswordRepeat', $options['admin_password'])
 		->checkbox('#infosNotification', $options['newsletter'])
 		->click('#btNext')
-		->fillIn('#dbServer', $this->mysql_host.':'.$this->mysql_port)
-		->fillIn('#dbName', $this->mysql_database)
-		->fillIn('#dbLogin', $this->mysql_user)
-		->fillIn('#dbPassword', $this->mysql_pass)
-		->fillIn('#db_prefix', $this->database_prefix)
+		->fillIn('#dbServer', $this->getShop()->getMysqlHost().':'.$this->getShop()->getMysqlPort())
+		->fillIn('#dbName', $this->getShop()->getMysqlDatabase())
+		->fillIn('#dbLogin', $this->getShop()->getMysqlUser())
+		->fillIn('#dbPassword', $this->getShop()->getMysqlPass())
+		->fillIn('#db_prefix', $this->getShop()->getDatabasePrefix())
 		->click('#btTestDB')
 		->waitFor('#btCreateDB')
 		->click('#btCreateDB')

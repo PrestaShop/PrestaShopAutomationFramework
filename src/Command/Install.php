@@ -7,6 +7,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use PrestaShop\ShopCapability\OptionProvider;
+
 class Install extends Command
 {
 	protected function configure()
@@ -14,7 +16,7 @@ class Install extends Command
 		$this->setName('shop:install')
 		->setDescription('Install PrestaShop');
 
-		$optionDescriptions = \PrestaShop\Action\OptionProvider::getDescriptions('ShopInstallation');
+		$optionDescriptions = OptionProvider::getDescriptions('ShopInstallation');
 
 		foreach ($optionDescriptions as $name => $data)
 		{
@@ -29,7 +31,7 @@ class Install extends Command
 		$conf = \PrestaShop\ConfigurationFile::getFromCWD();
 		$shop = new \PrestaShop\Shop(getcwd(), $conf->get('shop'), \PrestaShop\SeleniumManager::getMyPort());
 
-		$shop->install(\PrestaShop\Action\OptionProvider::fromInput('ShopInstallation', $input));
+		$shop->getInstaller()->install(OptionProvider::fromInput('ShopInstallation', $input));
 		$shop->getBrowser()->quit();
 	}
 }

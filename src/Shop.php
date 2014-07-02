@@ -59,12 +59,14 @@ class Shop
 	*/
 	protected $prestashop_version;
 
-	/**
-	* Shop Capabilities
-	*/
-	use \PrestaShop\Action\ShopInstallation;
-
 	protected $browser;
+
+	/**
+	* Capabilities
+	*/
+	protected $installer;
+	protected $database_manager;
+	protected $back_office_navigator;
 
 	/**
 	* Create a new shop object.
@@ -97,6 +99,13 @@ class Shop
 		$this->filesystem_path = $filesystem_path;
 	}
 
+	public static function getFromCWD()
+	{
+		$conf = ConfigurationFile::getFromCWD();
+		$shop = new Shop('.', $conf->get('shop'), SeleniumManager::getMyPort());
+		return $shop;
+	}
+
 	public function getBrowser()
 	{
 		return $this->browser;
@@ -110,45 +119,62 @@ class Shop
 		return rtrim($this->front_office_url, '/').'/'.trim($this->install_folder_name, '/').'/';
 	}
 
-	public function getPDO()
-	{
-		static $pdo;
-
-		try {
-			if (!$pdo)
-				$pdo = new \PDO('mysql:host='.$this->mysql_host.';port='.$this->mysql_port.';dbname='.$this->mysql_database,
-					$this->mysql_user,
-					$this->mysql_pass
-				);
-		} catch (\Exception $e) {
-			$pdo = null;
-		}
-
-		return $pdo;
-	}
-
 	/**
-	* Drop the database if it exists
-	* @return true if the database existed, false otherwise
+	* Get the Back-Office URL
 	*/
-	public function dropDatabaseIfExists()
+	public function getBackOfficeURL()
 	{
-		$h = $this->getPDO();
-		if ($h) {
-			$sql = 'DROP DATABASE `'.$this->mysql_database.'`';
-			$res = $h->exec($sql);
-			if (!$res) {
-				throw new \Exception($h->errorInfo()[2]);
-			}
-			return true;
-		}
-		return false;
+		return rtrim($this->front_office_url, '/').'/'.trim($this->back_office_folder_name, '/').'/';
 	}
 
-	public static function getFromCWD()
+	public function getInstaller()
 	{
-		$conf = ConfigurationFile::getFromCWD();
-		$shop = new Shop('.', $conf->get('shop'), SeleniumManager::getMyPort());
-		return $shop;
+		if (!$this->installer)
+			$this->installer = new \PrestaShop\ShopCapability\ShopInstallation($this);
+		return $this->installer;
+	}
+
+	public function getDatabaseManager()
+	{
+		if (!$this->database_manager)
+			$this->database_manager = new \PrestaShop\ShopCapability\DatabaseManagement($this);
+		return $this->database_manager;
+	}
+
+	public function getBackOfficeNavigator()
+	{
+		if (!$this->back_office_navigator)
+			$this->back_office_navigator = new \PrestaShop\ShopCapability\BackOfficeNavigation($this);
+		return $this->back_office_navigator;
+	}
+
+	public function getMysqlHost()
+	{
+		return $this->mysql_host;
+	}
+
+	public function getMysqlPort()
+	{
+		return $this->mysql_port;
+	}
+
+	public function getMysqlUser()
+	{
+		return $this->mysql_user;
+	}
+
+	public function getMysqlPass()
+	{
+		return $this->mysql_pass;
+	}
+
+	public function getMysqlDatabase()
+	{
+		return $this->mysql_database;
+	}
+
+	public function getDatabasePrefix()
+	{
+		return $this->database_prefix;
 	}
 }

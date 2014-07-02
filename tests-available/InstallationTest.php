@@ -14,6 +14,6 @@ class InstallationTest extends \PrestaShop\TestCase
 
 	public function execute($language, $country)
 	{
-		$this->shop->install(['language' => $language, 'country' => $country]);
+		$this->shop->getInstaller()->install(['language' => $language, 'country' => $country]);
 	}
 }
