@@ -15,6 +15,12 @@ class TestCase extends \PHPUnit_Framework_TestCase
 		\PrestaShop\SeleniumManager::ensureSeleniumIsRunning();
 		if (!isset(self::$shops[get_called_class()]))
 			self::$shops[get_called_class()] = Shop::getFromCWD();
+		static::beforeAll();
+	}
+
+	public static function beforeAll()
+	{
+		
 	}
 
 	public static function tearDownAfterClass()

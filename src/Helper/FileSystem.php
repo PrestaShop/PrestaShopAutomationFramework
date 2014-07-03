@@ -1,8 +1,8 @@
 <?php
 
-namespace PrestaShop;
+namespace PrestaShop\Helper;
 
-class FSHelper
+class FileSystem
 {
 	public static function join()
 	{
@@ -19,6 +19,6 @@ class FSHelper
 
 	public static function exists()
 	{
-		return file_exists(call_user_func_array(__NAMESPACE__.'\FSHelper::join', func_get_args()));
+		return file_exists(call_user_func_array(__NAMESPACE__.'\FileSystem::join', func_get_args()));
 	}
 }

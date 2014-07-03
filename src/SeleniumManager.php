@@ -28,7 +28,7 @@ class SeleniumManager
 			{
 				if (preg_match('/selenium-server-standalone(?:-\d+(?:\.\d+)*)?\.jar$/', $entry))
 				{
-					$path = \PrestaShop\FSHelper::join($base, $entry);
+					$path = \PrestaShop\Helper\FileSystem::join($base, $entry);
 					break;
 				}
 			}

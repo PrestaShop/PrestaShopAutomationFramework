@@ -67,6 +67,7 @@ class Shop
 	protected $installer;
 	protected $database_manager;
 	protected $back_office_navigator;
+	protected $tax_manager;
 
 	/**
 	* Create a new shop object.
@@ -146,6 +147,13 @@ class Shop
 		if (!$this->back_office_navigator)
 			$this->back_office_navigator = new \PrestaShop\ShopCapability\BackOfficeNavigation($this);
 		return $this->back_office_navigator;
+	}
+
+	public function getTaxManager()
+	{
+		if (!$this->tax_manager)
+			$this->tax_manager = new \PrestaShop\ShopCapability\TaxManagement($this);
+		return $this->tax_manager;
 	}
 
 	public function getMysqlHost()

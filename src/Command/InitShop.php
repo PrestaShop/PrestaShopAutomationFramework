@@ -7,7 +7,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use PrestaShop\FSHelper;
+use PrestaShop\Helper\FileSystem as FSHelper;
 
 class InitShop extends Command
 {
@@ -71,7 +71,7 @@ class InitShop extends Command
 
 		foreach (scandir($folder) as $entry)
 		{
-			if ($entry[0] !== '.' && is_dir(\PrestaShop\FSHelper::join($folder, $entry)))
+			if ($entry[0] !== '.' && is_dir(FSHelper::join($folder, $entry)))
 			{
 				if (FSHelper::exists($folder, $entry, 'index_cli.php'))
 					$install_folder_name = $entry;

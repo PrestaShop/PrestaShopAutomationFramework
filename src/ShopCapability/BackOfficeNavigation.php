@@ -52,6 +52,7 @@ class BackOfficeNavigation extends ShopCapability
 	/**
 	* Visit a controller page
 	* e.g. AdminDashboard
+	*
 	* Preconditions: be on a back-office page
 	*/
 	public function visit($controller_name)
@@ -60,7 +61,7 @@ class BackOfficeNavigation extends ShopCapability
 		$browser = $this->getShop()->getBrowser();
 		if (isset($links[$controller_name]))
 		{
-			$browser->visit($links[$controller_name]);
+			return $browser->visit($links[$controller_name]);
 		}
 		else
 			throw new \PrestaShop\Exception\AdminControllerNotFoundException();

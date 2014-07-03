@@ -57,9 +57,14 @@ class Browser
 		return $this;
 	}
 
-	public function gatAttribute($selector, $attribute)
+	public function getAttribute($selector, $attribute)
 	{
 		return $this->find($selector)->getAttribute($attribute);
+	}
+
+	public function getValue($selector)
+	{
+		return $this->getAttribute($selector, 'value');
 	}
 
 	/**
@@ -173,6 +178,27 @@ class Browser
 	}
 
 	/**
+	* Check or uncheck a PrestaShop classical switch
+	*/
+	public function prestaShopSwitch($idWithoutHash, $yesno)
+	{
+		$idWithoutHash = $idWithoutHash . ($yesno ? '_on' : '_off');
+		$this->click('label[for='.$idWithoutHash.']');
+		return $this;
+	}
+
+	public function prestaShopSwitchValue($idWithoutHash)
+	{
+		return $this->find('#'.$idWithoutHash.'_on')->isSelected();
+	}
+
+	public function ensureStandardSuccessMessageDisplayed()
+	{
+		$this->find('div.alert.alert-success');
+		return $this;
+	}
+
+	/**
 	* Wait for element to appear
 	*/
 	public function waitFor($selector, $timeout_in_second = null, $interval_in_millisecond = null)
@@ -195,6 +221,23 @@ class Browser
 		$this->waitFor($selector, $timeout_in_second, $interval_in_millisecond);
 
 		return $this;
+	}
+
+	/**
+	* Return the current URL
+	*/
+	public function getCurrentURL()
+	{
+		return $this->driver->getCurrentURL();
+	}
+
+	/**
+	* Return a parameter from the current URL
+	*/
+	public function getURLParameter($param)
+	{
+		$url = $this->getCurrentURL();
+		return \PrestaShop\Helper\URL::getParameter($url, $param);
 	}
 
 	public function refresh()
