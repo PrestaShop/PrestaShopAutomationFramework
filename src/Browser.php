@@ -11,7 +11,17 @@ class Browser
 	{
 		$host = 'http://localhost:'.(int)$seleniumPort.'/wd/hub';
 
-		$this->driver = \RemoteWebDriver::create($host, \DesiredCapabilities::firefox());
+		/*
+		$profile = new \FirefoxProfile();
+		$profile->setPreference('network.http.phishy-userpass-length', 255);
+		$profile->setPreference('network.automatic-ntlm-auth.trusted-uris', 'http://v3.prestashop.com,https://v3.prestashop.com');
+		echo $profile->encode();
+		'firefox_profile' => $profile->encode()
+		*/
+
+		$this->driver = \RemoteWebDriver::create($host, [
+			'browserName' => 'firefox'
+		]);
 	}
 
 	public function __destruct()
@@ -32,16 +42,24 @@ class Browser
 	public function waitForUserInput()
     {
 		echo "\n\n<<-- [[PAUSED]] hit RETURN to keep going -->>\n\n";
-        if(trim(fgets(fopen("php://stdin","r"))) != chr(13)) return;
+        if(trim(fgets(fopen("php://stdin","r"))) != chr(13)) return $this;
+		return $this;
     }
 
 	/**
 	* Visit a URL
 	*/
-	public function visit($url)
+	public function visit($url, $basic_auth = null)
 	{
+		if ($basic_auth)
+			$url = preg_replace('/^(\w+:\/\/)/', '\1'.$basic_auth['user'].':'.$basic_auth['pass'].'@', $url);
 		$this->driver->get($url);
 		return $this;
+	}
+
+	public function gatAttribute($selector, $attribute)
+	{
+		return $this->find($selector)->getAttribute($attribute);
 	}
 
 	/**
@@ -56,9 +74,28 @@ class Browser
 		return $e;
 	}
 
-	public function ensureElementIsOnPage($selector)
+	public function all($selector)
 	{
-		$this->find($selector);
+		return $this->find($selector, ['unique' => false]);
+	}
+
+	public function count($selector)
+	{
+		return count($this->find($selector, ['unique' => false]));
+	}
+
+	public function ensureElementIsOnPage($selector, $exception=null)
+	{
+		try {
+			$this->find($selector);
+		} catch (\Exception $e) {
+			if ($exception)
+				throw $exception;
+			else
+				throw $e;
+		}
+
+		return $this;
 	}
 
 	public function click($selector)
@@ -157,6 +194,12 @@ class Browser
 	{
 		$this->waitFor($selector, $timeout_in_second, $interval_in_millisecond);
 
+		return $this;
+	}
+
+	public function refresh()
+	{
+		$this->driver->navigate()->refresh();
 		return $this;
 	}
 
