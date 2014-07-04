@@ -49,4 +49,22 @@ class TaxManagement extends ShopCapability
 
 		return (int)$id_tax;
 	}
+
+	/**
+	* Create a Tax Rule Group
+	*
+	* $taxRules is an array describing the Tax Rules composing the group
+	* each element has the following structure:
+	* [
+	*	'id_tax' => some_positive_integer - anything else treated as no tax,
+	*	'country' => null or array of integer country_id's,
+	*	'behaviour' => '!' (this tax only) or '+' (combine) or '*' (one after another),
+	*	'description' => 'Description of the tax rule'
+	* ]
+	*
+	*/
+	public function createTaxRuleGroup($name, array $taxRules, $enabled = true)
+	{
+
+	}
 }

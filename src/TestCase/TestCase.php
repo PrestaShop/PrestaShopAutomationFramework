@@ -4,23 +4,20 @@ namespace PrestaShop\TestCase;
 
 use \PrestaShop\Shop;
 
-class TestCase extends \PHPUnit_Framework_TestCase
+abstract class TestCase extends \PHPUnit_Framework_TestCase
 {
 	private static $shops = [];
 
 	protected $shop;
 
-	public static function setupBeforeClass()
+	public static function setUpBeforeClass()
 	{
-		\PrestaShop\SeleniumManager::ensureSeleniumIsRunning();
-		if (!isset(self::$shops[get_called_class()]))
-			self::$shops[get_called_class()] = Shop::getFromCWD();
 		static::beforeAll();
 	}
 
 	public static function beforeAll()
 	{
-		
+
 	}
 
 	public static function tearDownAfterClass()
@@ -32,12 +29,14 @@ class TestCase extends \PHPUnit_Framework_TestCase
 
 	public static function getShop()
 	{
+		\PrestaShop\SeleniumManager::ensureSeleniumIsRunning();
+		if (!isset(self::$shops[get_called_class()]))
+			self::$shops[get_called_class()] = Shop::getFromCWD();
 		return self::$shops[get_called_class()];
 	}
 
 	public function setUp()
 	{
-		$this->shop = self::getShop();
 		// TODO: Save state of shop
 	}
 

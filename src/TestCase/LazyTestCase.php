@@ -12,12 +12,6 @@ use \PrestaShop\Shop;
 
 class LazyTestCase extends TestCase
 {
-
-	public function __construct()
-	{
-		parent::__construct();
-	}
-
 	public function setUp()
 	{
 		$this->shop = self::getShop();
