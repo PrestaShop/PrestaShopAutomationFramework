@@ -42,10 +42,11 @@ class RunTest extends Command
 		}
 
 		$class_path = realpath(__DIR__.'/../../tests-available/'.$test_name.'Test.php');
+		$phpunit_xml_path = realpath(__DIR__.'/../../tests-available/phpunit.xml');
 		$phpunit_path = realpath(__DIR__.'/../../vendor/bin/phpunit');
 
-		if ($class_path && $phpunit_path)
-			pcntl_exec($phpunit_path, [$class_path]);
+		if ($class_path && $phpunit_path && $phpunit_xml_path)
+			pcntl_exec($phpunit_path, ['-c', $phpunit_xml_path, $class_path]);
 		else
 			$output->writeln('<error>Could not find either test case or phphunit itself.</error>');
 	}

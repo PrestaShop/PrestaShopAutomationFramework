@@ -84,8 +84,6 @@ class TaxManagement extends ShopCapability
 
 		foreach ($taxRules as $taxRule)
 		{
-			print_r($taxRule);
-
 			$browser->click('#page-header-desc-tax_rule-new');
 
 			if (!empty($taxRule['country']))
@@ -101,7 +99,9 @@ class TaxManagement extends ShopCapability
 
 			$browser
 			->select('#behavior', $behavior)
-			->select('#id_tax', $taxRule['id_tax']);
+			->select('#id_tax', $taxRule['id_tax'])
+			->clickButtonNamed('create_ruleAndStay')
+			->ensureStandardSuccessMessageDisplayed();
 
 			$browser->waitForUserInput();
 		}

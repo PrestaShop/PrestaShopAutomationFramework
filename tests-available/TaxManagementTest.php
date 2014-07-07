@@ -4,15 +4,26 @@ class TaxManagementTest extends \PrestaShop\TestCase\TestCase
 {
 	public static function beforeAll()
 	{
+		static::getShop()->getBackOfficeNavigator()->login();
+	}
+
+	public function taxRules()
+	{
+		return [
+			['OldFrenchVat', 19.6, true]
+		];
+	}
+
+	/**
+	* @dataProvider taxRules
+	*/
+	public function testTaxRuleCreation($name, $rate, $enabled)
+	{
 		$shop = static::getShop();
-		$ds   = $shop->getDataStore();
-		$tm   = $shop->getTaxManager();
-
-		$shop->getBackOfficeNavigator()->login();
-
-		$ds->set("tax_rules.a", ['id_tax' => $tm->createTaxRule('Old French Vat', 19.6, true)]);
-		/*$ds->set("tax_rules.b", ['id_tax' => $tm->createTaxRule('Some Medium Tax Rate', 8.5, true)]);
-		$ds->set("tax_rules.c", ['id_tax' => $tm->createTaxRule('A Tiny Tax', 5, true)]);*/
+		$id_tax = $shop->getTaxManager()->createTaxRule($name, $rate, $enabled);
+		$shop
+		->getDataStore()
+		->set('tax_rules.OldFrenchVat', ['id_tax' => $id_tax, 'rate' => $rate]);
 	}
 
 	/*
@@ -31,32 +42,41 @@ class TaxManagementTest extends \PrestaShop\TestCase\TestCase
 		->createTaxRule('Old French Vat', '19.6', true);
 	}*/
 
-	public function taxRuleGroupData()
+	public function taxRuleGroups()
 	{
-		$shop = static::getShop();
-		$ds = $shop->getDataStore();
+		$groups = [];
 
-		print_r($ds->toArray());
-
-		$specs[] = [
+		$groups[] = [
 			'Same Single Rate For Everyone',
 			[[
-				'id_tax' => $ds->get('tax_rules.a.id_tax'),
+				'id_tax' => 'OldFrenchVat',
 				'country' => null,
 				'behavior' => '!'
 			]],
 			true
 		];
 
-		return $specs;
+		return $groups;
 	}
 
 	/**
-	* @dataProvider taxRuleGroupData
+	* @dataProvider taxRuleGroups
 	*/
 	public function testTaxRuleGroupCreation($name, array $taxRules, $enabled)
 	{
 		$shop = static::getShop();
+
+
+		// Retrieve the id_tax's of the tax rules created earlier
+		foreach ($taxRules as $n => $taxRule)
+		{
+			$tax_name = $taxRules[$n]['id_tax'];
+			$taxRules[$n]['id_tax'] = $shop->getDataStore()->get("tax_rules.$tax_name")['id_tax'];
+			// Sanity check, errors should have been caught earlier
+			$this->assertInternalType('int', $taxRules[$n]['id_tax']);
+			$this->assertGreaterThan(0, $taxRules[$n]['id_tax']);
+		}
+
 		$tm = $shop->getTaxManager();
 		$tm->createTaxRuleGroup($name, $taxRules, $enabled);
 	}

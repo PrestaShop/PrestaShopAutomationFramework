@@ -69,6 +69,7 @@ class Shop
 	protected $installer;
 	protected $database_manager;
 	protected $back_office_navigator;
+	protected $back_office_paginator;
 	protected $tax_manager;
 
 	/**
@@ -150,6 +151,13 @@ class Shop
 		if (!$this->back_office_navigator)
 			$this->back_office_navigator = new \PrestaShop\ShopCapability\BackOfficeNavigation($this);
 		return $this->back_office_navigator;
+	}
+
+	public function getBackOfficePaginator()
+	{
+		if (!$this->back_office_paginator)
+			$this->back_office_paginator = new \PrestaShop\ShopCapability\BackOfficePagination($this);
+		return $this->back_office_paginator;
 	}
 
 	public function getTaxManager()

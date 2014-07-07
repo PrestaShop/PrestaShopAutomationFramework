@@ -110,6 +110,12 @@ class Browser
 		return $this;
 	}
 
+	public function clickButtonNamed($name)
+	{
+		$this->click("button[name=$name]");
+		return $this;
+	}
+
 	public function clickLabelFor($for)
 	{
 		$element = $this->find("label[for=$for]");
