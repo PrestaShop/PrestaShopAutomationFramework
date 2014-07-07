@@ -61,6 +61,8 @@ class Shop
 
 	protected $browser;
 
+	protected $data_store;
+
 	/**
 	* Capabilities
 	*/
@@ -76,6 +78,7 @@ class Shop
 	*/
 	public function __construct($filesystem_path, $shop_settings, $seleniumPort)
 	{
+		$this->data_store = new Util\DataStore();
 		$this->browser = new Browser($seleniumPort);
 
 		$import = [
@@ -184,5 +187,10 @@ class Shop
 	public function getDatabasePrefix()
 	{
 		return $this->database_prefix;
+	}
+
+	public function getDataStore()
+	{
+		return $this->data_store;
 	}
 }

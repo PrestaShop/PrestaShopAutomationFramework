@@ -24,13 +24,13 @@ class TaxManagement extends ShopCapability
 		->fillIn($this->i18nFieldName('#name'), $name)
 		->fillIn('#rate', $rate)
 		->prestaShopSwitch('active', $enabled)
-		->click('#tax_form_submit_btn_1')
+		->click('button[name=submitAddtax]')
 		->ensureStandardSuccessMessageDisplayed();
 
 		$id_tax = $browser->getURLParameter('id_tax');
 
 		if ((int)$id_tax < 1)
-			throw new \PrestaShop\Exception\TaxRuleCreationIncorrectException();
+			throw new \PrestaShop\Exception\TaxRuleCreationIncorrectException("id_tax not a positive integer");
 
 		$check_url = \PrestaShop\Helper\URL::filterParameters(
 			$browser->getCurrentURL(),
@@ -45,7 +45,7 @@ class TaxManagement extends ShopCapability
 		$actual_enabled = $browser->prestaShopSwitchValue('active');
 
 		if ($actual_name !== $name || $actual_rate !== (float)$rate || $actual_enabled != $enabled)
-			throw new \PrestaShop\Exception\TaxRuleCreationIncorrectException();
+			throw new \PrestaShop\Exception\TaxRuleCreationIncorrectException("stored results differ from submitted data");
 
 		return (int)$id_tax;
 	}
@@ -53,18 +53,57 @@ class TaxManagement extends ShopCapability
 	/**
 	* Create a Tax Rule Group
 	*
-	* $taxRules is an array describing the Tax Rules composing the group
+	* $taxRules is an array of arrays describing the Tax Rules composing the group
 	* each element has the following structure:
 	* [
 	*	'id_tax' => some_positive_integer - anything else treated as no tax,
 	*	'country' => null or array of integer country_id's,
-	*	'behaviour' => '!' (this tax only) or '+' (combine) or '*' (one after another),
+	*	'behavior' => '!' (this tax only) or '+' (combine) or '*' (one after another),
 	*	'description' => 'Description of the tax rule'
 	* ]
 	*
 	*/
 	public function createTaxRuleGroup($name, array $taxRules, $enabled = true)
 	{
+		$shop = $this->getShop();
 
+		$browser = $shop->getBackOfficeNavigator()->visit('AdminTaxRulesGroup');
+
+		$browser
+		->click('#page-header-desc-tax_rules_group-new_tax_rules_group')
+		->fillIn('#name', $name)
+		->prestaShopSwitch('active', $enabled)
+		->click('button[name=submitAddtax_rules_groupAndStay]')
+		->ensureStandardSuccessMessageDisplayed();
+
+		$actual_name = $browser->getValue('#name');
+		$actual_enabled = $browser->prestaShopSwitchValue('active');
+
+		if ($actual_name !== $name || $actual_enabled !== $enabled)
+			throw new \PrestaShop\Exception\TaxRuleGroupCreationIncorrectException();
+
+		foreach ($taxRules as $taxRule)
+		{
+			print_r($taxRule);
+
+			$browser->click('#page-header-desc-tax_rule-new');
+
+			if (!empty($taxRule['country']))
+			{
+				$browser->select('#country', $taxRule['country']);
+			}
+
+			$behavior = 0;
+			if ($taxRule['behavior'] === '+')
+				$behavior = 1;
+			elseif ($taxRule['behavior'] === '*')
+				$behavior = 2;
+
+			$browser
+			->select('#behavior', $behavior)
+			->select('#id_tax', $taxRule['id_tax']);
+
+			$browser->waitForUserInput();
+		}
 	}
 }

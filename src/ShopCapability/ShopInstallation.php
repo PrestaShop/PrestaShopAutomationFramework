@@ -2,6 +2,8 @@
 
 namespace PrestaShop\ShopCapability;
 
+use PrestaShop\OptionProvider;
+
 class ShopInstallation extends ShopCapability
 {
 	public function install($options=[])

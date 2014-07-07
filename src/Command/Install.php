@@ -7,7 +7,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use PrestaShop\ShopCapability\OptionProvider;
+use PrestaShop\OptionProvider;
 
 class Install extends Command
 {

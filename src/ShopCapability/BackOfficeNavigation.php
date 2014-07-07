@@ -2,6 +2,8 @@
 
 namespace PrestaShop\ShopCapability;
 
+use PrestaShop\OptionProvider;
+
 class BackOfficeNavigation extends ShopCapability
 {
 	/**
