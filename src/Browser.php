@@ -135,12 +135,15 @@ class Browser
 	/**
 	* Select by value in a select.
 	*/
-	public function select($selector, $value)
+	public function select($selector, $value, &$name = null)
 	{
 		if (!$value)
 			return $this;
 
-		$select = new \WebDriverSelect($this->find($selector));
+		$select = $this->find($selector);
+		$name = $select->findElement(\WebDriverBy::cssSelector('option[value="'.$value.'"]'))->getText();
+
+		$select = new \WebDriverSelect($select);
 		$select->selectByValue($value);
 		return $this;
 	}

@@ -97,11 +97,20 @@ class TaxManagement extends ShopCapability
 			elseif ($taxRule['behavior'] === '*')
 				$behavior = 2;
 
+			$behavior_name = null;
+
 			$browser
-			->select('#behavior', $behavior)
+			->waitFor('#id_tax')
+			->select('#behavior', $behavior, $behavior_name)
 			->select('#id_tax', $taxRule['id_tax'])
 			->clickButtonNamed('create_ruleAndStay')
 			->ensureStandardSuccessMessageDisplayed();
+
+			$paginator = $shop->getBackOfficePaginator()->getPaginatorFor('AdminTaxRulesGroup');
+
+			echo "behavior: $behavior_name\n";
+
+			//print_r($paginator->scrapeAll());
 
 			$browser->waitForUserInput();
 		}
