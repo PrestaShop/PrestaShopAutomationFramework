@@ -135,17 +135,30 @@ class Browser
 	/**
 	* Select by value in a select.
 	*/
-	public function select($selector, $value, &$name = null)
+	public function select($selector, $value)
 	{
 		if (!$value)
 			return $this;
 
-		$select = $this->find($selector);
-		$name = $select->findElement(\WebDriverBy::cssSelector('option[value="'.$value.'"]'))->getText();
-
-		$select = new \WebDriverSelect($select);
+		$select = new \WebDriverSelect($this->find($selector));
 		$select->selectByValue($value);
 		return $this;
+	}
+
+	/**
+	* Get Select Options as associative array
+	*/
+	public function getSelectOptions($selector)
+	{
+		$options = [];
+		$elem = $this->find($selector);
+		$elem->click();
+		$select = new \WebDriverSelect($elem);
+		foreach ($select->getOptions() as $opt)
+		{
+			$options[$opt->getAttribute('value')] = $opt->getText();
+		}
+		return $options;
 	}
 
 	/**
@@ -258,6 +271,12 @@ class Browser
 	public function sleep($seconds)
 	{
 		sleep($seconds);
+		return $this;
+	}
+
+	public function clearCookies()
+	{
+		$this->driver->manage()->deleteAllCookies();
 		return $this;
 	}
 }

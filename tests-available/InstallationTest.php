@@ -35,6 +35,7 @@ class InstallationTest extends \PrestaShop\TestCase\TestCase
 	*/
 	public function testInstallationForLanguageAndCountry($language, $country)
 	{
-		$this->shop->getInstaller()->install(['language' => $language, 'country' => $country]);
+		static::getShop()->getInstaller()->install(['language' => $language, 'country' => $country]);
+		static::getShop()->getBackOfficeNavigator()->login();
 	}
 }
