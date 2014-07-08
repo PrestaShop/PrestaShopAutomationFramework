@@ -19,7 +19,7 @@ class InstallationTest extends \PrestaShop\TestCase\TestCase
 			['br', 'br'], ['br', 'sk'],
 			['ro', 'ro'], ['ro', 'it'],
 			['sr', 'rs'], ['sr', 'fr'],
-			['tr', 'tr'], ['tr', 'el'],
+			['tr', 'tr'], ['tr', 'gr'],
 			['cs', 'cz'], ['cs', 'gr'],
 			['ru', 'ru'], ['ru', 'nl'],
 			['mk', 'mk'], ['mk', 'de'],
