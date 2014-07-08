@@ -11,9 +11,19 @@ abstract class ShopCapability
 		$this->shop = $shop;
 	}
 
+	/**
+	* Called immediately after construction, do your initializations here.
+	*/
+	public function setup(){}
+
 	public function getShop()
 	{
 		return $this->shop;
+	}
+
+	public function getBrowser()
+	{
+		return $this->getShop()->getBrowser();
 	}
 
 	public function isAvailable()
@@ -41,9 +51,18 @@ abstract class ShopCapability
 		{
 			return (float)$value;
 		}
+		elseif ($type === 'percent')
+		{
+			return $this->i18nParse(trim(str_replace('%', '', $value)), 'float');
+		}
 		else
 		{
 			return $value;
 		}
+	}
+
+	public function shopVersionBefore($v)
+	{
+		return version_compare($this->getShop()->getPrestaShopVersion(), $v, '<');
 	}
 }

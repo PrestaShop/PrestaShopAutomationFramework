@@ -39,7 +39,6 @@ class ShopInstallation extends ShopCapability
 		->click('#btCreateDB')
 		->waitFor('#dbResultCheck.okBlock')
 		->click('#btNext')
-		->waitFor('a.BO', 600, 500)
-		->click('a.FO');
+		->waitFor('a.BO', 600, 500);
 	}
 }

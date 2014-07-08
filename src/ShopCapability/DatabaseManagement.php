@@ -33,10 +33,7 @@ class DatabaseManagement extends ShopCapability
 		if ($h) {
 			$sql = 'DROP DATABASE `'.$this->getShop()->getMysqlDatabase().'`';
 			$res = $h->exec($sql);
-			if (!$res) {
-				throw new \Exception($h->errorInfo()[2]);
-			}
-			return true;
+			return $res;
 		}
 		return false;
 	}

@@ -1,6 +1,6 @@
 <?php
 
-class TaxManagementTest extends \PrestaShop\TestCase\TestCase
+class TaxManagementTest extends \PrestaShop\TestCase\LazyTestCase
 {
 	public static function beforeAll()
 	{

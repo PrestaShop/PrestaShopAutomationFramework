@@ -50,8 +50,24 @@ class TaxManagement extends ShopCapability
 		return (int)$id_tax;
 	}
 
+	public function getTaxRateFromIdTax($id_tax)
+	{
+		$url = $this
+			->getShop()
+			->getBackOfficeNavigator()
+			->visit('AdminTaxes')
+			->getCurrentURL();
+
+		$url .= '&id_tax='.$id_tax.'&updatetax';
+
+		$rate = $this->getBrowser()->visit($url)->getValue('#rate');
+
+		return $this->i18nParse($rate, 'float');
+	}
+
 	/**
 	* Create a Tax Rule Group
+	* presupposes: logged in to the back office and on a back office page
 	*
 	* $taxRules is an array of arrays describing the Tax Rules composing the group
 	* each element has the following structure:
@@ -66,6 +82,8 @@ class TaxManagement extends ShopCapability
 	public function createTaxRuleGroup($name, array $taxRules, $enabled = true)
 	{
 		$shop = $this->getShop();
+
+		// $countries = $shop->getInformationRetriever()->getCountries();
 
 		$browser = $shop->getBackOfficeNavigator()->visit('AdminTaxRulesGroup');
 
@@ -82,13 +100,28 @@ class TaxManagement extends ShopCapability
 		if ($actual_name !== $name || $actual_enabled !== $enabled)
 			throw new \PrestaShop\Exception\TaxRuleGroupCreationIncorrectException();
 
+		$behavior_names = null;
+		$country_names = null;
+
+		$expected = [];
+
 		foreach ($taxRules as $taxRule)
 		{
-			$browser->click('#page-header-desc-tax_rule-new');
+			$tax_rate = $browser->doThenComeBack(function() use ($taxRule){
+				return $this->getTaxRateFromIdTax($taxRule['id_tax']);
+			});
 
-			if (!empty($taxRule['country']))
+			$browser->click('#page-header-desc-tax_rule-new');
+			$browser->waitFor('#id_tax');
+
+			if (!$behavior_names)
 			{
-				$browser->select('#country', $taxRule['country']);
+				$behavior_names = $browser->getSelectOptions('#behavior');
+			}
+
+			if (!$country_names)
+			{
+				$country_names = $browser->getSelectOptions('#country');
 			}
 
 			$behavior = 0;
@@ -97,22 +130,72 @@ class TaxManagement extends ShopCapability
 			elseif ($taxRule['behavior'] === '*')
 				$behavior = 2;
 
-			$behavior_name = null;
+			if (!empty($taxRule['country']) && (int)$taxRule['country'] > 0)
+			{
+				$browser->select('#country', $taxRule['country']);
+
+				$expected[] = [
+					'country' => $country_names[$taxRule['country']],
+					'behavior' => $behavior_names[$behavior],
+					'tax' => $tax_rate
+				];
+			}
+			else
+			{
+				foreach ($country_names as $value => $name)
+				{
+					if ($value > 0)
+					{
+						$expected[] = [
+							'country' => $name,
+							'behavior' => $behavior_names[$behavior],
+							'tax' => $tax_rate
+						];
+					}
+				}
+			}
 
 			$browser
-			->waitFor('#id_tax')
-			->select('#behavior', $behavior, $behavior_name)
+			->select('#behavior', $behavior)
 			->select('#id_tax', $taxRule['id_tax'])
 			->clickButtonNamed('create_ruleAndStay')
 			->ensureStandardSuccessMessageDisplayed();
+		}
 
-			$paginator = $shop->getBackOfficePaginator()->getPaginatorFor('AdminTaxRulesGroup');
+		$paginator = $shop->getBackOfficePaginator()->getPaginatorFor('AdminTaxRulesGroup');
 
-			echo "behavior: $behavior_name\n";
+		$actual = [];
 
-			//print_r($paginator->scrapeAll());
+		foreach ($paginator->scrapeAll() as $row)
+		{
+			$actual[] = [
+				'country' => $row['country'],
+				'behavior' => $row['behavior'],
+				'tax' => $row['tax']
+			];
+		}
 
-			$browser->waitForUserInput();
+		$makeComparableResult = function(array $list)
+		{
+			$out = [];
+			foreach ($list as $item)
+			{
+				if (!isset($out[$item['country']]))
+				{
+					$out[$item['country']] = '';
+				}
+				$out[$item['country']] .= '('.$item['behavior'].':'.$item['tax'].')';
+			}
+			ksort($out);
+			return $out;
+		};
+
+		$actual = $makeComparableResult($actual);
+		$expected = $makeComparableResult($expected);
+
+		if ($actual !== $expected)
+		{
+			throw new \PrestaShop\Exception\TaxRuleGroupCreationIncorrectException();
 		}
 	}
 }

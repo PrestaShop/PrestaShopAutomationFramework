@@ -36,6 +36,17 @@ class Browser
 		$this->driver->quit();
 	}
 
+	public function doThenComeBack(callable $callback)
+	{
+		$url = $this->getCurrentURL();
+
+		$res = $callback();
+
+		$this->visit($url);
+
+		return $res;
+	}
+
 	/**
 	* Wait for user input - useful when debugging
 	*/

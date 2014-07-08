@@ -70,6 +70,11 @@ class BackOfficePaginator
 		{
 			return $td->findElement(\WebDriverBy::cssSelector('.'.$m[1]))->isDisplayed();
 		}
+		elseif (preg_match('/^i18n:(.+)$/', $type, $m))
+		{
+			$value = $this->pagination->i18nParse($td->getText(), $m[1]);
+			return $value;
+		}
 		else
 		{
 			return null;

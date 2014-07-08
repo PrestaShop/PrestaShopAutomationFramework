@@ -65,12 +65,12 @@ class Shop
 
 	/**
 	* Capabilities
+	*
+	* Added with addShopCapability, see below.
+	*
 	*/
-	protected $installer;
-	protected $database_manager;
-	protected $back_office_navigator;
-	protected $back_office_paginator;
-	protected $tax_manager;
+	protected $capabilities = [];
+
 
 	/**
 	* Create a new shop object.
@@ -102,6 +102,42 @@ class Shop
 		}
 
 		$this->filesystem_path = $filesystem_path;
+
+		$this->addShopCapability('\PrestaShop\ShopCapability\InformationRetrieval', 'getInformationRetriever');
+		$this->addShopCapability('\PrestaShop\ShopCapability\ShopInstallation', 'getInstaller');
+		$this->addShopCapability('\PrestaShop\ShopCapability\DatabaseManagement', 'getDatabaseManager');
+		$this->addShopCapability('\PrestaShop\ShopCapability\BackOfficeNavigation', 'getBackOfficeNavigator');
+		$this->addShopCapability('\PrestaShop\ShopCapability\BackOfficePagination', 'getBackOfficePaginator');
+		$this->addShopCapability('\PrestaShop\ShopCapability\TaxManagement', 'getTaxManager');
+	}
+
+	/**
+	* Adds a ShopCapability to the shop. Capabilities are lazy loaded
+	* and behave as singletons for this shop instance.
+	*/
+	public function addShopCapability($classname, $getter)
+	{
+		$this->capabilities[$getter] = ['classname' => $classname, 'instance' => null];
+	}
+
+	public function __call($name, array $arguments)
+	{
+		if (isset($this->capabilities[$name]))
+		{
+			if ($this->capabilities[$name]['instance'] === null)
+			{
+				$cap = new $this->capabilities[$name]['classname']($this);
+				$cap->setup();
+				$this->capabilities[$name]['instance'] = $cap;
+			}
+			return $this->capabilities[$name]['instance'];
+		}
+
+		$class = get_called_class();
+		$trace = debug_backtrace();
+		$file = $trace[0]['file'];
+		$line = $trace[0]['line'];
+		trigger_error("Call to undefined method $class::$name() in $file on line $line", E_USER_ERROR);
 	}
 
 	public static function getFromCWD()
@@ -130,41 +166,6 @@ class Shop
 	public function getBackOfficeURL()
 	{
 		return rtrim($this->front_office_url, '/').'/'.trim($this->back_office_folder_name, '/').'/';
-	}
-
-	public function getInstaller()
-	{
-		if (!$this->installer)
-			$this->installer = new \PrestaShop\ShopCapability\ShopInstallation($this);
-		return $this->installer;
-	}
-
-	public function getDatabaseManager()
-	{
-		if (!$this->database_manager)
-			$this->database_manager = new \PrestaShop\ShopCapability\DatabaseManagement($this);
-		return $this->database_manager;
-	}
-
-	public function getBackOfficeNavigator()
-	{
-		if (!$this->back_office_navigator)
-			$this->back_office_navigator = new \PrestaShop\ShopCapability\BackOfficeNavigation($this);
-		return $this->back_office_navigator;
-	}
-
-	public function getBackOfficePaginator()
-	{
-		if (!$this->back_office_paginator)
-			$this->back_office_paginator = new \PrestaShop\ShopCapability\BackOfficePagination($this);
-		return $this->back_office_paginator;
-	}
-
-	public function getTaxManager()
-	{
-		if (!$this->tax_manager)
-			$this->tax_manager = new \PrestaShop\ShopCapability\TaxManagement($this);
-		return $this->tax_manager;
 	}
 
 	public function getMysqlHost()
@@ -200,5 +201,10 @@ class Shop
 	public function getDataStore()
 	{
 		return $this->data_store;
+	}
+
+	public function getPrestaShopVersion()
+	{
+		return $this->prestashop_version;
 	}
 }
