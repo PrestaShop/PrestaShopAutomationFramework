@@ -70,6 +70,7 @@ class Shop
 	*
 	*/
 	protected $capabilities = [];
+	protected $page_objects = [];
 
 
 	/**
@@ -138,6 +139,18 @@ class Shop
 		$file = $trace[0]['file'];
 		$line = $trace[0]['line'];
 		trigger_error("Call to undefined method $class::$name() in $file on line $line", E_USER_ERROR);
+	}
+
+	public function getPageObject($name)
+	{
+		if (!isset($this->page_objects[$name]))
+		{
+			$class = "\PrestaShop\PageObject\\$name";
+			$this->page_objects[$name] = new $class($this);
+			$this->page_objects[$name]->setup();
+		}
+
+		return $this->page_objects[$name];
 	}
 
 	public static function getFromCWD()

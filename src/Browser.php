@@ -184,15 +184,43 @@ class Browser
 		$chosen = $select->findElement(\WebDriverBy::xpath("./following-sibling::div[contains(concat(' ',normalize-space(@class),' '),' chosen-container ')]"));
 		$chosen->click();
 
-		$optionElements = $select->findElements(\WebDriverBy::tagName('option'));
+		$option_containers = [$select];
 
-		foreach ($optionElements as $n => $element)
+		$optgroups = $select->findElements(\WebDriverBy::tagName('optgroup'));
+		if (count($optgroups) > 0)
 		{
-			$v = $element->getAttribute('value');
-			if ($v == $value)
+			$option_containers = $optgroups;
+		}
+
+		$n = 0;
+
+		/**
+		* Here we loop over the options inside the original select, recording their positions ($n).
+		* When we find the option with the required value, we use the position to click the item in
+		* the jQuery chosen box, referencing it by its data-option-array-index attribute.
+		* There is a special treatment for optgroups, because optgroups are counted by jQuery Chosen
+		* as an option, hence increment the counter.
+		*/
+
+		foreach ($option_containers as $option_container)
+		{
+			if ($option_container->getTagName() === 'optgroup')
 			{
-				$chosen->findElement(\WebDriverBy::cssSelector('*[data-option-array-index="'.$n.'"]'))->click();
-				return $this;
+				$n += 1;
+			}
+
+			$optionElements = $option_container->findElements(\WebDriverBy::tagName('option'));
+
+			foreach ($optionElements as $element)
+			{
+				$v = $element->getAttribute('value');
+				if ($v == $value)
+				{
+					$chosen->findElement(\WebDriverBy::cssSelector('*[data-option-array-index="'.$n.'"]'))->click();
+					return $this;
+				}
+
+				$n += 1;
 			}
 		}
 
