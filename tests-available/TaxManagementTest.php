@@ -10,7 +10,8 @@ class TaxManagementTest extends \PrestaShop\TestCase\LazyTestCase
 	public function taxRules()
 	{
 		return [
-			['OldFrenchVat', 19.6, true]
+			['OldFrenchVat', 19.6, true],
+			['NewFrenchVat', 20, true]
 		];
 	}
 
@@ -23,7 +24,7 @@ class TaxManagementTest extends \PrestaShop\TestCase\LazyTestCase
 		$id_tax = $shop->getTaxManager()->createTaxRule($name, $rate, $enabled);
 		$shop
 		->getDataStore()
-		->set('tax_rules.OldFrenchVat', ['id_tax' => $id_tax, 'rate' => $rate]);
+		->set("tax_rules.$name", ['id_tax' => $id_tax, 'rate' => $rate]);
 	}
 
 	/*
@@ -48,11 +49,30 @@ class TaxManagementTest extends \PrestaShop\TestCase\LazyTestCase
 
 		$groups[] = [
 			'Same Single Rate For Everyone',
-			[[
-				'id_tax' => 'OldFrenchVat',
-				'country' => null,
-				'behavior' => '!'
-			]],
+			[
+				[
+					'id_tax' => 'OldFrenchVat',
+					'country' => null,
+					'behavior' => '!'
+				]
+			],
+			true
+		];
+
+		$groups[] = [
+			'Same Cumulative Rate For Everyone',
+			[
+				[
+					'id_tax' => 'OldFrenchVat',
+					'country' => null,
+					'behavior' => '+'
+				],
+				[
+					'id_tax' => 'NewFrenchVat',
+					'country' => null,
+					'behavior' => '+'
+				]
+			],
 			true
 		];
 

@@ -227,7 +227,29 @@ class Browser
 
 	public function ensureStandardSuccessMessageDisplayed()
 	{
-		$this->find('div.alert.alert-success');
+		try {
+			$element = $this->find('div.alert.alert-success');
+		} catch (\Exception $e)
+		{
+			throw new \PrestaShop\Exception\StandardSuccessMessageNotDisplayedException();
+		}
+
+		if (!$element->isDisplayed())
+			throw new \PrestaShop\Exception\StandardSuccessMessageNotDisplayedException();
+
+		return $this;
+	}
+
+	public function ensureStandardErrorMessageNotDisplayed()
+	{
+		try {
+			$this->find('div.alert.alert-error');
+			throw new \PrestaShop\Exception\StandardErrorMessageDisplayedException();
+		} catch (\Exception $e)
+		{
+			// That's expected :)
+		}
+		
 		return $this;
 	}
 
