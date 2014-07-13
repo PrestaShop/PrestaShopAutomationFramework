@@ -72,16 +72,18 @@ class Shop
 	protected $capabilities = [];
 	protected $page_objects = [];
 
+	private $selenium_settings;
+
 
 	/**
 	* Create a new shop object.
 	* Settings come from the "shop" property of the configuration file.
 	* Filesystem path is the root of the installation, e.g. /var/www/prestashop
 	*/
-	public function __construct($filesystem_path, $shop_settings, $seleniumPort)
+	public function __construct($shop_settings, $selenium_settings)
 	{
 		$this->data_store = new Util\DataStore();
-		$this->browser = new Browser($seleniumPort);
+		$this->selenium_settings = $selenium_settings;
 
 		$import = [
 			'mysql_host',
@@ -93,7 +95,8 @@ class Shop
 			'front_office_url',
 			'back_office_folder_name',
 			'install_folder_name',
-			'prestashop_version'
+			'prestashop_version',
+			'filesystem_path'
 		];
 
 		foreach ($import as $prop)
@@ -102,11 +105,10 @@ class Shop
 				$this->$prop = $shop_settings[$prop];
 		}
 
-		$this->filesystem_path = $filesystem_path;
-
 		$this->addShopCapability('\PrestaShop\ShopCapability\InformationRetrieval', 'getInformationRetriever');
 		$this->addShopCapability('\PrestaShop\ShopCapability\ShopInstallation', 'getInstaller');
 		$this->addShopCapability('\PrestaShop\ShopCapability\DatabaseManagement', 'getDatabaseManager');
+		$this->addShopCapability('\PrestaShop\ShopCapability\FileManagement', 'getFileManager');
 		$this->addShopCapability('\PrestaShop\ShopCapability\BackOfficeNavigation', 'getBackOfficeNavigator');
 		$this->addShopCapability('\PrestaShop\ShopCapability\BackOfficePagination', 'getBackOfficePaginator');
 		$this->addShopCapability('\PrestaShop\ShopCapability\TaxManagement', 'getTaxManager');
@@ -162,6 +164,11 @@ class Shop
 
 	public function getBrowser()
 	{
+		if (!$this->browser)
+		{
+			$this->browser = new Browser($this->selenium_settings);
+		}
+
 		return $this->browser;
 	}
 
@@ -214,6 +221,11 @@ class Shop
 	public function getDataStore()
 	{
 		return $this->data_store;
+	}
+
+	public function getFilesystemPath()
+	{
+		return $this->filesystem_path;
 	}
 
 	public function getPrestaShopVersion()

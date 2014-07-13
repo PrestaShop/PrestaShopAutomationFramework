@@ -7,9 +7,9 @@ class Browser
 	private $driver;
 	private $quitted = false;
 
-	public function __construct($seleniumPort)
+	public function __construct($seleniumSettings)
 	{
-		$host = 'http://localhost:'.(int)$seleniumPort.'/wd/hub';
+		//'http://localhost:'.(int)$seleniumPort.'/wd/hub';
 
 		/*
 		$profile = new \FirefoxProfile();
@@ -19,7 +19,7 @@ class Browser
 		'firefox_profile' => $profile->encode()
 		*/
 
-		$this->driver = \RemoteWebDriver::create($host, [
+		$this->driver = \RemoteWebDriver::create($seleniumSettings['host'], [
 			'browserName' => 'firefox'
 		]);
 	}

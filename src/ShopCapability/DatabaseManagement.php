@@ -37,4 +37,33 @@ class DatabaseManagement extends ShopCapability
 		}
 		return false;
 	}
+
+	public function buildMysqlCommand($command, array $arguments)
+	{
+		$command = $command
+		.' -u'.escapeshellcmd($this->getShop()->getMysqlUser())
+		.' -p'.escapeshellcmd($this->getShop()->getMysqlPass())
+		.' -h'.escapeshellcmd($this->getShop()->getMysqlHost())
+		.' -P'.escapeshellcmd($this->getShop()->getMysqlPort())
+		.implode('', array_map(function($arg){return ' '.escapeshellcmd($arg);}, $arguments))
+		.' 2>/dev/null'; // quickfix for warning about using password on command line
+
+		return $command;
+	}
+
+	public function duplicateDatabaseTo($new_database_name)
+	{
+		$old_database_name = $this->getShop()->getMysqlDatabase();
+
+		$commands = [
+			$this->buildMysqlCommand('mysqladmin', ['create', $new_database_name]),
+			$this->buildMysqlCommand('mysqldump', [$old_database_name])
+			.' | '.$this->buildMysqlCommand('mysql', [$new_database_name])
+		];	
+
+		foreach ($commands as $command)
+		{
+			exec($command);
+		}
+	}
 }

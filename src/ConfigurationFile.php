@@ -6,6 +6,7 @@ class ConfigurationFile implements Util\DataStoreInterface
 {
 	private $path;
 	private $options;
+	private static $instances = [];
 
 	public function __construct($path)
 	{
@@ -49,11 +50,17 @@ class ConfigurationFile implements Util\DataStoreInterface
 		return $this->options->toArray();
 	}
 
-	public static function getFromCWD()
+	public static function getInstance($from_specific_path = null)
 	{
-		static $instance = null;
-		if (!$instance)
-			$instance = new ConfigurationFile('pstaf.conf.json');
-		return $instance;
+		$path = $from_specific_path ? $from_specific_path : 'pstaf.conf.json';
+
+		if (!isset(static::$instances[$path]))
+		{
+			$conf = new ConfigurationFile($path);
+			$conf->set("shop.filesystem_path", dirname(realpath($path)));
+			static::$instances[$path] = $conf;
+		}
+
+		return static::$instances[$path];
 	}
 }

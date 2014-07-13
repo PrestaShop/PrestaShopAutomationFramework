@@ -2,16 +2,18 @@
 
 namespace PrestaShop\TestCase;
 
+use \PrestaShop\ShopManager;
 use \PrestaShop\Shop;
 
 abstract class TestCase extends \PHPUnit_Framework_TestCase
 {
 	private static $shops = [];
 
-	protected $shop;
-
 	public static function setUpBeforeClass()
 	{
+		\PrestaShop\SeleniumManager::ensureSeleniumIsRunning();
+		$class = get_called_class();
+		self::$shops[$class] = ShopManager::getShop();
 		static::beforeAll();
 	}
 
@@ -22,17 +24,14 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 
 	public static function tearDownAfterClass()
 	{
-		// Close the opened window
-		if (isset(self::$shops[get_called_class()]))
-			self::$shops[get_called_class()]->getBrowser()->quit();
+		$shop = static::getShop();
+		$shop->getBrowser()->quit();
 	}
 
 	public static function getShop()
 	{
-		\PrestaShop\SeleniumManager::ensureSeleniumIsRunning();
-		if (!isset(self::$shops[get_called_class()]))
-			self::$shops[get_called_class()] = Shop::getFromCWD();
-		return self::$shops[get_called_class()];
+		$class = get_called_class();
+		return self::$shops[$class];
 	}
 
 	public function setUp()
