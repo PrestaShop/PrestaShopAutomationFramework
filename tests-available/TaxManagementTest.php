@@ -59,6 +59,7 @@ class TaxManagementTest extends \PrestaShop\TestCase\LazyTestCase
 			true
 		];
 
+		/*
 		$groups[] = [
 			'Same Cumulative Rate For Everyone',
 			[
@@ -74,7 +75,7 @@ class TaxManagementTest extends \PrestaShop\TestCase\LazyTestCase
 				]
 			],
 			true
-		];
+		];*/
 
 		return $groups;
 	}

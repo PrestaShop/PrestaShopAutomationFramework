@@ -74,6 +74,7 @@ class Shop
 
 	private $selenium_settings;
 
+	private $temporary = false;
 
 	/**
 	* Create a new shop object.
@@ -188,6 +189,11 @@ class Shop
 		return rtrim($this->front_office_url, '/').'/'.trim($this->back_office_folder_name, '/').'/';
 	}
 
+	public function getFrontOfficeURL()
+	{
+		return $this->front_office_url;
+	}
+
 	public function getMysqlHost()
 	{
 		return $this->mysql_host;
@@ -231,5 +237,16 @@ class Shop
 	public function getPrestaShopVersion()
 	{
 		return $this->prestashop_version;
+	}
+
+	public function setTemporary($temporary = true)
+	{
+		$this->temporary = $temporary;
+		return $this;
+	}
+
+	public function isTemporary()
+	{
+		return $this->temporary;
 	}
 }

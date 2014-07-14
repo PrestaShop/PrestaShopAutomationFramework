@@ -66,4 +66,13 @@ class DatabaseManagement extends ShopCapability
 			exec($command);
 		}
 	}
+
+	public function changeShopUrlPhysicalURI($old_physical_uri, $new_physical_uri)
+	{
+		$h = $this->getPDO();
+		$sql = 'UPDATE %1$sshop_url SET physical_uri = :new WHERE physical_uri = :old';
+		$sql = sprintf($sql, $this->getShop()->getDatabasePrefix());
+		$stm = $h->prepare($sql);
+		$stm->execute(['new' => $new_physical_uri, 'old' => $old_physical_uri]);
+	}
 }

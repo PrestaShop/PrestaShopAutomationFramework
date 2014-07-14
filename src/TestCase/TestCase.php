@@ -8,12 +8,15 @@ use \PrestaShop\Shop;
 abstract class TestCase extends \PHPUnit_Framework_TestCase
 {
 	private static $shops = [];
+	private static $shop_managers = [];
 
 	public static function setUpBeforeClass()
 	{
 		\PrestaShop\SeleniumManager::ensureSeleniumIsRunning();
 		$class = get_called_class();
-		self::$shops[$class] = ShopManager::getShop();
+		$manager = ShopManager::getInstance();
+		self::$shops[$class] = $manager->getShop();
+		self::$shop_managers[$class] = $manager;
 		static::beforeAll();
 	}
 
@@ -24,14 +27,19 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 
 	public static function tearDownAfterClass()
 	{
-		$shop = static::getShop();
-		$shop->getBrowser()->quit();
+		static::getShopManager()->cleanUp(static::getShop());
 	}
 
 	public static function getShop()
 	{
 		$class = get_called_class();
 		return self::$shops[$class];
+	}
+
+	public static function getShopManager()
+	{
+		$class = get_called_class();
+		return self::$shop_managers[$class];
 	}
 
 	public function setUp()
