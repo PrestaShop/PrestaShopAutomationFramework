@@ -18,16 +18,18 @@ class RunTest extends Command
 		->setDescription('Runs a test');
 
 		$this->addArgument('test_name', InputArgument::OPTIONAL, 'Which test do you want to run?');
+		$this->addOption('parallel', 'p', InputOption::VALUE_OPTIONAL, 'Parallelize tests');
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
 		// TODO: windows?
 		$test_name = $input->getArgument('test_name');
+		$parallel = $input->getOption('parallel');
 
 		if (!$test_name)
 		{
-			$tests = [];
+			$tests = ['all'];
 			foreach (scandir(__DIR__.'/../../tests-available/') as $entry)
 			{
 				$m = [];
@@ -41,13 +43,41 @@ class RunTest extends Command
 			$test_name = $helper->ask($input, $output, $question);
 		}
 
-		$class_path = realpath(__DIR__.'/../../tests-available/'.$test_name.'Test.php');
+		if (!$test_name)
+			$test_name = 'all';
+
 		$phpunit_xml_path = realpath(__DIR__.'/../../tests-available/phpunit.xml');
 		$phpunit_path = realpath(__DIR__.'/../../vendor/bin/phpunit');
 
-		if ($class_path && $phpunit_path && $phpunit_xml_path)
-			pcntl_exec($phpunit_path, ['-c', $phpunit_xml_path, $class_path]);
+		if ($test_name !== 'all')
+		{
+			$class_path = realpath(__DIR__.'/../../tests-available/'.$test_name.'Test.php');
+
+			if ($class_path && $phpunit_path && $phpunit_xml_path)
+				pcntl_exec($phpunit_path, ['-c', $phpunit_xml_path, $class_path]);
+			else
+				$output->writeln('<error>Could not find either test case, phphunit or phpunit.xml.</error>');
+		}
+		elseif (!$parallel)
+		{
+			$tests_path = realpath(__DIR__.'/../../tests-available/');
+
+			if ($tests_path && $phpunit_path && $phpunit_xml_path)
+				pcntl_exec($phpunit_path, ['-c', $phpunit_xml_path, $tests_path]);
+			else
+				$output->writeln('<error>Could not find either test cases directory, phphunit or phpunit.xml.</error>');
+		}
 		else
-			$output->writeln('<error>Could not find either test case or phphunit itself.</error>');
+		{
+			$tests_path = realpath(__DIR__.'/../../tests-available/');
+			$paratest_path = realpath(__DIR__.'/../../vendor/bin/paratest');
+
+			if ($tests_path && $paratest_path && $phpunit_xml_path)
+				pcntl_exec($paratest_path, ['-c', $phpunit_xml_path, '-p', $parallel, $tests_path]);
+			else
+				$output->writeln('<error>Could not find either test cases directory, paratest or phpunit.xml.</error>');
+		}
+
+		
 	}
 }
