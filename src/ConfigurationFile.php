@@ -57,7 +57,8 @@ class ConfigurationFile implements Util\DataStoreInterface
 		if (!isset(static::$instances[$path]))
 		{
 			$conf = new ConfigurationFile($path);
-			$conf->set("shop.filesystem_path", dirname(realpath($path)));
+			if (!$conf->get("shop.filesystem_path"))
+				$conf->set("shop.filesystem_path", dirname(realpath($path)));
 			static::$instances[$path] = $conf;
 		}
 
