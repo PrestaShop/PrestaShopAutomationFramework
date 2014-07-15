@@ -41,8 +41,12 @@ class DatabaseManagement extends ShopCapability
 	public function buildMysqlCommand($command, array $arguments)
 	{
 		$command = $command
-		.' -u'.escapeshellcmd($this->getShop()->getMysqlUser())
-		.' -p'.escapeshellcmd($this->getShop()->getMysqlPass())
+		.' -u'.escapeshellcmd($this->getShop()->getMysqlUser());
+		
+		if ($this->getShop()->getMysqlPass())
+			$command .= ' -p'.escapeshellcmd($this->getShop()->getMysqlPass());
+
+		$command = $command
 		.' -h'.escapeshellcmd($this->getShop()->getMysqlHost())
 		.' -P'.escapeshellcmd($this->getShop()->getMysqlPort())
 		.implode('', array_map(function($arg){return ' '.escapeshellcmd($arg);}, $arguments))

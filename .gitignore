@@ -2,6 +2,6 @@
 vendor
 output
 tmp.php
-tests-available/OD*
+external-tests
 selenium.log
 selenium.pid

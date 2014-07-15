@@ -64,7 +64,7 @@ class ShopManager
 			{
 				$exp = '/(define\s*\(\s*([\'"])_DB_NAME_\2\s*,\s*([\'"]))(.*?)((\3)\s*\)\s*;)/';
 				$settings = file_get_contents($settings_inc);
-				$settings = preg_replace($exp, '\1'.$new_mysql_database.'\5', $settings);
+				$settings = preg_replace($exp, "\${1}".$new_mysql_database."\${5}", $settings);
 				file_put_contents($settings_inc, $settings);
 			}
 
