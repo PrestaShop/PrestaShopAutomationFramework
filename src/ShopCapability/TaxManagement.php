@@ -159,7 +159,7 @@ class TaxManagement extends ShopCapability
 			->select('#behavior', $behavior)
 			->select('#id_tax', $taxRule['id_tax'])
 			->clickButtonNamed('create_ruleAndStay')
-			->ensureStandardSuccessMessageDisplayed();
+			->ensureStandardSuccessMessageDisplayed('Could not add rule to TaxRuleGroup');
 		}
 
 		$paginator = $shop->getBackOfficePaginator()->getPaginatorFor('AdminTaxRulesGroup');

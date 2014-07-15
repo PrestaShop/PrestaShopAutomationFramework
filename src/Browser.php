@@ -253,26 +253,26 @@ class Browser
 		return $this->find('#'.$idWithoutHash.'_on')->isSelected();
 	}
 
-	public function ensureStandardSuccessMessageDisplayed()
+	public function ensureStandardSuccessMessageDisplayed($error_explanation = null)
 	{
 		try {
 			$element = $this->find('div.alert.alert-success');
 		} catch (\Exception $e)
 		{
-			throw new \PrestaShop\Exception\StandardSuccessMessageNotDisplayedException();
+			throw new \PrestaShop\Exception\StandardSuccessMessageNotDisplayedException($error_explanation);
 		}
 
 		if (!$element->isDisplayed())
-			throw new \PrestaShop\Exception\StandardSuccessMessageNotDisplayedException();
+			throw new \PrestaShop\Exception\StandardSuccessMessageNotDisplayedException($error_explanation);
 
 		return $this;
 	}
 
-	public function ensureStandardErrorMessageNotDisplayed()
+	public function ensureStandardErrorMessageNotDisplayed($error_explanation = null)
 	{
 		try {
 			$this->find('div.alert.alert-error');
-			throw new \PrestaShop\Exception\StandardErrorMessageDisplayedException();
+			throw new \PrestaShop\Exception\StandardErrorMessageDisplayedException($error_explanation);
 		} catch (\Exception $e)
 		{
 			// That's expected :)
