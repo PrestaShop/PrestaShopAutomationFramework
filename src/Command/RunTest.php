@@ -19,6 +19,7 @@ class RunTest extends Command
 
 		$this->addArgument('test_name', InputArgument::OPTIONAL, 'Which test do you want to run?');
 		$this->addOption('parallel', 'p', InputOption::VALUE_OPTIONAL, 'Parallelize tests');
+		$this->addOption('paratest', null, InputOption::VALUE_NONE, 'Use paratest for parallelization');
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output)
@@ -49,7 +50,7 @@ class RunTest extends Command
 		$phpunit_xml_path = realpath(__DIR__.'/../../tests-available/phpunit.xml');
 		$phpunit_path = realpath(__DIR__.'/../../vendor/bin/phpunit');
 
-		if ($test_name !== 'all')
+		if ($test_name !== 'all' && !$parallel)
 		{
 			$class_path = realpath(__DIR__.'/../../tests-available/'.$test_name.'Test.php');
 
@@ -67,7 +68,7 @@ class RunTest extends Command
 			else
 				$output->writeln('<error>Could not find either test cases directory, phphunit or phpunit.xml.</error>');
 		}
-		else
+		elseif ($input->getOption('paratest'))
 		{
 			$tests_path = realpath(__DIR__.'/../../tests-available/');
 			$paratest_path = realpath(__DIR__.'/../../vendor/bin/paratest');
@@ -77,7 +78,20 @@ class RunTest extends Command
 			else
 				$output->writeln('<error>Could not find either test cases directory, paratest or phpunit.xml.</error>');
 		}
+		else
+		{
+			$tests_path = realpath(__DIR__.'/../../tests-available/');
+			$ptest_path = realpath(__DIR__.'/../../vendor/bin/ptest');
 
-		
+			if ($test_name !== 'all')
+				$tests_path = realpath("$tests_path/{$test_name}Test.php");
+
+			$output->writeln(sprintf('Running tests using ptest with %d processes', $parallel));
+
+			if ($ptest_path && $tests_path)
+				pcntl_exec($ptest_path, ['run', $tests_path, '-p', $parallel]);
+			else
+				$output->writeln('<error>Could not find either test cases directory or the ptest runner.</error>');
+		}
 	}
 }

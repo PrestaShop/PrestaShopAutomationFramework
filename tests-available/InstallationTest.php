@@ -4,7 +4,7 @@ class InstallationTest extends \PrestaShop\TestCase\TestCase
 {
 	public function languageAndCountryPairs()
 	{
-		return [['fr', 'fr']];
+		return [['fr', 'fr'], ['ca', 'fr']];
 
 		return [
 			['ca', 'es'], ['ca', 'fr'],
@@ -34,6 +34,7 @@ class InstallationTest extends \PrestaShop\TestCase\TestCase
 
 	/**
 	* @dataProvider languageAndCountryPairs
+	* @parallelize 20
 	*/
 	public function testInstallationForLanguageAndCountry($language, $country)
 	{
