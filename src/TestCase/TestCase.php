@@ -5,7 +5,7 @@ namespace PrestaShop\TestCase;
 use \PrestaShop\ShopManager;
 use \PrestaShop\Shop;
 
-abstract class TestCase extends \PHPUnit_Framework_TestCase
+abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaShop\Ptest\TestClass\Basic
 {
 	private static $shops = [];
 	private static $shop_managers = [];

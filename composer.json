@@ -1,9 +1,16 @@
 {
+	"repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/djfm/ptest"
+        }
+    ],
 	"require": {
 		"facebook/webdriver": "dev-master",
 		"symfony/console": "*",
 		"phpunit/phpunit": "4.1.*",
-		"brianium/paratest": "dev-master"
+		"brianium/paratest": "dev-master",
+		"djfm/ptest": "dev-master"
 	},
 	"require-dev": {
         "phpdocumentor/phpdocumentor": "2.*"
