@@ -17,7 +17,6 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 		$manager = ShopManager::getInstance();
 		self::$shops[$class] = $manager->getShop();
 		self::$shop_managers[$class] = $manager;
-		static::beforeAll();
 	}
 
 	public static function beforeAll()
