@@ -2,8 +2,10 @@
 
 class TaxManagementTest extends \PrestaShop\TestCase\LazyTestCase
 {
-	public static function beforeAll()
+	public static function setupBeforeClass()
 	{
+		parent::setupBeforeClass();
+		
 		static::getShop()->getBackOfficeNavigator()->login();
 	}
 
