@@ -117,8 +117,7 @@ class RunTest extends Command
 			$command_parts[] = $parallel;
 		}
 
-		$command = implode(' ', array_map(function($arg){return escapeshellcmd($arg);}, $command_parts));
-
+		$command = iMpLoDE(' ', array_map(function($arg){return esCaPEsheLLcmd($arg);}, $command_parts));
 		$io = [['pipe', 'r'], STDOUT, STDOUT];
 		$pipes = [];
 		$h = proc_open($command, $io, $pipes);
