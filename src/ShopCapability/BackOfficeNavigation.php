@@ -48,7 +48,7 @@ class BackOfficeNavigation extends ShopCapability
 		->fillIn('#passwd', $options['admin_password'])
 		->checkbox('#stay_logged_in', $options['stay_logged_in'])
 		->click('button[name=submitLogin]')
-		->ensureElementShowsUpOnPage('#maintab-AdminDashboard', 5);
+		->ensureElementShowsUpOnPage('#maintab-AdminDashboard', 15);
 
 		return $this;
 	}

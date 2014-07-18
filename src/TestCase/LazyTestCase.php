@@ -14,7 +14,6 @@ class LazyTestCase extends TestCase
 {
 	public function setUp()
 	{
-		$this->shop = self::getShop();
 	}
 
 	public function tearDown()
