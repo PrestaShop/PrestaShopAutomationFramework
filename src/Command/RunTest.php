@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 
-use PrestaShop\Helper\FileSystem as FSHelper;
+use PrestaShop\Helper\FileSystem as FS;
 
 class RunTest extends Command
 {
@@ -18,80 +18,122 @@ class RunTest extends Command
 		->setDescription('Runs a test');
 
 		$this->addArgument('test_name', InputArgument::OPTIONAL, 'Which test do you want to run?');
-		$this->addOption('parallel', 'p', InputOption::VALUE_OPTIONAL, 'Parallelize tests');
-		$this->addOption('paratest', null, InputOption::VALUE_NONE, 'Use paratest for parallelization');
+		$this->addOption('parallel', 'p', InputOption::VALUE_OPTIONAL, 'Parallelize tests: max number of parallel processes.');
+		$this->addOption('runner', 'r', InputOption::VALUE_REQUIRED, 'Test runner to use: phpunit, paratest or ptest.', 'ptest');
+		$this->addOption('all', 'a', InputOption::VALUE_NONE, 'Run all available tests.');
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
-		// TODO: windows?
-		$test_name = $input->getArgument('test_name');
-		$parallel = $input->getOption('parallel');
+		$runners = ['phpunit', 'paratest', 'ptest'];
 
-		if (!$test_name)
+		$parallel = max(1, (int)$input->getOption('parallel'));
+
+		$runner = $input->getOption('runner');
+
+		if (!in_array($runner, $runners))
 		{
-			$tests = ['all'];
-			foreach (scandir(__DIR__.'/../../tests-available/') as $entry)
+			$output->writeln('<error>Unsupported runner! Available runners are: phpunit, paratest and ptsest.</error>');
+			return;
+		}
+
+		if ($parallel > 1 && $runner === 'phpunit')
+		{
+			$output->writeln('<error>The PHPUnit runner can\'t run tests in parallel.</error>');
+			return;
+		}
+
+		$runner_path = realpath(FS::join(__DIR__, '/../../vendor/bin/', $runner));
+
+		if (!$runner_path)
+		{
+			$output->writeln(sprintf('<error>Could not find runner executable (%s). Did you run composer install?</error>', $runner));
+			return;
+		}
+
+		if ($input->getArgument('test_name') && $input->getOption('all'))
+		{
+			$output->writeln(sprintf('<error>Cannot specify both a test name / folder and the "all" option.</error>'));
+			return;
+		}
+
+		$tests_directory = realpath(FS::join(__DIR__, '..', '..', 'tests-available'));
+		if (!$tests_directory)
+		{
+			$output->writeln('<error>Couldn\'t find directory containing tests.</error>');
+			return;
+		}
+
+		if ($input->getOption('all'))
+		{
+			$tests_path = $tests_directory;
+		}
+		elseif ($input->getArgument('test_name'))
+		{
+			$tests_path = realpath(FS::join($tests_directory, $input->getArgument('test_name').'Test.php'));
+		}
+		else
+		{
+			$rdi = new \RecursiveDirectoryIterator(
+				$tests_directory,
+				\RecursiveDirectoryIterator::SKIP_DOTS
+			);
+			$rii = new \RecursiveIteratorIterator($rdi);
+
+			$tests = [];
+
+			foreach ($rii as $path => $info)
 			{
-				$m = [];
-				if (preg_match('/^(\w+?)Test\.php$/', $entry, $m))
-					$tests[] = $m[1];
+				if (
+					$info->getExtension() === 'php' &&
+					preg_match('/Test$/', $info->getBaseName('.php'))
+				)
+				{
+					$tests[] = substr($path, strlen($tests_directory) + 1, - strlen('Test.php'));
+				}
 			}
 
 			$question = new Question('Which test do you want to run? ');
 			$question->setAutocompleterValues($tests);
 			$helper = $this->getHelperSet()->get('question');
-			$test_name = $helper->ask($input, $output, $question);
+			$tests_path = realpath(FS::join($tests_directory, $helper->ask($input, $output, $question).'Test.php'));
 		}
 
-		if (!$test_name)
-			$test_name = 'all';
-
-		$phpunit_xml_path = realpath(__DIR__.'/../../tests-available/phpunit.xml');
-		$phpunit_path = realpath(__DIR__.'/../../vendor/bin/phpunit');
-
-		if ($test_name !== 'all' && !$parallel)
+		if (!$tests_path)
 		{
-			$class_path = realpath(__DIR__.'/../../tests-available/'.$test_name.'Test.php');
-
-			if ($class_path && $phpunit_path && $phpunit_xml_path)
-				pcntl_exec($phpunit_path, ['-c', $phpunit_xml_path, $class_path]);
-			else
-				$output->writeln('<error>Could not find either test case, phphunit or phpunit.xml.</error>');
+			$output->writeln('<error>Could not find requested test.</error>');
 		}
-		elseif (!$parallel)
-		{
-			$tests_path = realpath(__DIR__.'/../../tests-available/');
 
-			if ($tests_path && $phpunit_path && $phpunit_xml_path)
-				pcntl_exec($phpunit_path, ['-c', $phpunit_xml_path, $tests_path]);
-			else
-				$output->writeln('<error>Could not find either test cases directory, phphunit or phpunit.xml.</error>');
+		$command_parts = [$runner_path];
+
+		if ($runner === 'ptest')
+			$command_parts[] = 'run';
+
+		$command_parts[] = $tests_path;
+
+		if ($runner === 'ptest' || $runner === 'paratest')
+		{
+			$command_parts[] = '-p';
+			$command_parts[] = $parallel;
 		}
-		elseif ($input->getOption('paratest'))
-		{
-			$tests_path = realpath(__DIR__.'/../../tests-available/');
-			$paratest_path = realpath(__DIR__.'/../../vendor/bin/paratest');
 
-			if ($tests_path && $paratest_path && $phpunit_xml_path)
-				pcntl_exec($paratest_path, ['-c', $phpunit_xml_path, '-p', $parallel, $tests_path]);
-			else
-				$output->writeln('<error>Could not find either test cases directory, paratest or phpunit.xml.</error>');
+		$command = implode(' ', array_map(function($arg){return escapeshellcmd($arg);}, $command_parts));
+
+		$io = [['pipe', 'r'], STDOUT, STDOUT];
+		$pipes = [];
+		$h = proc_open($command, $io, $pipes);
+
+		$status = proc_get_status($h);
+
+		if (extension_loaded('pcntl'))
+		{
+			$st = null;
+			pcntl_waitpid($status['pid'], $st);
 		}
 		else
 		{
-			$tests_path = realpath(__DIR__.'/../../tests-available/');
-			$ptest_path = realpath(__DIR__.'/../../vendor/bin/ptest');
-
-			if ($test_name !== 'all')
-				$tests_path = realpath("$tests_path/{$test_name}Test.php");
-
-			$output->writeln(sprintf('Running tests using ptest with %d processes', $parallel));
-
-			if ($ptest_path && $tests_path)
-				pcntl_exec($ptest_path, ['run', $tests_path, '-p', $parallel]);
-			else
-				$output->writeln('<error>Could not find either test cases directory or the ptest runner.</error>');
+			while (proc_get_status($h)['running'])
+				sleep(1);
 		}
 	}
 }
