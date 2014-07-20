@@ -43,6 +43,8 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 
 	public function setUp()
 	{
+		$this->shop = static::getShop();
+		
 		static::getShop()->getBrowser()->clearCookies();
 		// TODO: Save state of shop
 	}
