@@ -85,9 +85,12 @@ EOS;
 
 		$this->getBrowser()->visit($this->getShop()->getFrontOfficeURL().'/selfkill.php');
 
-		if (file_exists($this->getShop()->getFilesystemPath()))
-		{
-			throw new \Exception(sprintf('Selfkill failed: file `%s` should not exist anymore.', $this->getShop()->getFilesystemPath()));
-		}
+		$assert = new \PrestaShop\Helper\SpinAssert(
+			sprintf('Selfkill failed: file `%s` should not exist anymore.', $this->getShop()->getFilesystemPath())
+		);
+
+		$assert->becomesTrue(function() {
+			return !file_exists($this->getShop()->getFilesystemPath());
+		});
 	}
 }

@@ -4,7 +4,8 @@ class InstallationTest extends \PrestaShop\TestCase\TestCase
 {
 	public function languageAndCountryPairs()
 	{
-		//return [['fr', 'fr']];
+		// return [['fr', 'fr']];
+		// return [['no', 'no']];
 
 		return [
 			['ca', 'es'], ['ca', 'fr'],
