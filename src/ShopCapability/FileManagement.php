@@ -24,7 +24,8 @@ class FileManagement extends ShopCapability
 			'#^/?cache/cachefs/.#',
 			'#^/?cache/cachefs/.#',
 			'#^/?cache/sandbox/.#',
-			'#^/?cache/tcpdf/.#'
+			'#^/?cache/tcpdf/.#',
+			'#^/?\.git/#',
 		]);
 		
 		mkdir($dstDir);

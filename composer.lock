@@ -113,7 +113,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/djfm/ptest",
-                "reference": "9660e4c4fabf4e6663b5927c9a40326e2d680e09"
+                "reference": "6109c0be37c21c20a074528037df467f6058ae64"
             },
             "require": {
                 "symfony/console": "*"
@@ -127,7 +127,7 @@
                     "PrestaShop\\Ptest\\": "src/"
                 }
             },
-            "time": "2014-07-18 09:44:57"
+            "time": "2014-07-21 05:42:28"
         },
         {
             "name": "facebook/webdriver",
@@ -2889,7 +2889,7 @@
                     "role": "Lead Developer"
                 },
                 {
-                    "name": "Armin Ronacher2",
+                    "name": "Armin Ronacher",
                     "email": "armin.ronacher@active-4.com",
                     "role": "Project Founder"
                 },
