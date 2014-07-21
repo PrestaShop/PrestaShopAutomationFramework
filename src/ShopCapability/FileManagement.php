@@ -86,7 +86,7 @@ EOS;
 
 		if (file_exists($this->getShop()->getFilesystemPath()))
 		{
-			throw new \Exception('Selfkill failed.');
+			throw new \Exception(sprintf('Selfkill failed: file `%s` should not exist anymore.', $this->getShop()->getFilesystemPath()));
 		}
 	}
 }
