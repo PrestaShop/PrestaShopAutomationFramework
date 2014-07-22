@@ -22,6 +22,11 @@ class FileSystem
 		return $base;
 	}
 
+	public static function rtrimSeparator($path)
+	{
+		return rtrim($path, DIRECTORY_SEPARATOR);
+	}
+
 	public static function exists()
 	{
 		return file_exists(call_user_func_array(__NAMESPACE__.'\FileSystem::join', func_get_args()));
