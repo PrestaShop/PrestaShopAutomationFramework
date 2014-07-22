@@ -17,6 +17,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 		$manager = ShopManager::getInstance();
 		self::$shops[$class] = $manager->getShop();
 		self::$shop_managers[$class] = $manager;
+		register_shutdown_function([$class, 'tearDownAfterClass']);
 	}
 
 	public static function beforeAll()
@@ -26,7 +27,12 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 
 	public static function tearDownAfterClass()
 	{
-		static::getShopManager()->cleanUp(static::getShop());
+		$class = get_called_class();
+		if (isset(self::$shops[$class]))
+		{
+			static::getShopManager()->cleanUp(static::getShop());
+			unset(self::$shops[$class]);
+		}
 	}
 
 	public static function getShop()
