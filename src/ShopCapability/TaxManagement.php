@@ -89,6 +89,7 @@ class TaxManagement extends ShopCapability
 
 		$browser
 		->click('#page-header-desc-tax_rules_group-new_tax_rules_group')
+		->waitFor('#name')
 		->fillIn('#name', $name)
 		->prestaShopSwitch('active', $enabled)
 		->click('button[name=submitAddtax_rules_groupAndStay]')
