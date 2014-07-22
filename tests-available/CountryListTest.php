@@ -2,7 +2,7 @@
 
 namespace PrestaShop\FunctionalTest;
 
-class CountryListTest extends PrestaShop\TestCase\LazyTestCase
+class CountryListTest extends \PrestaShop\TestCase\LazyTestCase
 {
 	public function testRetrievalOfCountryList()
 	{
