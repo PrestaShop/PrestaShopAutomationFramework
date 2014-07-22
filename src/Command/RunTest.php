@@ -22,6 +22,7 @@ class RunTest extends Command
 		$this->addOption('runner', 'r', InputOption::VALUE_REQUIRED, 'Test runner to use: phpunit, paratest or ptest.', 'ptest');
 		$this->addOption('all', 'a', InputOption::VALUE_NONE, 'Run all available tests.');
 		$this->addOption('info', 'i', InputOption::VALUE_NONE, 'Make a dry run: display information but do not perform tests.');
+		$this->addOption('filter', 'f', InputOption::VALUE_REQUIRED, 'Filter tests');
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output)
@@ -126,6 +127,13 @@ class RunTest extends Command
 		{
 			$command_parts[] = '-p';
 			$command_parts[] = $parallel;
+		}
+
+		$filter = $input->getOption('filter');
+		if ($filter)
+		{
+			$command_parts[] = '--filter';
+			$command_parts[] = $filter;
 		}
 
 		$command = iMpLoDE(' ', array_map(function($arg){return esCaPEsheLLcmd($arg);}, $command_parts));
