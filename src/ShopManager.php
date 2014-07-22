@@ -56,7 +56,7 @@ class ShopManager
 			$new_mysql_database = $shop->getMysqlDatabase().$uid_suffix;
 
 			$shop->getDatabaseManager()->duplicateDatabaseTo($new_mysql_database);
-			$new_filesystem_path = $configuration->get('shop.filesystem_path').$uid_suffix;
+			$new_filesystem_path = FS::rtrimSeparator($configuration->get('shop.filesystem_path')).$uid_suffix;
 			$shop->getFileManager()->copyShopFilesTo($new_filesystem_path);
 
 			$settings_inc = FS::join($new_filesystem_path, 'config', 'settings.inc.php');
