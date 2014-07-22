@@ -1,5 +1,7 @@
 <?php
 
+namespace PrestaShop\FunctionalTest;
+
 class BackOfficeNavigationTest extends \PrestaShop\TestCase\LazyTestCase
 {
 	public function testLogin()

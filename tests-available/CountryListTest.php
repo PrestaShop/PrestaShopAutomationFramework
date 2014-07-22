@@ -1,5 +1,7 @@
 <?php
 
+namespace PrestaShop\FunctionalTest;
+
 class CountryListTest extends PrestaShop\TestCase\LazyTestCase
 {
 	public function testRetrievalOfCountryList()

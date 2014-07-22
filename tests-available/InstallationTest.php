@@ -1,5 +1,7 @@
 <?php
 
+namespace PrestaShop\FunctionalTest;
+
 class InstallationTest extends \PrestaShop\TestCase\TestCase
 {
 	public function languageAndCountryPairs()

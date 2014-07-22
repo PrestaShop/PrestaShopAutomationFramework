@@ -1,5 +1,7 @@
 <?php
 
+namespace PrestaShop\FunctionalTest;
+
 class TaxManagementTest extends \PrestaShop\TestCase\LazyTestCase
 {
 	public static function setupBeforeClass()
