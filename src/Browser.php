@@ -172,10 +172,31 @@ class Browser
 		return $options;
 	}
 
+
 	/**
 	* Select by value in a JQuery chosen select.
 	*/
 	public function jqcSelect($selector, $value)
+	{
+		/**
+		* Spin this test, because since JQuery is involved, the DOM is likely not to be ready.
+		*/
+		$spinner = new \PrestaShop\Helper\Spinner(null, 5, 1000);
+
+		$spinner->assertBecomesTrue(function() use ($selector, $value) {
+			$this->_jqcSelect($selector, $value);
+			return true;
+		});
+
+		return $this;
+	}
+
+	/**
+	* Select by value in a JQuery chosen select,
+	* this function is called by jqcSelect and wrapped into a Spin assertion
+	* because it is very likely to fail on first attempt.
+	*/
+	private function _jqcSelect($selector, $value)
 	{
 		if (!$value)
 			return $this;

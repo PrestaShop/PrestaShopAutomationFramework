@@ -85,11 +85,11 @@ EOS;
 
 		$this->getBrowser()->visit($this->getShop()->getFrontOfficeURL().'/selfkill.php');
 
-		$assert = new \PrestaShop\Helper\SpinAssert(
+		$spinner = new \PrestaShop\Helper\Spinner(
 			sprintf('Selfkill failed: file `%s` should not exist anymore.', $this->getShop()->getFilesystemPath())
 		);
 
-		$assert->becomesTrue(function() {
+		$spinner->assertBecomesTrue(function() {
 			return !file_exists($this->getShop()->getFilesystemPath());
 		});
 	}

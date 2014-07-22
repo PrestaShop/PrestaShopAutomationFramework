@@ -12,7 +12,9 @@ class ShopInstallation extends ShopCapability
 
 		$this->getShop()->getDatabaseManager()->dropDatabaseIfExists();
 
-		$this->getShop()->getBrowser()
+		$browser = $this->getShop()->getBrowser();
+
+		$browser
 		->visit($this->getShop()->getInstallerURL())
 		->select('#langList', $options['language'])
 		->click('#btNext')
