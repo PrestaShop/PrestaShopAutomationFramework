@@ -34,6 +34,8 @@ class Spinner
 				$exception = $e;
 			}
 
+			if ($ok)
+				return;
 
 			usleep($this->interval_in_milliseconds * 1000);
 			$elapsed += $this->interval_in_milliseconds / 1000;
