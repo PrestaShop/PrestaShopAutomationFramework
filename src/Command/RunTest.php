@@ -21,6 +21,7 @@ class RunTest extends Command
 		$this->addOption('parallel', 'p', InputOption::VALUE_OPTIONAL, 'Parallelize tests: max number of parallel processes.');
 		$this->addOption('runner', 'r', InputOption::VALUE_REQUIRED, 'Test runner to use: phpunit, paratest or ptest.', 'ptest');
 		$this->addOption('all', 'a', InputOption::VALUE_NONE, 'Run all available tests.');
+		$this->addOption('info', 'i', InputOption::VALUE_NONE, 'Make a dry run: display information but do not perform tests.');
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output)
@@ -40,6 +41,13 @@ class RunTest extends Command
 		if ($parallel > 1 && $runner === 'phpunit')
 		{
 			$output->writeln('<error>The PHPUnit runner can\'t run tests in parallel.</error>');
+			return;
+		}
+
+		$info = $input->getOption('info');
+		if ($info && $runner !== 'ptest')
+		{
+			$output->writeln('<error>The info option is only supported by the ptest runner.</error>');
 			return;
 		}
 
@@ -108,6 +116,9 @@ class RunTest extends Command
 
 		if ($runner === 'ptest')
 			$command_parts[] = 'run';
+
+		if ($info)
+			$command_parts[] = '-i';
 
 		$command_parts[] = $tests_path;
 
