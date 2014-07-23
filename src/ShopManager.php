@@ -75,8 +75,6 @@ class ShopManager
 			}
 		}
 
-		$old_folder = basename($configuration->get('shop.front_office_url'));
-
 		$new_front_office_url = preg_replace(
 			'#/([^/]+)(?:/)?$#',
 			'/'.$target_folder_name.'/',
@@ -171,7 +169,7 @@ class ShopManager
 		return $shop;
 	}
 
-	public function getShop(array $initial_state = null)
+	public function getShop(array $initial_state = null, $copy = true)
 	{
 		$tmp = is_array($initial_state) ? $initial_state : [];
 		$this->rksort($tmp);
@@ -179,9 +177,7 @@ class ShopManager
 		
 		$options = ['suffix' => ''];
 
-		$parallel = getenv('TEST_TOKEN') !== false;
-
-		if ($parallel)
+		if ($copy)
 		{
 			$options['suffix'] = '_tmpshpcpy_'.$this->getUID();
 		}
@@ -195,7 +191,7 @@ class ShopManager
 			$shop = $this->_getShop($options);
 		}
 
-		if ($parallel)
+		if ($copy)
 		{
 			$shop->setTemporary(true);
 		}

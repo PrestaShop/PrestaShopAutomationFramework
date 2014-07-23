@@ -22,8 +22,7 @@ class ShopAddOrUpdateLanguage extends Command
 	{
 		\PrestaShop\SeleniumManager::ensureSeleniumIsRunning();
 
-		$conf = \PrestaShop\ConfigurationFile::getFromCWD();
-		$shop = new \PrestaShop\Shop(getcwd(), $conf->get('shop'), \PrestaShop\SeleniumManager::getMyPort());
+		$shop = \PrestaShop\ShopManager::getInstance()->getShop(null, false);
 
 		$lc = $input->getArgument('TwoLettersLanguageCode');
 

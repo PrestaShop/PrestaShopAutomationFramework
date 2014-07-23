@@ -13,7 +13,7 @@ class ProjectInit extends Command
 {
 	protected function configure()
 	{
-		$this->setName('init:project')
+		$this->setName('project:init')
 		->setDescription('Setup a pstaf project in the current directory.')
 		->addQuoption('mysql_host', null, InputOption::VALUE_REQUIRED, 'Mysql server address', 'localhost')
 		->addQuoption('mysql_port', null, InputOption::VALUE_REQUIRED, 'Mysql server port', '3306')

@@ -28,7 +28,7 @@ class Install extends Command
 	{
 		\PrestaShop\SeleniumManager::ensureSeleniumIsRunning();
 
-		$shop = \PrestaShop\ShopManager::getInstance()->getShop();
+		$shop = \PrestaShop\ShopManager::getInstance()->getShop(null, false);
 
 		$shop->getInstaller()->install(OptionProvider::fromInput('ShopInstallation', $input));
 		$shop->getBrowser()->quit();

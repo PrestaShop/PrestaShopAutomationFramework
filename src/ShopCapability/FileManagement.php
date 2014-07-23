@@ -28,7 +28,9 @@ class FileManagement extends ShopCapability
 			'#^/?cache/sandbox/.#',
 			'#^/?cache/tcpdf/.#',
 			'#^/?\.git/#',
-			'#^/?pstaf\.#'
+			'#^/?pstaf\.#',
+			'#^/?selenium\.pid$#',
+			'#^/?selenium\.log$#'
 		]);
 		
 		mkdir($dstDir);
