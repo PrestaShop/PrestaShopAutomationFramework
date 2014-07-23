@@ -114,4 +114,10 @@ EOS;
 			}
 		}
 	}
+
+	public function changeHtaccessPhysicalURI($uri)
+	{
+		// RewriteRule . - [E=REWRITEBASE:/1.6/]
+		// ErrorDocument 404 /1.6/index.php?controller=404
+	}
 }

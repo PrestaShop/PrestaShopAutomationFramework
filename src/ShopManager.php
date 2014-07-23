@@ -59,14 +59,23 @@ class ShopManager
 
 		// Copy database if needed
 		$new_mysql_database = null;
-		if ($suffix !== '' && $shop->getDatabaseManager()->databaseExists())
+		if ($suffix !== '')
 		{
 			$new_mysql_database = $shop->getMysqlDatabase().$suffix;
 			if (!isset($options['database_dump']))
-				$shop->getDatabaseManager()->duplicateDatabaseTo($new_mysql_database);
+			{
+				if ($shop->getDatabaseManager()->databaseExists())
+				{
+					$shop->getDatabaseManager()->duplicateDatabaseTo($new_mysql_database);
+				}
+			}
 			else
+			{
 				$shop->getDatabaseManager()->loadDump($options['database_dump'], $new_mysql_database);				
+			}
 		}
+
+		$old_folder = basename($configuration->get('shop.front_office_url'));
 
 		$new_front_office_url = preg_replace(
 			'#/([^/]+)(?:/)?$#',
@@ -90,15 +99,12 @@ class ShopManager
 			]);
 		}
 
-		$old_folder = basename($configuration->get('shop.front_office_url'));
-
 		if ($shop->getDatabaseManager()->databaseExists())
 		{
-			$shop->getDatabaseManager()->changeShopUrlPhysicalURI(
-				"/$old_folder/",
-				"/$target_folder_name/"
-			);
+			$shop->getDatabaseManager()->changeShopUrlPhysicalURI("/$target_folder_name/");
 		}
+
+		$shop->getFileManager()->changeHtaccessPhysicalURI("/$target_folder_name/");
 
 		return $shop;
 	}

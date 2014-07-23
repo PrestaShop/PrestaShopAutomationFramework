@@ -4,27 +4,28 @@ namespace PrestaShop\ShopCapability;
 
 class DatabaseManagement extends ShopCapability
 {
+	private $pdo;
+
 	public function getPDO()
 	{
-		static $pdo;
-
 		$shop = $this->getShop();
 
 		try {
-			if (!$pdo)
-				$pdo = new \PDO('mysql:host='.$shop->getMysqlHost().';port='.$shop->getMysqlPort().';dbname='.$shop->getMysqlDatabase(),
+			if (!$this->pdo)
+				$this->pdo = new \PDO('mysql:host='.$shop->getMysqlHost().';port='.$shop->getMysqlPort().';dbname='.$shop->getMysqlDatabase(),
 					$shop->getMysqlUser(),
 					$shop->getMysqlPass()
 				);
 		} catch (\Exception $e) {
-			$pdo = null;
+			$this->pdo = null;
 		}
 
-		return $pdo;
+		return $this->pdo;
 	}
 
 	public function databaseExists($database_name = null)
 	{
+		
 		if ($database_name === null)
 			$database_name = $this->getShop()->getMysqlDatabase();
 
@@ -32,8 +33,14 @@ class DatabaseManagement extends ShopCapability
 		if (!$h)
 			return false;
 
+		
+
+
 		$sql = 'SHOW DATABASES LIKE \''.$database_name.'\'';
-		$res = $h->exec($sql);
+		$stm = $h->prepare($sql);
+		$stm->execute();
+		$res = $stm->fetchAll();
+
 		return $res && count($res) === 1;
 	}
 
@@ -113,9 +120,19 @@ class DatabaseManagement extends ShopCapability
 		return $this;
 	}
 
-	public function changeShopUrlPhysicalURI($old_physical_uri, $new_physical_uri)
+	public function changeShopUrlPhysicalURI($new_physical_uri)
 	{
 		$h = $this->getPDO();
+
+		$sql = 'SELECT physical_uri FROM %1$sshop_url ORDER BY id_shop_url ASC LIMIT 1';
+		$sql = sprintf($sql, $this->getShop()->getDatabasePrefix());
+
+		$stm = $h->prepare($sql);
+		$stm->execute();
+		$old_physical_uri = $stm->fetch(\PDO::FETCH_ASSOC)['physical_uri'];
+
+		$db = $this->getShop()->getMysqlDatabase();
+
 		$sql = 'UPDATE %1$sshop_url SET physical_uri = :new WHERE physical_uri = :old';
 		$sql = sprintf($sql, $this->getShop()->getDatabasePrefix());
 		$stm = $h->prepare($sql);
