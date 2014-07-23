@@ -93,4 +93,22 @@ EOS;
 			return !file_exists($this->getShop()->getFilesystemPath());
 		});
 	}
+
+	public function updateSettingsIncIfExists(array $values)
+	{
+		$settings_inc = FS::join($this->getShop()->getFilesystemPath(), 'config', 'settings.inc.php');
+		if (file_exists($settings_inc))
+		{
+			foreach ($values as $key => $value)
+			{
+				if ($key === '_DB_NAME_')
+				{
+					$exp = '/(define\s*\(\s*([\'"])_DB_NAME_\2\s*,\s*([\'"]))(.*?)((\3)\s*\)\s*;)/';
+					$settings = file_get_contents($settings_inc);
+					$settings = preg_replace($exp, "\${1}".$value."\${5}", $settings);
+					file_put_contents($settings_inc, $settings);
+				}
+			}
+		}
+	}
 }

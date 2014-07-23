@@ -9,11 +9,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use PrestaShop\Helper\FileSystem as FSHelper;
 
-class InitShop extends Command
+class ProjectInit extends Command
 {
 	protected function configure()
 	{
-		$this->setName('shop:init')
+		$this->setName('init:project')
 		->setDescription('Setup a pstaf project in the current directory.')
 		->addQuoption('mysql_host', null, InputOption::VALUE_REQUIRED, 'Mysql server address', 'localhost')
 		->addQuoption('mysql_port', null, InputOption::VALUE_REQUIRED, 'Mysql server port', '3306')
@@ -24,7 +24,10 @@ class InitShop extends Command
 		->addQuoption('front_office_url', null, InputOption::VALUE_REQUIRED, 'Front-Office URL', 'http://localhost/')
 		->addQuoption('back_office_folder_name', null, InputOption::VALUE_REQUIRED, 'Back-Office folder name', 'admin-dev')
 		->addQuoption('install_folder_name', null, InputOption::VALUE_REQUIRED, 'Install folder name', 'install-dev')
-		->addQuoption('prestashop_version', null, InputOption::VALUE_REQUIRED, 'PrestaShop version', '1.6');
+		->addQuoption('prestashop_version', null, InputOption::VALUE_REQUIRED, 'PrestaShop version', '1.6')
+		->addQuoption('filesystem_path', null, InputOption::VALUE_REQUIRED, 'Path to original shop files', '.')
+		->addQuoption('path_to_web_root', null, InputOption::VALUE_REQUIRED, 'Path to web root', '..')
+		;
 
 		$this->addOption('accept_defaults', 'y', InputOption::VALUE_NONE, 'Accept defaults without prompt');
 	}
@@ -94,6 +97,6 @@ class InitShop extends Command
 		$this->quoptparse($input, $output, $this->guessShopSettings('.'), $input->getOption('accept_defaults'));
 
 		$conf = new \PrestaShop\ConfigurationFile('pstaf.conf.json');
-		$conf->update(['shop' => $this->options])->save();
+		$conf->update(['shop' => $this->getOptions()])->save();
 	}
 }

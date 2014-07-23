@@ -27,6 +27,16 @@ class FileSystem
 		return rtrim($path, DIRECTORY_SEPARATOR);
 	}
 
+	public static function isAbsolutePath($path)
+	{
+		return preg_match('#^/|^\w+\:#', $path);
+	}
+
+	public static function isRelativePath($path)
+	{
+		return !static::isAbsolutePath($path);
+	}
+
 	public static function exists()
 	{
 		return file_exists(call_user_func_array(__NAMESPACE__.'\FileSystem::join', func_get_args()));

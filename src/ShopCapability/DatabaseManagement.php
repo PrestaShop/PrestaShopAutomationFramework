@@ -23,6 +23,17 @@ class DatabaseManagement extends ShopCapability
 		return $pdo;
 	}
 
+	public function databaseExists()
+	{
+		$h = $this->getPDO();
+		if (!$h)
+			return false;
+
+		$sql = 'SHOW DATABASES LIKE `'.$this->getShop()->getMysqlDatabase().'`';
+		$res = $h->exec($sql);
+		return count($res) === 1;
+	}
+
 	/**
 	* Drop the database if it exists
 	* @return true if the database existed, false otherwise

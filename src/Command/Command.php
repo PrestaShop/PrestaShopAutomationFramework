@@ -10,7 +10,7 @@ use Symfony\Component\Console\Question\Question;
 
 class Command extends \Symfony\Component\Console\Command\Command
 {
-	protected $options = [];
+	private $options = [];
 	private $questions = [];
 
 	public function addQuoption($name, $shortcut, $mode, $description, $default = null, $completions = [], $prompt = null) {
@@ -53,5 +53,25 @@ class Command extends \Symfony\Component\Console\Command\Command
 			if ($value)
 				$this->options[$name] = $value;
 		}
+	}
+
+	public function getOptions(array $whitelist = null, array $blacklist = null)
+	{
+		$options = [];
+		foreach ($this->options as $key => $value)
+		{
+			if ($whitelist !== null)
+			{
+				if (!in_array($key, $whitelist))
+					continue;
+			}
+			if ($blacklist !== null)
+			{
+				if (in_array($key, $blacklist))
+					continue;
+			}
+			$options[$key] = $value;
+		}
+		return $options;
 	}
 }

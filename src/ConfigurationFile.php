@@ -2,6 +2,8 @@
 
 namespace PrestaShop;
 
+use PrestaShop\Helper\FileSystem as FS;
+
 class ConfigurationFile implements Util\DataStoreInterface
 {
 	private $path;
@@ -54,11 +56,24 @@ class ConfigurationFile implements Util\DataStoreInterface
 	{
 		$path = $from_specific_path ? $from_specific_path : 'pstaf.conf.json';
 
+		$base_path = dirname(realpath($path));
+
 		if (!isset(static::$instances[$path]))
 		{
 			$conf = new ConfigurationFile($path);
 			if (!$conf->get("shop.filesystem_path"))
-				$conf->set("shop.filesystem_path", dirname(realpath($path)));
+			{
+				$conf->set("shop.filesystem_path", $base_path);
+			}
+
+			$filesystem_path = $conf->get('shop.filesystem_path');
+			if (FS::isRelativePath($filesystem_path))
+				$conf->set('shop.filesystem_path', realpath(FS::join($base_path, $filesystem_path)));
+
+			$path_to_web_root = $conf->get('shop.path_to_web_root');
+			if (FS::isRelativePath($path_to_web_root))
+				$conf->set('shop.path_to_web_root', realpath(FS::join($base_path, $path_to_web_root)));			
+
 			static::$instances[$path] = $conf;
 		}
 

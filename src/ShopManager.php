@@ -24,17 +24,76 @@ class ShopManager
 		return static::$managers[$configuration_file_path];
 	}
 
-	public function getShop()
+	private function _getShop($suffix = null)
 	{
+		if (!$suffix)
+			$suffix = '';
+
 		$configuration = ConfigurationFile::getInstance($this->configuration_file_path);
 		$seleniumPort = SeleniumManager::getMyPort();
 		$seleniumHost = 'http://localhost:'.(int)$seleniumPort.'/wd/hub';
-
 		$shopSettings = $configuration->get('shop');
 		$seleniumSettings = ['host' => $seleniumHost];
 
 		$shop = new Shop($shopSettings, $seleniumSettings);
 
+		// Where the shop files should live
+		$target_folder_name = basename($configuration->get('shop.filesystem_path')).$suffix;
+		$target_path = FS::join(
+			$configuration->get('shop.path_to_web_root'),
+			$target_folder_name
+		);
+		
+		// Move the files to their location if they are not already there
+		if (!is_dir($target_path))
+			$shop->getFileManager()->copyShopFilesTo($target_path);
+
+		// Copy database if needed
+		$new_mysql_database = null;
+		if ($suffix !== '' && $shop->getDatabaseManager()->databaseExists())
+		{
+			$new_mysql_database = $shop->getMysqlDatabase().$suffix;
+			$shop->getDatabaseManager()->duplicateDatabaseTo($new_mysql_database);
+		}
+
+		$new_front_office_url = preg_replace(
+			'#/([^/]+)(?:/)?$#',
+			'/'.$target_folder_name.'/',
+			$configuration->get('shop.front_office_url')
+		);
+
+		$configuration->set('shop.filesystem_path', $target_path);
+		if ($new_mysql_database)
+		{
+			$configuration->set('shop.mysql_database', $new_mysql_database);
+		}
+		$configuration->set('shop.front_office_url', $new_front_office_url);
+
+		$shop = new Shop($configuration->get('shop'), $seleniumSettings);
+
+		if ($new_mysql_database)
+		{
+			$shop->getFileManager()->updateSettingsIncIfExists([
+				'_DB_NAME_' => $configuration->get('shop.mysql_database')
+			]);
+		}
+
+		$old_folder = basename($configuration->get('shop.front_office_url'));
+
+		if ($shop->getDatabaseManager()->databaseExists())
+		{
+			$shop->getDatabaseManager()->changeShopUrlPhysicalURI(
+				"/$old_folder/",
+				"/$target_folder_name/"
+			);
+		}
+
+		return $shop;
+	}
+
+	public function getShop()
+	{
+		$shop = null;
 		$parallel = getenv('TEST_TOKEN') !== false;
 
 		if ($parallel)
@@ -52,37 +111,14 @@ class ShopManager
 			fclose($h);
 
 			$uid_suffix = '_tmpshpcpy_'.$uid;
-
-			$new_mysql_database = $shop->getMysqlDatabase().$uid_suffix;
-
-			$shop->getDatabaseManager()->duplicateDatabaseTo($new_mysql_database);
-			$new_filesystem_path = FS::rtrimSeparator($configuration->get('shop.filesystem_path')).$uid_suffix;
-			$shop->getFileManager()->copyShopFilesTo($new_filesystem_path);
-
-			$settings_inc = FS::join($new_filesystem_path, 'config', 'settings.inc.php');
-			if (file_exists($settings_inc))
-			{
-				$exp = '/(define\s*\(\s*([\'"])_DB_NAME_\2\s*,\s*([\'"]))(.*?)((\3)\s*\)\s*;)/';
-				$settings = file_get_contents($settings_inc);
-				$settings = preg_replace($exp, "\${1}".$new_mysql_database."\${5}", $settings);
-				file_put_contents($settings_inc, $settings);
-			}
-
-			$new_front_office_url = preg_replace(
-				'#/([^/]+)(?:/)?$#',
-				'/\1'.$uid_suffix.'/',
-				$configuration->get('shop.front_office_url')
-			);
-
-			$configuration->set('shop.filesystem_path', $new_filesystem_path);
-			$configuration->set('shop.mysql_database', $new_mysql_database);
-			$configuration->set('shop.front_office_url', $new_front_office_url);
-			$shop = new Shop($configuration->get('shop'), $seleniumSettings);
-
-			$old_folder = basename(dirname($this->configuration_file_path));
-			$new_folder = $old_folder.$uid_suffix;
-			$shop->getDatabaseManager()->changeShopUrlPhysicalURI("/$old_folder/", "/$new_folder/");
+			
+			$shop = $this->_getShop($uid_suffix);
+			
 			$shop->setTemporary(true);
+		}
+		else
+		{
+			$shop = $this->_getShop();
 		}
 
 		return $shop;

@@ -73,7 +73,7 @@ class TaxManagement extends ShopCapability
 	* each element has the following structure:
 	* [
 	*	'id_tax' => some_positive_integer - anything else treated as no tax,
-	*	'country' => null or array of integer country_id's,
+	*	'country' => null or country_id or array of integer country_id's,
 	*	'behavior' => '!' (this tax only) or '+' (combine) or '*' (one after another),
 	*	'description' => 'Description of the tax rule'
 	* ]
@@ -108,6 +108,7 @@ class TaxManagement extends ShopCapability
 
 		foreach ($taxRules as $taxRule)
 		{
+			// We need to get the numerical tax rate to check correct display later
 			$tax_rate = $browser->doThenComeBack(function() use ($taxRule){
 				return $this->getTaxRateFromIdTax($taxRule['id_tax']);
 			});
@@ -131,8 +132,9 @@ class TaxManagement extends ShopCapability
 			elseif ($taxRule['behavior'] === '*')
 				$behavior = 2;
 
-			if (!empty($taxRule['country']) && (int)$taxRule['country'] > 0)
+			if (!empty($taxRule['country']))
 			{
+				die("yop");
 				$browser->select('#country', $taxRule['country']);
 
 				$expected[] = [

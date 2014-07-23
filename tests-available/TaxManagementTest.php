@@ -2,6 +2,16 @@
 
 namespace PrestaShop\FunctionalTest;
 
+/**
+ * This test does the following:
+ *
+ * - Create and enable 2 tax rules, OldFrenchVat and NewFrenchVat
+ * - Create a Tax Rule Group that applies OldFrenchVat to Country the country with id 1
+ * - Create a Tax Rule Group that applies OldFrenchVat to all countries
+ * - Create a Tax Rule Group that applies both OldFrenchVat and NewFrenchVat, combined, to all countries
+ * 
+ */
+
 class TaxManagementTest extends \PrestaShop\TestCase\LazyTestCase
 {
 	public static function setupBeforeClass()
@@ -20,8 +30,8 @@ class TaxManagementTest extends \PrestaShop\TestCase\LazyTestCase
 	}
 
 	/**
-	* @dataProvider taxRules
-	*/
+	 * @dataProvider taxRules
+	 */
 	public function testTaxRuleCreation($name, $rate, $enabled)
 	{
 		$shop = static::getShop();
@@ -50,6 +60,20 @@ class TaxManagementTest extends \PrestaShop\TestCase\LazyTestCase
 	public function taxRuleGroups()
 	{
 		$groups = [];
+
+		$groups[] = [
+			'One Rate For One Country',
+			[
+				[
+					'id_tax' => 'OldFrenchVat',
+					'country' => 1,
+					'behavior' => '!'
+				]
+			],
+			true
+		];
+
+		return $groups;
 
 		$groups[] = [
 			'Same Single Rate For Everyone',
@@ -84,8 +108,8 @@ class TaxManagementTest extends \PrestaShop\TestCase\LazyTestCase
 	}
 
 	/**
-	* @dataProvider taxRuleGroups
-	*/
+	 * @dataProvider taxRuleGroups
+	 */
 	public function testTaxRuleGroupCreation($name, array $taxRules, $enabled)
 	{
 		$shop = static::getShop();
