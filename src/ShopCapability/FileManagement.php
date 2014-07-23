@@ -117,7 +117,18 @@ EOS;
 
 	public function changeHtaccessPhysicalURI($uri)
 	{
-		// RewriteRule . - [E=REWRITEBASE:/1.6/]
-		// ErrorDocument 404 /1.6/index.php?controller=404
+		$htaccess_path = FS::join($this->getShop()->getFilesystemPath(), '.htaccess');
+
+		if (file_exists($htaccess_path))
+		{
+			$htaccess = file_get_contents($htaccess_path);
+			$rewrite_exp = '/(^\s*RewriteRule\s+\.\s+-\s+\[\s*E\s*=\s*REWRITEBASE\s*:)[^]]+(\]\s*$)/mi';
+			$htaccess = preg_replace($rewrite_exp, '${1}'.$uri.'${2}', $htaccess);
+
+			$errdoc_exp = '/(^\s*ErrorDocument\s+\w+\s+)\/[^\/]+\/(.*?$)/mi';
+			$htaccess = preg_replace($errdoc_exp, '${1}'.$uri.'${2}', $htaccess);
+
+			file_put_contents($htaccess_path, $htaccess);
+		}
 	}
 }
