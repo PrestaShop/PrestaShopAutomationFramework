@@ -24,10 +24,14 @@ class ShopManager
 		return static::$managers[$configuration_file_path];
 	}
 
-	private function _getShop($suffix = null)
+	public function getWorkingDirectory()
 	{
-		if (!$suffix)
-			$suffix = '';
+		return dirname($this->configuration_file_path);
+	}
+
+	private function _getShop($options)
+	{
+		$suffix = $options['suffix'];
 
 		$configuration = ConfigurationFile::getInstance($this->configuration_file_path);
 		$seleniumPort = SeleniumManager::getMyPort();
@@ -46,14 +50,22 @@ class ShopManager
 		
 		// Move the files to their location if they are not already there
 		if (!is_dir($target_path))
-			$shop->getFileManager()->copyShopFilesTo($target_path);
+		{
+			$shop->getFileManager()->copyShopFilesTo(
+				$target_path,
+				isset($options['source_files']) ? $options['source_files'] : null
+			);
+		}
 
 		// Copy database if needed
 		$new_mysql_database = null;
 		if ($suffix !== '' && $shop->getDatabaseManager()->databaseExists())
 		{
 			$new_mysql_database = $shop->getMysqlDatabase().$suffix;
-			$shop->getDatabaseManager()->duplicateDatabaseTo($new_mysql_database);
+			if (!isset($options['database_dump']))
+				$shop->getDatabaseManager()->duplicateDatabaseTo($new_mysql_database);
+			else
+				$shop->getDatabaseManager()->loadDump($options['database_dump'], $new_mysql_database);				
 		}
 
 		$new_front_office_url = preg_replace(
@@ -91,34 +103,95 @@ class ShopManager
 		return $shop;
 	}
 
-	public function getShop()
+	private function rksort(array &$array)
 	{
+		ksort($array);
+		foreach ($array as $key => $value)
+		{
+			if (is_array($value))
+				$this->rksort($array[$key]);
+		}
+	}
+
+	public function getUID()
+	{
+		$uid_lock_path = FS::join($this->getWorkingDirectory(), 'pstaf.maxuid');
+			
+		$h = fopen($uid_lock_path, 'c+');
+		if (!$h)
+			throw new \Exception('Could not get pstaf.maxuid file.');
+		flock($h, LOCK_EX);
+		$uid = (int)file_get_contents($uid_lock_path) + 1;
+		file_put_contents($uid_lock_path, $uid);
+		fflush($h);
+		flock($h, LOCK_UN);
+		fclose($h);
+
+		return $uid;
+	}
+
+	public function buildInitialStateOrWaitForIt($options, $initial_state_key, $initial_state)
+	{
+		$lock_path = FS::join($this->getWorkingDirectory(), "pstaf.$initial_state_key.lock");
+		$build_folder = FS::join($this->getWorkingDirectory(), "pstaf.$initial_state_key.shop");
+		$database_dump = FS::join($build_folder, 'pstaf.shopdb.sql');
+
+		$h = fopen($lock_path, 'w');
+		if (!$h)
+		{
+			throw new \Exception(sprintf('Could not create lock file %s.', $lock_path));
+		}
+		flock($h, LOCK_EX);
+
 		$shop = null;
+
+		// shop already built
+		if (is_dir($build_folder))
+		{
+			$options['source_files'] = $build_folder;
+			$options['database_dump'] = $database_dump;
+			$shop = $this->_getShop($options);
+		}
+		else
+		{
+			$shop = $this->_getShop($options);
+			$shop->getFixtureManager()->setupInitialState($initial_state);
+			$shop->getFileManager()->copyShopFilesTo($build_folder);
+			$shop->getDatabaseManager()->dumpTo($database_dump);
+		}
+		flock($h, LOCK_UN);
+		fclose($h);
+
+		return $shop;
+	}
+
+	public function getShop(array $initial_state = null)
+	{
+		$tmp = is_array($initial_state) ? $initial_state : [];
+		$this->rksort($tmp);
+		$initial_state_key = empty($tmp) ? null : md5(json_encode($tmp));
+		
+		$options = ['suffix' => ''];
+
 		$parallel = getenv('TEST_TOKEN') !== false;
 
 		if ($parallel)
 		{
-			$uid_lock_path = FS::join(dirname($this->configuration_file_path), 'pstaf.maxuid');
-			
-			$h = fopen($uid_lock_path, 'c+');
-			if (!$h)
-				throw new \Exception('Could not get pstaf.maxuid file.');
-			flock($h, LOCK_EX);
-			$uid = (int)file_get_contents($uid_lock_path) + 1;
-			file_put_contents($uid_lock_path, $uid);
-			fflush($h);
-			flock($h, LOCK_UN);
-			fclose($h);
+			$options['suffix'] = '_tmpshpcpy_'.$this->getUID();
+		}
 
-			$uid_suffix = '_tmpshpcpy_'.$uid;
-			
-			$shop = $this->_getShop($uid_suffix);
-			
-			$shop->setTemporary(true);
+		if ($initial_state_key)
+		{
+			$shop = $this->buildInitialStateOrWaitForIt($options, $initial_state_key, $initial_state);
 		}
 		else
 		{
-			$shop = $this->_getShop();
+			$shop = $this->_getShop($options);
+		}
+
+		if ($parallel)
+		{
+			$shop->setTemporary(true);
 		}
 
 		return $shop;

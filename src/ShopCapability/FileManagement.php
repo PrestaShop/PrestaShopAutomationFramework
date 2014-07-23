@@ -6,9 +6,11 @@ use \PrestaShop\Helper\FileSystem as FS;
 
 class FileManagement extends ShopCapability
 {
-	public function copyShopFilesTo($dstDir)
+	public function copyShopFilesTo($dstDir, $srcDir = null)
 	{
-		$srcDir = realpath($this->getShop()->getFilesystemPath());
+		if ($srcDir === null)
+			$srcDir = realpath($this->getShop()->getFilesystemPath());
+		
 		$files = FS::lsRecursive($srcDir,[
 			'#^/?cache/smarty/cache/index.php#',
 			'#^/?cache/smarty/compile/index.php#',
@@ -26,6 +28,7 @@ class FileManagement extends ShopCapability
 			'#^/?cache/sandbox/.#',
 			'#^/?cache/tcpdf/.#',
 			'#^/?\.git/#',
+			'#^/?pstaf\.#'
 		]);
 		
 		mkdir($dstDir);

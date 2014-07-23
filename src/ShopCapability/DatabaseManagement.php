@@ -23,15 +23,18 @@ class DatabaseManagement extends ShopCapability
 		return $pdo;
 	}
 
-	public function databaseExists()
+	public function databaseExists($database_name = null)
 	{
+		if ($database_name === null)
+			$database_name = $this->getShop()->getMysqlDatabase();
+
 		$h = $this->getPDO();
 		if (!$h)
 			return false;
 
-		$sql = 'SHOW DATABASES LIKE `'.$this->getShop()->getMysqlDatabase().'`';
+		$sql = 'SHOW DATABASES LIKE \''.$database_name.'\'';
 		$res = $h->exec($sql);
-		return count($res) === 1;
+		return $res && count($res) === 1;
 	}
 
 	/**
@@ -60,7 +63,12 @@ class DatabaseManagement extends ShopCapability
 		$command = $command
 		.' -h'.escapeshellcmd($this->getShop()->getMysqlHost())
 		.' -P'.escapeshellcmd($this->getShop()->getMysqlPort())
-		.implode('', array_map(function($arg){return ' '.escapeshellcmd($arg);}, $arguments))
+		.implode('', array_map(function($arg){
+			if (is_array($arg))
+				return ' '.$arg[0];
+			else
+				return ' '.escapeshellcmd($arg);
+		}, $arguments))
 		.' 2>/dev/null'; // quickfix for warning about using password on command line
 
 		return $command;
@@ -80,6 +88,29 @@ class DatabaseManagement extends ShopCapability
 		{
 			exec($command);
 		}
+	}
+
+	public function dumpTo($path)
+	{
+		$command = $this->buildMysqlCommand('mysqldump', [$this->getShop()->getMysqlDatabase(), ['>'], $path]);
+		exec($command);
+	}
+
+	public function loadDump($dump_path, $database_name = null)
+	{
+		if (!$database_name)
+			$database_name = $this->getShop()->getMysqlDatabase();
+
+		if (!$this->databaseExists($database_name))
+		{
+			$command = $this->buildMysqlCommand('mysqladmin', ['create', $database_name]);
+			exec($command);
+		}
+
+		$command = $this->buildMysqlCommand('mysql', [$database_name, ['<'], $dump_path]);
+		exec($command);
+
+		return $this;
 	}
 
 	public function changeShopUrlPhysicalURI($old_physical_uri, $new_physical_uri)

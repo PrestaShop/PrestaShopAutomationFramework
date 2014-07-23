@@ -113,6 +113,7 @@ class Shop
 		$this->addShopCapability('\PrestaShop\ShopCapability\BackOfficeNavigation', 'getBackOfficeNavigator');
 		$this->addShopCapability('\PrestaShop\ShopCapability\BackOfficePagination', 'getBackOfficePaginator');
 		$this->addShopCapability('\PrestaShop\ShopCapability\TaxManagement', 'getTaxManager');
+		$this->addShopCapability('\PrestaShop\ShopCapability\FixtureManagement', 'getFixtureManager');
 	}
 
 	/**

@@ -4,6 +4,11 @@ namespace PrestaShop\FunctionalTest;
 
 class InstallationTest extends \PrestaShop\TestCase\TestCase
 {
+	public static function initialState()
+	{
+		return null;
+	}
+
 	public function languageAndCountryPairs()
 	{
 		/*return [['no', 'no']];
