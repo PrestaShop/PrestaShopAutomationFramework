@@ -134,14 +134,18 @@ class TaxManagement extends ShopCapability
 
 			if (!empty($taxRule['country']))
 			{
-				die("yop");
-				$browser->select('#country', $taxRule['country']);
+				$ids = is_array($taxRule['country']) ? $taxRule['country'] : [$taxRule['country']];
 
-				$expected[] = [
-					'country' => $country_names[$taxRule['country']],
-					'behavior' => $behavior_names[$behavior],
-					'tax' => $tax_rate
-				];
+				foreach ($ids as $id)
+				{
+					$browser->select('#country', $id);
+
+					$expected[] = [
+						'country' => $country_names[$id],
+						'behavior' => $behavior_names[$behavior],
+						'tax' => $tax_rate
+					];
+				}
 			}
 			else
 			{

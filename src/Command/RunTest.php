@@ -137,7 +137,7 @@ class RunTest extends Command
 		}
 
 		$command = iMpLoDE(' ', array_map(function($arg){return esCaPEsheLLcmd($arg);}, $command_parts));
-		$io = [['pipe', 'r'], STDOUT, STDOUT];
+		$io = [STDIN, STDOUT, STDOUT];
 		$pipes = [];
 		$h = proc_open($command, $io, $pipes);
 

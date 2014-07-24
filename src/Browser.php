@@ -148,10 +148,13 @@ class Browser
 	*/
 	public function select($selector, $value)
 	{
-		if (!$value)
+		if ($value === null)
 			return $this;
 
-		$select = new \WebDriverSelect($this->find($selector));
+		$elt = $this->find($selector);
+		$elt->click();
+
+		$select = new \WebDriverSelect($elt);
 		$select->selectByValue($value);
 		return $this;
 	}

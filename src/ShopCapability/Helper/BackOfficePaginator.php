@@ -107,8 +107,17 @@ class BackOfficePaginator
 
 	public function scrapeAll()
 	{
+		try {
+			$max_page = $this->getLastPageNumber();
+		} catch (\Exception $e) {
+			$max_page = null;
+		}
+
+		if ($max_page === null)
+			return $this->scrape();
+
 		$rows = [];
-		for($p = 1; $p <= $this->getLastPageNumber(); $p++)
+		for($p = 1; $p <= $max_page; $p++)
 		{
 			$this->gotoPage($p);
 			$data = $this->scrape();

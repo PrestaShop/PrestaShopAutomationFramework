@@ -9,15 +9,19 @@ class ShopManager
 	protected $configuration_file_path;
 	protected static $managers = [];
 
-	public function __construct($configuration_file_path = null)
+	public function __construct($configuration_file_path)
 	{
-		if ($configuration_file_path === null)
-			$configuration_file_path = realpath(FS::join('.', 'pstaf.conf.json'));
 		$this->configuration_file_path = $configuration_file_path;
 	}
 
 	public static function getInstance($configuration_file_path = null)
 	{
+		if ($configuration_file_path === null)
+			$configuration_file_path = realpath(FS::join('.', 'pstaf.conf.json'));
+
+		if (!$configuration_file_path)
+			throw new \Exception('Could not find configuration file pstaf.conf.json in current directory. Did you run pstaf project:init?');
+
 		if (!isset(static::$managers[$configuration_file_path]))
 			static::$managers[$configuration_file_path] = new static($configuration_file_path);
 
@@ -169,7 +173,7 @@ class ShopManager
 		return $shop;
 	}
 
-	public function getShop(array $initial_state = null, $copy = true)
+	public function getShop(array $initial_state = null, $copy = true, $use_cache = true)
 	{
 		$tmp = is_array($initial_state) ? $initial_state : [];
 		$this->rksort($tmp);
@@ -184,7 +188,15 @@ class ShopManager
 
 		if ($initial_state_key)
 		{
-			$shop = $this->buildInitialStateOrWaitForIt($options, $initial_state_key, $initial_state);
+			if ($use_cache)
+			{
+				$shop = $this->buildInitialStateOrWaitForIt($options, $initial_state_key, $initial_state);
+			}
+			else
+			{
+				$shop = $this->_getShop($options);
+				$shop->getFixtureManager()->setupInitialState($initial_state);
+			}
 		}
 		else
 		{

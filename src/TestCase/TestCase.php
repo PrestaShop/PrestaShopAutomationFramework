@@ -9,13 +9,14 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 {
 	private static $shops = [];
 	private static $shop_managers = [];
+	protected static $cache_initial_state = true;
 
 	public static function setUpBeforeClass()
 	{
 		\PrestaShop\SeleniumManager::ensureSeleniumIsRunning();
 		$class = get_called_class();
 		$manager = ShopManager::getInstance();
-		self::$shops[$class] = $manager->getShop(static::initialState());
+		self::$shops[$class] = $manager->getShop(static::initialState(), true, static::$cache_initial_state);
 		self::$shop_managers[$class] = $manager;
 		register_shutdown_function([$class, 'tearDownAfterClass']);
 	}
