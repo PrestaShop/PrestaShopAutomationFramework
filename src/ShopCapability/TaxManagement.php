@@ -73,10 +73,19 @@ class TaxManagement extends ShopCapability
 	* each element has the following structure:
 	* [
 	*	'id_tax' => some_positive_integer - anything else treated as no tax,
-	*	'country' => null or country_id or array of integer country_id's,
+	*	'country' => see below
 	*	'behavior' => '!' (this tax only) or '+' (combine) or '*' (one after another),
 	*	'description' => 'Description of the tax rule'
 	* ]
+	*
+	* the country key above can have the following values:
+	* 	- falsey value: all countries
+	* 	- a single item, or an array of items, where an item is either:
+	* 		- an integer (country_id)
+	* 		- an array, having the following keys :
+	* 			- id: integer country_id
+	* 			- state: falsey value for all states, integer, or array of integer state_ids
+	* 			- ziprange: a string representing a range of postcodes
 	*
 	*/
 	public function createTaxRuleGroup($name, array $taxRules, $enabled = true)
@@ -113,47 +122,96 @@ class TaxManagement extends ShopCapability
 				return $this->getTaxRateFromIdTax($taxRule['id_tax']);
 			});
 
-			$browser->click('#page-header-desc-tax_rule-new');
-			$browser->waitFor('#id_tax');
-
-			if (!$behavior_names)
-			{
-				$behavior_names = $browser->getSelectOptions('#behavior');
-			}
-
-			if (!$country_names)
-			{
-				$country_names = $browser->getSelectOptions('#country');
-			}
-
 			$behavior = 0;
 			if ($taxRule['behavior'] === '+')
 				$behavior = 1;
 			elseif ($taxRule['behavior'] === '*')
 				$behavior = 2;
 
-			if (!empty($taxRule['country']))
+			
+			$locations = [];
+			if (empty($taxRule['country']))
 			{
-				// TODO: this is dumb
-				die("FIXME in TaxManagement.php");
-				$ids = is_array($taxRule['country']) ? $taxRule['country'] : [$taxRule['country']];
-
-				foreach ($ids as $id)
-				{
-					$browser->select('#country', $id);
-
-					$expected[] = [
-						'country' => $country_names[$id],
-						'behavior' => $behavior_names[$behavior],
-						'tax' => $tax_rate
-					];
-				}
+				$locations[] = ['country' => 0, 'state' => null, 'ziprange' => null];
 			}
 			else
 			{
+				$countries = [];
+
+				// case: country => 1
+				if (!is_array($taxRule['country'])) 
+					$countries[] = $taxRule['country'];
+				// case: country => [id => 1]
+				elseif (is_array($taxRule['country']) && array_key_exists('id', $taxRule['country'])) 
+					$countries[] = $taxRule['country'];
+				// case: country => [[id => 1]]
+				else
+					$countries = $taxRule['country'];
+
+				foreach ($countries as $country)
+				{
+					if (!is_array($country))
+					{
+						$country = $country ? $country : 0;
+						$locations[] = ['country' => $country, 'state' => null, 'ziprange' => null];
+					}
+					else
+					{
+						$ziprange = isset($country['ziprange']) ? $country['ziprange'] : null;
+						// [id => 1]
+						if (!array_key_exists('state', $country))
+						{
+							$locations[] = ['country' => $country['id'], 'state' => null, 'ziprange' => $ziprange];
+						}
+						// [id => 1, state => [2, 3]]
+						elseif (is_array($country['state']))
+						{
+							$locations[] = ['country' => $country['id'], 'state' => $country['state'], 'ziprange' => $ziprange];
+						}
+						// [id => 1, state => 2]
+						elseif ($country['state'])
+						{
+							$locations[] = ['country' => $country['id'], 'state' => [$country['state']], 'ziprange' => $ziprange];
+						}
+						// [id => 1, state => null]
+						else
+						{
+							$locations[] = ['country' => $country['id'], 'state' => [0], 'ziprange' => $ziprange];
+						}
+					}
+				}
+			}
+
+			foreach ($locations as $location)
+			{
+				$browser->click('#page-header-desc-tax_rule-new');
+				$browser->waitFor('#id_tax');
+
+				if (!$behavior_names)
+				{
+					$behavior_names = $browser->getSelectOptions('#behavior');
+				}
+
+				if (!$country_names)
+				{
+					$country_names = $browser->getSelectOptions('#country');
+				}
+
+				$browser->select('#country', $location['country']);
+
+				if (isset($location['state']) && $location['state'])
+				{
+					die("TODO IN TaxManagement.php");
+				}
+
+				if (isset($location['ziprange']) && $location['ziprange'])
+				{
+					$browser->fillIn('#zipcode', $location['ziprange']);
+				}
+
 				foreach ($country_names as $value => $name)
 				{
-					if ($value > 0)
+					if (($location['country'] == 0 && $value > 0) || $location['country'] == $value)
 					{
 						$expected[] = [
 							'country' => $name,
@@ -162,12 +220,13 @@ class TaxManagement extends ShopCapability
 						];
 					}
 				}
+
+				$browser
+				->select('#behavior', $behavior)
+				->select('#id_tax', $taxRule['id_tax'])
+				->clickButtonNamed('create_ruleAndStay')
+				->ensureStandardSuccessMessageDisplayed('Could not add rule to TaxRuleGroup');
 			}
-			$browser
-			->select('#behavior', $behavior)
-			->select('#id_tax', $taxRule['id_tax'])
-			->clickButtonNamed('create_ruleAndStay')
-			->ensureStandardSuccessMessageDisplayed('Could not add rule to TaxRuleGroup');
 		}
 
 		$paginator = $shop->getBackOfficePaginator()->getPaginatorFor('AdminTaxRulesGroup');
@@ -192,7 +251,7 @@ class TaxManagement extends ShopCapability
 				{
 					$out[$item['country']] = '';
 				}
-				$out[$item['country']] .= $item['country'].'='.$item['behavior'].':'.$item['tax'];
+				$out[$item['country']] .= '('.$item['country'].'='.$item['behavior'].':'.$item['tax'].')';
 			}
 			ksort($out);
 			return implode("\n", $out);
@@ -201,11 +260,13 @@ class TaxManagement extends ShopCapability
 		$actual = $makeComparableResult($actual);
 		$expected = $makeComparableResult($expected);
 
+		//echo "Expected:\n$expected\n\nActual:\n$actual\n";
+
 		if ($actual !== $expected)
 		{
-			$differ = new \SebastianBergmann\Diff\Differ();
-			$diff = $differ->diff($expected, $actual);
-			throw new \PrestaShop\Exception\TaxRuleGroupCreationIncorrectException($diff);
+			/*$differ = new \SebastianBergmann\Diff\Differ();
+			$diff = $differ->diff($expected, $actual);*/
+			throw new \PrestaShop\Exception\TaxRuleGroupCreationIncorrectException();
 		}
 	}
 }

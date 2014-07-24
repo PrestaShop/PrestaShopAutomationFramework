@@ -85,19 +85,34 @@ class BackOfficePaginator
 	{
 		$rows = [];
 
+		$ths = $this->pagination->getShop()->getBrowser()->find(
+			$this->settings['container_selector'].' '.$this->settings['table_selector'].' thead tr th',
+			['unique' => false]
+		);
+
 		foreach ($this->pagination->getShop()->getBrowser()->find(
 			$this->settings['container_selector'].' '.$this->settings['table_selector'].' tbody tr',
 			['unique' => false]
 		) as $tr)
 		{
 			$row = [];
-			foreach ($tr->findElements(\WebDriverBy::cssSelector('td')) as $n => $td)
+			$n = 0;
+			foreach ($tr->findElements(\WebDriverBy::cssSelector('td')) as $i => $td)
 			{
+				/**
+				 * Ignore cells corresponding to columns without text
+				 * this is useful because an extra column appears when there are bulk actions
+				 */
+				if (!$ths[$i]->getText())
+					continue;
+
 				if (!empty($this->settings['columns'][$n]))
 				{
 					$header = $this->settings['columns'][$n];
 					$row[$this->getHeaderName($header)] = $this->getTDValue($header, $td);
 				}
+
+				$n++;
 			}
 			$rows[] = $row;
 		}

@@ -143,6 +143,12 @@ class Browser
 		return $this;
 	}
 
+	public function sendKeys($keys)
+	{
+		$this->driver->getKeyboard()->sendKeys($keys);
+		return $this;
+	}
+
 	/**
 	* Select by value in a select.
 	*/
@@ -171,6 +177,7 @@ class Browser
 		{
 			$options[$opt->getAttribute('value')] = $opt->getText();
 		}
+		$this->sendKeys(\WebDriverKeys::ESCAPE);
 		return $options;
 	}
 
