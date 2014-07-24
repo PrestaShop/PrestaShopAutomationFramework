@@ -165,6 +165,25 @@ class Browser
 	}
 
 	/**
+	 * Select by value in a multiple select.
+	 * Options is an array of values.
+	 */
+	public function multiSelect($selector, $options)
+	{
+		$elem = $this->find($selector);
+		$option_elts = $elem->findElements(\WebDriverBy::cssSelector('option'));
+		foreach ($option_elts as $opt)
+		{
+			if (in_array($opt->getAttribute('value'), $options))
+			{
+				$opt->click();
+				die("TODO in BROWSER.PHP");
+			}
+		}
+		return $this;
+	}
+
+	/**
 	* Get Select Options as associative array
 	*/
 	public function getSelectOptions($selector)

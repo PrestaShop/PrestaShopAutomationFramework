@@ -201,7 +201,9 @@ class TaxManagement extends ShopCapability
 
 				if (isset($location['state']) && $location['state'])
 				{
-					die("TODO IN TaxManagement.php");
+					$browser->waitFor('#states');
+					$browser->multiSelect('#states', $location['state']);
+					$browser->waitForUserInput();
 				}
 
 				if (isset($location['ziprange']) && $location['ziprange'])
@@ -211,7 +213,10 @@ class TaxManagement extends ShopCapability
 
 				foreach ($country_names as $value => $name)
 				{
-					if (($location['country'] == 0 && $value > 0) || $location['country'] == $value)
+					if ((int)$value === 0)
+						continue;
+
+					if (!$location['country'] || $location['country'] == $value)
 					{
 						$expected[] = [
 							'country' => $name,
@@ -260,7 +265,7 @@ class TaxManagement extends ShopCapability
 		$actual = $makeComparableResult($actual);
 		$expected = $makeComparableResult($expected);
 
-		//echo "Expected:\n$expected\n\nActual:\n$actual\n";
+		// echo "Expected:\n$expected\n\nActual:\n$actual\n";
 
 		if ($actual !== $expected)
 		{

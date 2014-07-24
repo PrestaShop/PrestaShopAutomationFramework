@@ -60,6 +60,32 @@ class TaxManagementTest extends \PrestaShop\TestCase\LazyTestCase
 	public function taxRuleGroups()
 	{
 		$groups = [];
+		
+		$groups[] = [
+			'One Rate For One State In One Country',
+			[
+				[
+					'id_tax' => 'OldFrenchVat',
+					'country' => ['id' => 21, 'state' => 2],
+					'behavior' => '!'
+				]
+			],
+			true
+		];
+
+		return $groups;
+
+		$groups[] = [
+			'One Rate For 2 Countries',
+			[
+				[
+					'id_tax' => 'OldFrenchVat',
+					'country' => [1, 2],
+					'behavior' => '!'
+				]
+			],
+			true
+		];
 
 		$groups[] = [
 			'One Rate For One Country',
@@ -89,8 +115,6 @@ class TaxManagementTest extends \PrestaShop\TestCase\LazyTestCase
 			],
 			true
 		];
-
-		return $groups;
 
 		$groups[] = [
 			'Same Single Rate For Everyone',
