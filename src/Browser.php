@@ -152,7 +152,6 @@ class Browser
 			return $this;
 
 		$elt = $this->find($selector);
-		$elt->click();
 
 		$select = new \WebDriverSelect($elt);
 		$select->selectByValue($value);

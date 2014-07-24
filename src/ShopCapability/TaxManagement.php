@@ -134,6 +134,8 @@ class TaxManagement extends ShopCapability
 
 			if (!empty($taxRule['country']))
 			{
+				// TODO: this is dumb
+				die("FIXME in TaxManagement.php");
 				$ids = is_array($taxRule['country']) ? $taxRule['country'] : [$taxRule['country']];
 
 				foreach ($ids as $id)
@@ -161,7 +163,6 @@ class TaxManagement extends ShopCapability
 					}
 				}
 			}
-
 			$browser
 			->select('#behavior', $behavior)
 			->select('#id_tax', $taxRule['id_tax'])
@@ -191,10 +192,10 @@ class TaxManagement extends ShopCapability
 				{
 					$out[$item['country']] = '';
 				}
-				$out[$item['country']] .= '('.$item['behavior'].':'.$item['tax'].')';
+				$out[$item['country']] .= $item['country'].'='.$item['behavior'].':'.$item['tax'];
 			}
 			ksort($out);
-			return $out;
+			return implode("\n", $out);
 		};
 
 		$actual = $makeComparableResult($actual);
@@ -202,7 +203,9 @@ class TaxManagement extends ShopCapability
 
 		if ($actual !== $expected)
 		{
-			throw new \PrestaShop\Exception\TaxRuleGroupCreationIncorrectException();
+			$differ = new \SebastianBergmann\Diff\Differ();
+			$diff = $differ->diff($expected, $actual);
+			throw new \PrestaShop\Exception\TaxRuleGroupCreationIncorrectException($diff);
 		}
 	}
 }

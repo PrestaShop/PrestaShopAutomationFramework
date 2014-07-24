@@ -10,7 +10,8 @@
 		"symfony/console": "*",
 		"phpunit/phpunit": "4.1.*",
 		"brianium/paratest": "dev-master",
-		"djfm/ptest": "dev-master"
+		"djfm/ptest": "dev-master",
+		"sebastian/diff": "*"
 	},
 	"require-dev": {
         "phpdocumentor/phpdocumentor": "2.*"

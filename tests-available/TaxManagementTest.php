@@ -61,7 +61,7 @@ class TaxManagementTest extends \PrestaShop\TestCase\LazyTestCase
 	{
 		$groups = [];
 
-		$groups[] = [
+		/*$groups[] = [
 			'One Rate For One Country',
 			[
 				[
@@ -73,7 +73,7 @@ class TaxManagementTest extends \PrestaShop\TestCase\LazyTestCase
 			true
 		];
 
-		return $groups;
+		return $groups;*/
 
 		$groups[] = [
 			'Same Single Rate For Everyone',

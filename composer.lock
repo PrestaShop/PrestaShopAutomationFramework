@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "ff17380b003398d9f6d5281a9a4cc2b9",
+    "hash": "0afe6cccd63abcf8465ded177de35e01",
     "packages": [
         {
             "name": "brianium/habitat",
@@ -53,12 +53,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/brianium/paratest.git",
-                "reference": "51e9c2e18fde7f79b68ebb063934c6bc6a15007f"
+                "reference": "e7e9494022190a03aa37ae7e5a2946b17c31686c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/brianium/paratest/zipball/51e9c2e18fde7f79b68ebb063934c6bc6a15007f",
-                "reference": "51e9c2e18fde7f79b68ebb063934c6bc6a15007f",
+                "url": "https://api.github.com/repos/brianium/paratest/zipball/e7e9494022190a03aa37ae7e5a2946b17c31686c",
+                "reference": "e7e9494022190a03aa37ae7e5a2946b17c31686c",
                 "shasum": ""
             },
             "require": {
@@ -105,7 +105,7 @@
                 "phpunit",
                 "testing"
             ],
-            "time": "2014-07-14 14:48:57"
+            "time": "2014-07-22 23:58:29"
         },
         {
             "name": "djfm/ptest",
@@ -113,7 +113,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/djfm/ptest",
-                "reference": "6109c0be37c21c20a074528037df467f6058ae64"
+                "reference": "bc41e05bcb8c670474a850ab3a43367ef6f88648"
             },
             "require": {
                 "symfony/console": "*"
@@ -127,7 +127,7 @@
                     "PrestaShop\\Ptest\\": "src/"
                 }
             },
-            "time": "2014-07-21 05:42:28"
+            "time": "2014-07-24 09:40:04"
         },
         {
             "name": "facebook/webdriver",
@@ -135,12 +135,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/facebook/php-webdriver.git",
-                "reference": "1096e1786b2733069c220ff9c7a7ebebe64afdc2"
+                "reference": "b88a65219b0ccd9bfc8ac1696fd9b4df6cf79cba"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/facebook/php-webdriver/zipball/1096e1786b2733069c220ff9c7a7ebebe64afdc2",
-                "reference": "1096e1786b2733069c220ff9c7a7ebebe64afdc2",
+                "url": "https://api.github.com/repos/facebook/php-webdriver/zipball/b88a65219b0ccd9bfc8ac1696fd9b4df6cf79cba",
+                "reference": "b88a65219b0ccd9bfc8ac1696fd9b4df6cf79cba",
                 "shasum": ""
             },
             "require": {
@@ -168,7 +168,7 @@
                 "selenium",
                 "webdriver"
             ],
-            "time": "2014-07-17 23:24:21"
+            "time": "2014-07-22 16:01:30"
         },
         {
             "name": "phpunit/php-code-coverage",
