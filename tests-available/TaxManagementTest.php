@@ -62,6 +62,30 @@ class TaxManagementTest extends \PrestaShop\TestCase\LazyTestCase
 		$groups = [];
 		
 		$groups[] = [
+			'One Rate For One Country with Ziprange',
+			[
+				[
+					'id_tax' => 'OldFrenchVat',
+					'country' => ['id' => 21, 'ziprange' => '00000-12345'],
+					'behavior' => '+'
+				]
+			],
+			true
+		];
+
+		$groups[] = [
+			'One Rate For 2 States In One Country',
+			[
+				[
+					'id_tax' => 'OldFrenchVat',
+					'country' => ['id' => 21, 'state' => [2, 3]],
+					'behavior' => '+'
+				]
+			],
+			true
+		];
+
+		$groups[] = [
 			'One Rate For One State In One Country',
 			[
 				[
@@ -72,8 +96,6 @@ class TaxManagementTest extends \PrestaShop\TestCase\LazyTestCase
 			],
 			true
 		];
-
-		return $groups;
 
 		$groups[] = [
 			'One Rate For 2 Countries',

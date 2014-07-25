@@ -265,7 +265,8 @@ class TaxManagement extends ShopCapability
 				'country' => $row['country'],
 				'state' => $row['state'],
 				'behavior' => $row['behavior'],
-				'tax' => $row['tax']
+				'ziprange' =>  str_replace('--', '', $row['ziprange']),
+				'tax' => $row['tax'],
 			];
 		}
 
@@ -283,7 +284,7 @@ class TaxManagement extends ShopCapability
 
 				$zr = '';
 				if (isset($item['ziprange']) && $item['ziprange'])
-					$zr = $item['ziprange'].' => ';
+					$zr = preg_replace('/\s+/', '', $item['ziprange'].' => ');
 
 				$out[$sort_key] .= ' ('.$zr.$item['tax'].':'.$item['behavior'].')';
 			}
@@ -294,12 +295,13 @@ class TaxManagement extends ShopCapability
 		$actual = $makeComparableResult($actual);
 		$expected = $makeComparableResult($expected);
 
-		// echo "Expected:\n$expected\n\nActual:\n$actual\n";
+		
 
 		if ($actual !== $expected)
 		{
 			/*$differ = new \SebastianBergmann\Diff\Differ();
 			$diff = $differ->diff($expected, $actual);*/
+			echo "Results differ!\n\nExpected:\n$expected\n\nActual:\n$actual\n";
 			throw new \PrestaShop\Exception\TaxRuleGroupCreationIncorrectException();
 		}
 	}
