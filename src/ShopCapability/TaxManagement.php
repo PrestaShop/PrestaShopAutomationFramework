@@ -50,6 +50,9 @@ class TaxManagement extends ShopCapability
 		return (int)$id_tax;
 	}
 
+	/**
+	 * Browse AdminTaxes to retrieve the tax rate corresponding to $id_tax
+	 */
 	public function getTaxRateFromIdTax($id_tax)
 	{
 		$url = $this
@@ -66,28 +69,28 @@ class TaxManagement extends ShopCapability
 	}
 
 	/**
-	* Create a Tax Rule Group
-	* presupposes: logged in to the back office and on a back office page
-	*
-	* $taxRules is an array of arrays describing the Tax Rules composing the group
-	* each element has the following structure:
-	* [
-	*	'id_tax' => some_positive_integer - anything else treated as no tax,
-	*	'country' => see below
-	*	'behavior' => '!' (this tax only) or '+' (combine) or '*' (one after another),
-	*	'description' => 'Description of the tax rule'
-	* ]
-	*
-	* the country key above can have the following values:
-	* 	- falsey value: all countries
-	* 	- a single item, or an array of items, where an item is either:
-	* 		- an integer (country_id)
-	* 		- an array, having the following keys :
-	* 			- id: integer country_id
-	* 			- state: falsey value for all states, integer, or array of integer state_ids
-	* 			- ziprange: a string representing a range of postcodes
-	*
-	*/
+	 * Create a Tax Rule Group
+	 * presupposes: logged in to the back office and on a back office page
+	 *
+	 * $taxRules is an array of arrays describing the Tax Rules composing the group
+	 * each element has the following structure:
+	 * [
+	 *	'id_tax' => some_positive_integer - anything else treated as no tax,
+	 *	'country' => see below
+	 *	'behavior' => '!' (this tax only) or '+' (combine) or '*' (one after another),
+	 *	'description' => 'Description of the tax rule'
+	 * ]
+	 *
+ 	 * the country key above can have the following values:
+	 * 	- falsey value: all countries
+	 * 	- a single item, or an array of items, where an item is either:
+	 * 		- an integer (country_id)
+	 * 		- an array, having the following keys (only id is required):
+	 * 			- id: integer country_id
+	 * 			- state: falsey value for all states, integer, or array of integer state_ids
+	 * 			- ziprange: a string representing a range of postcodes
+	 *
+	 */
 	public function createTaxRuleGroup($name, array $taxRules, $enabled = true)
 	{
 		$shop = $this->getShop();
