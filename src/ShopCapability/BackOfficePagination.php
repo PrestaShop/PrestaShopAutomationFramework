@@ -27,7 +27,7 @@ class BackOfficePagination extends ShopCapability
 				'columns' => [
 					'country',
 					'state',
-					'zip_code',
+					'ziprange',
 					'behavior',
 					['name' => 'tax', 'type' => 'i18n:percent'],
 					'description'

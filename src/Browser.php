@@ -171,15 +171,37 @@ class Browser
 	public function multiSelect($selector, $options)
 	{
 		$elem = $this->find($selector);
+		$elem->click();
+		sleep(1); 	// strangely, this is needed, 
+				  	// otherwise Selenium throws a StaleElementException
+					// I don't have the faintest idea why
+
 		$option_elts = $elem->findElements(\WebDriverBy::cssSelector('option'));
+		
+		$this->driver->getKeyboard()->pressKey(\WebDriverKeys::CONTROL);
+		
+		$matched = 0;
+
 		foreach ($option_elts as $opt)
 		{
 			if (in_array($opt->getAttribute('value'), $options))
 			{
+				$matched += 1;
+				if (!$opt->isSelected())
+				{
+					$opt->click();
+				}
+			}
+			elseif ($opt->isSelected()) {
 				$opt->click();
-				die("TODO in BROWSER.PHP");
 			}
 		}
+		
+		$this->driver->getKeyboard()->releaseKey(\WebDriverKeys::CONTROL);
+
+		if ($matched !== count($options))
+			throw new \Exception('Could not select all values.');
+
 		return $this;
 	}
 
@@ -191,6 +213,9 @@ class Browser
 		$options = [];
 		$elem = $this->find($selector);
 		$elem->click();
+		// Multiselects apparently need us to slow down
+		if ($elem->getAttribute('multiple'))
+			sleep(1);
 		$select = new \WebDriverSelect($elem);
 		foreach ($select->getOptions() as $opt)
 		{

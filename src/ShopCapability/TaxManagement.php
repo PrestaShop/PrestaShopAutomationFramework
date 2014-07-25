@@ -112,6 +112,7 @@ class TaxManagement extends ShopCapability
 
 		$behavior_names = null;
 		$country_names = null;
+		$state_names = null;
 
 		$expected = [];
 
@@ -199,11 +200,26 @@ class TaxManagement extends ShopCapability
 
 				$browser->select('#country', $location['country']);
 
+				$expected_states = [];
 				if (isset($location['state']) && $location['state'])
 				{
 					$browser->waitFor('#states');
+
+					if (!$state_names)
+					{
+						$state_names = $browser->getSelectOptions('#states');
+					}
+
 					$browser->multiSelect('#states', $location['state']);
-					$browser->waitForUserInput();
+
+					foreach ($location['state'] as $id)
+						$expected_states[] = $state_names[$id];
+
+					//$browser->waitForUserInput();
+				}
+				else
+				{
+					$expected_states = ['--'];
 				}
 
 				if (isset($location['ziprange']) && $location['ziprange'])
@@ -218,11 +234,16 @@ class TaxManagement extends ShopCapability
 
 					if (!$location['country'] || $location['country'] == $value)
 					{
-						$expected[] = [
-							'country' => $name,
-							'behavior' => $behavior_names[$behavior],
-							'tax' => $tax_rate
-						];
+						foreach ($expected_states as $state)
+						{
+							$expected[] = [
+								'country' => $name,
+								'state' => $state,
+								'behavior' => $behavior_names[$behavior],
+								'tax' => $tax_rate,
+								'ziprange' => $location['ziprange']
+							];
+						}
 					}
 				}
 
@@ -242,6 +263,7 @@ class TaxManagement extends ShopCapability
 		{
 			$actual[] = [
 				'country' => $row['country'],
+				'state' => $row['state'],
 				'behavior' => $row['behavior'],
 				'tax' => $row['tax']
 			];
@@ -252,11 +274,18 @@ class TaxManagement extends ShopCapability
 			$out = [];
 			foreach ($list as $item)
 			{
-				if (!isset($out[$item['country']]))
+				$sort_key = $item['country'].':'.$item['state'];
+
+				if (!isset($out[$sort_key]))
 				{
-					$out[$item['country']] = '';
+					$out[$sort_key] = $item['country'].'['.$item['state'].'] =';
 				}
-				$out[$item['country']] .= '('.$item['country'].'='.$item['behavior'].':'.$item['tax'].')';
+
+				$zr = '';
+				if (isset($item['ziprange']) && $item['ziprange'])
+					$zr = $item['ziprange'].' => ';
+
+				$out[$sort_key] .= ' ('.$zr.$item['tax'].':'.$item['behavior'].')';
 			}
 			ksort($out);
 			return implode("\n", $out);
