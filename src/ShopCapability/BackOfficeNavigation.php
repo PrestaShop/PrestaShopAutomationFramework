@@ -6,6 +6,18 @@ use PrestaShop\OptionProvider;
 
 class BackOfficeNavigation extends ShopCapability
 {
+	public static $crud_url_settings;
+	private static $controller_links;
+
+	public function setup()
+	{
+		static::$crud_url_settings = [
+			'AdminTaxes' => ['object_name' => 'tax'],
+			'AdminTaxRulesGroup' => ['object_name' => 'tax_rules_group']
+		];
+	}
+
+
 	/**
 	* Returns an array with controller names as key and URLs as values.
 	* Assumes the browser is on a Back-Office page
@@ -34,9 +46,55 @@ class BackOfficeNavigation extends ShopCapability
 	}
 
 	/**
-	* Logs in to the back-office.
-	* Options may include: admin_email, admin_password, stay_logged_in
-	*/
+	 * Construct a normalized link to a CRUD action
+	 * 
+	 * @param  string $controller_name
+	 * @param  string $action [new, view, edit, delete]
+	 * @param  int $id optional id of entity
+	 * @return string
+	 */
+	public function getCRUDLink($controller_name, $action, $id = null)
+	{
+		if (isset(static::$crud_url_settings[$controller_name]))
+		{
+			$data = static::$crud_url_settings[$controller_name];
+
+			if ($id === null && $action !== 'new')
+				throw new \Exception('Missing id parameter for action other than `new`.');
+
+			if (!static::$controller_links)
+				static::$controller_links = $this->getMenuLinks();
+
+			if (!isset(static::$controller_links[$controller_name]))
+				throw new Exception(sprintf('Could not find controller link %s.', $controller_name));
+				
+			$base = static::$controller_links[$controller_name];
+
+			$actmap = [
+				'new' => 'add'.$data['object_name'],
+				'view' => 'view'.$data['object_name'],
+				'edit' => 'update'.$data['object_name'],
+				'delete' => 'delete'.$data['object_name']
+			];
+
+			if (!isset($actmap[$action]))
+				throw new \Exception(sprintf('Unknown action %s.', $action));
+
+			$link = $base.'&'.$actmap[$action];
+
+			if ($action !== 'new')
+				$link .= '&id_'.$data['object_name'].'='.$id;
+
+			return $link;
+		}
+		else
+			throw new \Exception(sprintf('CRUD parameters for %s are not defined.', $controller_name));
+	}
+
+	/**
+	 * Logs in to the back-office.
+	 * Options may include: admin_email, admin_password, stay_logged_in
+	 */
 	public function login($options = [])
 	{
 		$options = OptionProvider::addDefaults('BackOfficeLogin', $options);

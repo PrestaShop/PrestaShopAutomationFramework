@@ -21,6 +21,59 @@ class TaxManagementTest extends \PrestaShop\TestCase\LazyTestCase
 		static::getShop()->getBackOfficeNavigator()->login();
 	}
 
+	public function testAccessToAdminTaxes()
+	{
+		$shop = static::getShop();
+		$shop->getBackOfficeNavigator()
+		->visit('AdminTaxes')
+		->ensureElementIsOnPage('#PS_TAX_on');
+	}
+
+	public function testTaxCanBeDisabled()
+	{
+		static::getShop()->getTaxManager()->enableTax(false);
+	}
+
+	public function testTaxCanBeEnabled()
+	{
+		static::getShop()->getTaxManager()->enableTax(true);
+	}
+
+	public function testTaxDisplayInTheShoppingCartCanBeDisabled()
+	{
+		static::getShop()->getTaxManager()->enableTaxInTheShoppingCart(false);
+	}
+
+	public function testTaxDisplayInTheShoppingCartCanBeEnabled()
+	{
+		static::getShop()->getTaxManager()->enableTaxInTheShoppingCart(true);
+	}
+
+	public function testEcotaxCanBeEnabled()
+	{
+		static::getShop()->getTaxManager()->enableEcotax(true);
+	}
+
+	public function testEcotaxTaxRulesGroupCanBeSet()
+	{
+		static::getShop()->getTaxManager()->setEcotaxTaxGroup(1);
+	}
+
+	public function testEcotaxCanBeDisabled()
+	{
+		static::getShop()->getTaxManager()->enableEcotax(false);
+	}
+
+	public function testBaseTaxOnInvoiceAddress()
+	{
+		static::getShop()->getTaxManager()->baseTaxOn('invoice address');
+	}
+
+	public function testBaseTaxOnDeliveryAddress()
+	{
+		static::getShop()->getTaxManager()->baseTaxOn('delivery address');
+	}
+
 	public function taxRules()
 	{
 		return [
@@ -40,22 +93,6 @@ class TaxManagementTest extends \PrestaShop\TestCase\LazyTestCase
 		->getDataStore()
 		->set("tax_rules.$name", ['id_tax' => $id_tax, 'rate' => $rate]);
 	}
-
-	/*
-	public function testAccessToAdminTaxes()
-	{
-		$shop = static::getShop();
-		$shop->getBackOfficeNavigator()
-		->visit('AdminTaxes')
-		->ensureElementIsOnPage('#PS_TAX_on');
-	}
-
-	public function testTaxCreation()
-	{
-		static::getShop()
-		->getTaxManager()
-		->createTaxRule('Old French Vat', '19.6', true);
-	}*/
 
 	public function taxRuleGroups()
 	{
@@ -189,6 +226,26 @@ class TaxManagementTest extends \PrestaShop\TestCase\LazyTestCase
 		}
 
 		$tm = $shop->getTaxManager();
-		$tm->createTaxRuleGroup($name, $taxRules, $enabled);
+		$id_tax_rules_group = $tm->createTaxRuleGroup($name, $taxRules, $enabled);
+
+		$shop
+		->getDataStore()
+		->set("tax_rules_groups.$name", ['id_tax_rules_group' => $id_tax_rules_group]);
+	}
+
+	public function testTaxRuleGroupsCanBeDeleted()
+	{
+		foreach ($this->getShop()->getDataStore()->get('tax_rules_groups') as $name => $data)
+		{
+			$this->getShop()->getTaxManager()->deleteTaxRuleGroup($data['id_tax_rules_group']);
+		}
+	}
+
+	public function testTaxRulesCanBeDeleted()
+	{
+		foreach ($this->getShop()->getDataStore()->get('tax_rules') as $name => $data)
+		{
+			$this->getShop()->getTaxManager()->deleteTaxRule($data['id_tax']);
+		}
 	}
 }

@@ -5,6 +5,118 @@ namespace PrestaShop\ShopCapability;
 class TaxManagement extends ShopCapability
 {
 	/**
+	 * Enable / Disable taxes
+	 * @param  boolean $on
+	 * @return $this
+	 */
+	public function enableTax($on = true)
+	{
+		$browser = $this->getShop()->getBackOfficeNavigator()->visit('AdminTaxes');
+		$browser
+		->prestaShopSwitch('PS_TAX', $on)
+		->clickButtonNamed('submitOptionstax')
+		->ensureStandardSuccessMessageDisplayed();
+
+		if ($browser->prestaShopSwitchValue('PS_TAX') != $on)
+			throw new \Exception(sprintf('Could not set tax to: %s', $on ? 'on' : 'off'));
+
+		return $this;
+	}
+
+	/**
+	 * Enable / Disable display of taxes in the shopping cart
+	 * @param  boolean $on
+	 * @return $this
+	 */
+	public function enableTaxInTheShoppingCart($on = true)
+	{
+		$browser = $this->getShop()->getBackOfficeNavigator()->visit('AdminTaxes');
+		$browser
+		->prestaShopSwitch('PS_TAX_DISPLAY', $on)
+		->clickButtonNamed('submitOptionstax')
+		->ensureStandardSuccessMessageDisplayed();
+
+		if ($browser->prestaShopSwitchValue('PS_TAX_DISPLAY') != $on)
+			throw new \Exception(sprintf('Could not set shopping cart tax to: %s', $on ? 'on' : 'off'));
+
+		return $this;
+	}
+
+	/**
+	 * Enable / Disable ecotax
+	 * @param  boolean $on
+	 * @return $this
+	 */
+	public function enableEcotax($on = true)
+	{
+		$browser = $this->getShop()->getBackOfficeNavigator()->visit('AdminTaxes');
+		$browser
+		->prestaShopSwitch('PS_USE_ECOTAX', $on)
+		->clickButtonNamed('submitOptionstax')
+		->ensureStandardSuccessMessageDisplayed();
+
+		if ($browser->prestaShopSwitchValue('PS_USE_ECOTAX') != $on)
+			throw new \Exception(sprintf('Could not set ecotax to: %s', $on ? 'on' : 'off'));
+
+		if ($on)
+			$browser->reload();
+
+		$browser->find('#PS_ECOTAX_TAX_RULES_GROUP_ID');
+
+		return $this;
+	}
+
+	/**
+	 * Set the tax group to be used for the ecotax
+	 * @param int $id_tax_rules_group
+	 */
+	public function setEcotaxTaxGroup($id_tax_rules_group)
+	{
+		$browser = $this->getShop()->getBackOfficeNavigator()->visit('AdminTaxes');
+		$browser
+		->select('#PS_ECOTAX_TAX_RULES_GROUP_ID', $id_tax_rules_group)
+		->clickButtonNamed('submitOptionstax')
+		->ensureStandardSuccessMessageDisplayed();
+
+		if ($browser->getValue('#PS_ECOTAX_TAX_RULES_GROUP_ID') != $id_tax_rules_group)
+		{
+			throw new \Exception('Could not set ecotax tax rules group.');
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Base tax on delivery or invoice address
+	 * @param  string $address_type, either 'delivery address' or 'invoice address'
+	 * @return $this
+	 */
+	public function baseTaxOn($address_type)
+	{
+		$browser = $this->getShop()->getBackOfficeNavigator()->visit('AdminTaxes');
+
+		$values = [
+			'delivery address' => 'id_address_delivery',
+			'invoice address' => 'id_address_invoice'
+		];
+
+		if (!isset($values[$address_type]))
+			throw new \Exception(sprintf('Unknown option %s', $address_type));
+
+		$at = $values[$address_type];
+
+		$browser
+		->select('#PS_TAX_ADDRESS_TYPE', $at)
+		->clickButtonNamed('submitOptionstax')
+		->ensureStandardSuccessMessageDisplayed();
+
+		if ($browser->getValue('#PS_TAX_ADDRESS_TYPE') !== $at)
+			throw new \Exception('Could not set correct address type for taxing.');
+
+		return $this;
+	}
+
+	/**
 	* Create a Tax Rule.
 	*
 	* Assumes:
@@ -48,6 +160,21 @@ class TaxManagement extends ShopCapability
 			throw new \PrestaShop\Exception\TaxRuleCreationIncorrectException("stored results differ from submitted data");
 
 		return (int)$id_tax;
+	}
+
+	/**
+	 * Delete a tax rule
+	 * @param  int $id_tax
+	 * @return $this
+	 */
+	public function deleteTaxRule($id_tax)
+	{
+		$link = $this->getShop()->getBackOfficeNavigator()->getCRUDLink('AdminTaxes', 'delete', $id_tax);
+		$this->getShop()->getBrowser()
+		->visit($link)
+		->ensureStandardSuccessMessageDisplayed();
+
+		return $this;
 	}
 
 	/**
@@ -307,5 +434,27 @@ class TaxManagement extends ShopCapability
 			echo "Results differ!\n\nExpected:\n$expected\n\nActual:\n$actual\n";
 			throw new \PrestaShop\Exception\TaxRuleGroupCreationIncorrectException();
 		}
+
+		$id_tax_rules_group = $browser->getURLParameter('id_tax_rules_group');
+
+		if ((int)$id_tax_rules_group < 1)
+			throw new \PrestaShop\Exception\TaxRuleCreationIncorrectException("id_tax_rules_group not a positive integer");
+
+		return $id_tax_rules_group;
+	}
+
+	/**
+	 * Delete a tax rules group
+	 * @param  int $id_tax_rules_group
+	 * @return $this
+	 */
+	public function deleteTaxRuleGroup($id_tax_rules_group)
+	{
+		$link = $this->getShop()->getBackOfficeNavigator()->getCRUDLink('AdminTaxRulesGroup', 'delete', $id_tax_rules_group);
+		$this->getShop()->getBrowser()
+		->visit($link)
+		->ensureStandardSuccessMessageDisplayed();
+
+		return $this;
 	}
 }

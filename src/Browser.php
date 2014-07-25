@@ -397,9 +397,23 @@ class Browser
 		return \PrestaShop\Helper\URL::getParameter($url, $param);
 	}
 
+	/**
+	 * Refresh the page, using same HTTP verb
+	 * @return $this
+	 */
 	public function refresh()
 	{
 		$this->driver->navigate()->refresh();
+		return $this;
+	}
+
+	/**
+	 * Refresh the page, performing a GET
+	 * @return $this
+	 */
+	public function reload()
+	{
+		$this->visit($this->getCurrentURL());
 		return $this;
 	}
 
