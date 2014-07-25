@@ -58,7 +58,7 @@ class TaxManagement extends ShopCapability
 		if ($browser->prestaShopSwitchValue('PS_USE_ECOTAX') != $on)
 			throw new \Exception(sprintf('Could not set ecotax to: %s', $on ? 'on' : 'off'));
 
-		if ($on)
+		if ($on && $this->shopVersionBefore('1.6.0.9'))
 			$browser->reload();
 
 		$browser->find('#PS_ECOTAX_TAX_RULES_GROUP_ID');
