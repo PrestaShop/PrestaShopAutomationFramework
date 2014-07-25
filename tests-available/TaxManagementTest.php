@@ -23,6 +23,9 @@ namespace PrestaShop\FunctionalTest;
  * - Create a tax rules group with one tax, applied to all countries
  * - Create a tax rules group with two taxes, applied to all countries in combine mode
  *
+ * - Delete created tax rule groups
+ * - Delete created taxes
+ *
  * THIS DOES NOT TEST THAT TAXES ARE ACTUALLY APPLIED CORRECTLY
  * IT JUST TESTS THAT THE BACK-OFFICE MENUS WORK AS EXPECTED
  *
