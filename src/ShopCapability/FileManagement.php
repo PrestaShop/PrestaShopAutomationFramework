@@ -76,6 +76,7 @@ class FileManagement extends ShopCapability
 		$dir = dirname(__FILE__);
 
 		foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST) as $path) {
+		    echo 'Removing: '.$path->getPathname()."<br>\n";
 		    $path->isDir() ? rmdir($path->getPathname()) : unlink($path->getPathname());
 		}
 		rmdir($dir);
@@ -95,7 +96,12 @@ EOS;
 		);
 
 		$spinner->assertBecomesTrue(function() {
-			return !file_exists($this->getShop()->getFilesystemPath());
+			$path = $this->getShop()->getFilesystemPath();
+
+			if (file_exists($path))
+				@rmdir($path);
+			
+			return !file_exists($path);
 		});
 	}
 
