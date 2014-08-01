@@ -55,23 +55,23 @@ class BackOfficeNavigation extends ShopCapability
 	 * @return string
 	 */
 	public function getCRUDLink($controller_name, $action = null, $id = null)
-	{
-		if (isset(static::$crud_url_settings[$controller_name]))
+	{		
+		if (isset(static::$crud_url_settings[$controller_name]) || $action === null)
 		{
-			$data = static::$crud_url_settings[$controller_name];
-
-			if ($id === null && $action !== 'new')
-				throw new \Exception('Missing id parameter for action other than `new`.');
-
 			if (!static::$controller_links)
 				static::$controller_links = $this->getMenuLinks();
 
+			$data = isset(static::$crud_url_settings[$controller_name]) ? static::$crud_url_settings[$controller_name] : null;
+
+			if ($id === null && $action !== null && $action !== 'new')
+				throw new \Exception('Missing id parameter for action other than `new`.');
+			
 			if (!isset(static::$controller_links[$controller_name]))
 				throw new \PrestaShop\Exception\AdminControllerNotFoundException($controller_name);
-				
+			
 			$base = static::$controller_links[$controller_name];
 
-			if (!$action)
+			if ($action === null)
 				return $base;
 
 			$actmap = [
