@@ -5,3 +5,7 @@ tmp.php
 external-tests
 selenium.log
 selenium.pid
+misc
+tests-available/tmp*
+fup.js
+tests-available/WIPTest.php

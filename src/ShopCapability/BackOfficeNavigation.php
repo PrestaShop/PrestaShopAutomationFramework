@@ -13,7 +13,8 @@ class BackOfficeNavigation extends ShopCapability
 	{
 		static::$crud_url_settings = [
 			'AdminTaxes' => ['object_name' => 'tax'],
-			'AdminTaxRulesGroup' => ['object_name' => 'tax_rules_group']
+			'AdminTaxRulesGroup' => ['object_name' => 'tax_rules_group'],
+			'AdminCategories' => ['object_name' => 'category']
 		];
 	}
 
@@ -53,7 +54,7 @@ class BackOfficeNavigation extends ShopCapability
 	 * @param  int $id optional id of entity
 	 * @return string
 	 */
-	public function getCRUDLink($controller_name, $action, $id = null)
+	public function getCRUDLink($controller_name, $action = null, $id = null)
 	{
 		if (isset(static::$crud_url_settings[$controller_name]))
 		{
@@ -66,9 +67,12 @@ class BackOfficeNavigation extends ShopCapability
 				static::$controller_links = $this->getMenuLinks();
 
 			if (!isset(static::$controller_links[$controller_name]))
-				throw new Exception(sprintf('Could not find controller link %s.', $controller_name));
+				throw new \PrestaShop\Exception\AdminControllerNotFoundException($controller_name);
 				
 			$base = static::$controller_links[$controller_name];
+
+			if (!$action)
+				return $base;
 
 			$actmap = [
 				'new' => 'add'.$data['object_name'],
@@ -117,15 +121,9 @@ class BackOfficeNavigation extends ShopCapability
 	*
 	* Preconditions: be on a back-office page
 	*/
-	public function visit($controller_name)
+	public function visit($controller_name, $action = null, $id = null)
 	{
-		$links = $this->getMenuLinks();
 		$browser = $this->getShop()->getBrowser();
-		if (isset($links[$controller_name]))
-		{
-			return $browser->visit($links[$controller_name]);
-		}
-		else
-			throw new \PrestaShop\Exception\AdminControllerNotFoundException();
+		return $browser->visit($this->getCRUDLink($controller_name, $action, $id));
 	}
 }
