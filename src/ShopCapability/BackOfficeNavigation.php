@@ -14,7 +14,9 @@ class BackOfficeNavigation extends ShopCapability
 		static::$crud_url_settings = [
 			'AdminTaxes' => ['object_name' => 'tax'],
 			'AdminTaxRulesGroup' => ['object_name' => 'tax_rules_group'],
-			'AdminCategories' => ['object_name' => 'category']
+			'AdminCategories' => ['object_name' => 'category'],
+			'AdminProducts' => ['object_name' => 'product'],
+			'AdminCarriers' => ['object_name' => 'carrier']
 		];
 	}
 

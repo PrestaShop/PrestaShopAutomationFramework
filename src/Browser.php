@@ -123,8 +123,16 @@ class Browser
 
 	public function clickButtonNamed($name)
 	{
-		$this->click("button[name=$name]");
-		return $this;
+		$buttons = $this->find("button[name=$name]", ['unique' => false]);
+		foreach ($buttons as $button)
+		{
+			if ($button->isDisplayed() && $button->isEnabled())
+			{
+				$button->click();
+				return $this;
+			}
+		}
+		throw new \Exception("Could not find any visible and enabled button named $name");
 	}
 
 	public function clickLabelFor($for)
