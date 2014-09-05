@@ -116,7 +116,7 @@ class TaxManagementTest extends \PrestaShop\TestCase\LazyTestCase
 		->set("tax_rules.$name", ['id_tax' => $id_tax, 'rate' => $rate]);
 	}
 
-	public function taxRuleGroups()
+	public function taxRulesGroups()
 	{
 		$groups = [];
 		
@@ -230,9 +230,9 @@ class TaxManagementTest extends \PrestaShop\TestCase\LazyTestCase
 	}
 
 	/**
-	 * @dataProvider taxRuleGroups
+	 * @dataProvider taxRulesGroups
 	 */
-	public function testTaxRuleGroupCreation($name, array $taxRules, $enabled)
+	public function testTaxRulesGroupCreation($name, array $taxRules, $enabled)
 	{
 		$shop = static::getShop();
 
@@ -248,18 +248,18 @@ class TaxManagementTest extends \PrestaShop\TestCase\LazyTestCase
 		}
 
 		$tm = $shop->getTaxManager();
-		$id_tax_rules_group = $tm->createTaxRuleGroup($name, $taxRules, $enabled);
+		$id_tax_rules_group = $tm->createTaxRulesGroup($name, $taxRules, $enabled);
 
 		$shop
 		->getDataStore()
 		->set("tax_rules_groups.$name", ['id_tax_rules_group' => $id_tax_rules_group]);
 	}
 
-	public function testTaxRuleGroupsCanBeDeleted()
+	public function testTaxRulesGroupsCanBeDeleted()
 	{
 		foreach ($this->getShop()->getDataStore()->get('tax_rules_groups') as $name => $data)
 		{
-			$this->getShop()->getTaxManager()->deleteTaxRuleGroup($data['id_tax_rules_group']);
+			$this->getShop()->getTaxManager()->deleteTaxRulesGroup($data['id_tax_rules_group']);
 		}
 	}
 

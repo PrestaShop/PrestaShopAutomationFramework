@@ -68,6 +68,11 @@ class Browser
 		return $this;
 	}
 
+	public function getPageSource()
+	{
+		return $this->driver->getPageSource();
+	}
+
 	public function getAttribute($selector, $attribute)
 	{
 		return $this->find($selector)->getAttribute($attribute);
@@ -84,7 +89,16 @@ class Browser
 	public function find($selector, $options = [])
 	{
 		$unique = !isset($options['unique']) || $options['unique'];
-		$tos = 'cssSelector';
+
+		$m = [];
+		if (preg_match('/^{xpath}(.*)$/', $selector, $m))
+		{
+			$selector = $m[1];
+			$tos = 'xpath';
+		}
+		else
+			$tos = 'cssSelector';
+		
 		$method = $unique ? 'findElement' : 'findElements';
 		$e =  $this->driver->$method(\WebDriverBy::$tos($selector));
 		return $e;

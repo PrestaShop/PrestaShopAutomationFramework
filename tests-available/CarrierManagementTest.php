@@ -17,13 +17,13 @@ class CarrierManagementTest extends \PrestaShop\TestCase\LazyTestCase {
 			'name' => 'Turtle',
 			'delay' => '28 days later',
 			'handling' => 0,
-			'free' => 0,
-			'tax_rule' => 9,
+			'free' => 1,
+			'tax_rules_group' => 9,
 			'based_on' => 'price',
-			'ranges' => [
+			/*'ranges' => [
 				1000 => 5,
 				10000 => 10
-			],
+			],*/
 			'oorb' => 'disable'
 		));
 	}

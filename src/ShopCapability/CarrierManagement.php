@@ -37,26 +37,32 @@ class CarrierManagement extends ShopCapability
 
 		$index = 3;
 		$inf = 0;
-		foreach ($options['ranges'] as $upper_limit => $value)
+		if (isset($options['ranges']))
 		{
-			if ($index > 3)
-				$browser->click('#add_new_range');
+			foreach ($options['ranges'] as $upper_limit => $value)
+			{
+				if ($index > 3)
+					$browser->click('#add_new_range');
 
-			// Set range inf
-			$browser
-			->fillIn('tr.range_inf td:nth-child('.$index.') input', $inf)
-			// Set range sup
-			->fillIn('tr.range_sup td:nth-child('.$index.') input', $upper_limit)
-			// Check all zones
-			->checkbox('tr.fees_all td:nth-child(2) input', true)
-			->sleep(1)
-			// Fill in price / weight
-			->fillIn('tr.fees_all td:nth-child('.$index.') input', $value)
-			->click('tr.range_inf');
+				// Set range inf
+				$browser
+				->fillIn('tr.range_inf td:nth-child('.$index.') input', $inf)
+				// Set range sup
+				->fillIn('tr.range_sup td:nth-child('.$index.') input', $upper_limit)
+				// Check all zones
+				->checkbox('tr.fees_all td:nth-child(2) input', true)
+				->sleep(1)
+				// Fill in price / weight
+				->fillIn('tr.fees_all td:nth-child('.$index.') input', $value)
+				->click('tr.range_inf');
 
-			$index += 1;
-			$inf = $upper_limit;
+				$index += 1;
+				$inf = $upper_limit;
+			}
 		}
+
+		if (!empty($options['free']))
+			$browser->checkbox('tr.fees_all td:nth-child(2) input', true);
 
 		$oorb = isset($options['oorb']) ? ($options['oorb'] === 'highest' ? 0 : 1) : 0;
 		$browser->select('#range_behavior', $oorb);
@@ -69,7 +75,5 @@ class CarrierManagement extends ShopCapability
 		->prestaShopSwitch('active', true)
 		->click('a.buttonFinish')
 		->ensureStandardSuccessMessageDisplayed();
-
-		$browser->waitForUserInput();
 	}
 }

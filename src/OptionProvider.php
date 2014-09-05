@@ -26,11 +26,35 @@ class OptionProvider
 				'admin_email' => [],
 				'admin_password' => [],
 				'stay_logged_in' => ['description' => 'Stay logged in (Back-Office)', 'default' => true]
+			],
+			'FrontOfficeLogin' => [
+				'customer_email' => [],
+				'customer_password' => []
 			]
 		];
 
 		return static::prepare($options[$type]);
 
+	}
+
+	private static function getDefaults($name, $prop)
+	{
+		static $defaults = [
+			'language' => ['short' => 'l', 'default' => 'en'],
+			'shop_name' => ['default' => 'PrestaShop'],
+			'country' => ['short' => 'c', 'default' => 'us'],
+			'admin_firstname' => ['default' => 'John'],
+			'admin_lastname' => ['default' => 'Doe'],
+			'admin_email' => ['default' => 'pub@prestashop.com'],
+			'admin_password' => ['default' => '123456789'],
+			'customer_email' => ['default' => 'pub@prestashop.com'],
+			'customer_password' => ['default' => '123456789']
+		];
+
+		if (isset($defaults[$name]) && isset($defaults[$name][$prop]))
+			return $defaults[$name][$prop];
+
+		return false;
 	}
 
 	public static function fromInput($type, InputInterface $input)
@@ -51,24 +75,6 @@ class OptionProvider
 				$options[$name] = $desc['default'];
 		}
 		return $options;
-	}
-
-	private static function getDefaults($name, $prop)
-	{
-		static $defaults = [
-			'language' => ['short' => 'l', 'default' => 'en'],
-			'shop_name' => ['default' => 'PrestaShop'],
-			'country' => ['short' => 'c', 'default' => 'us'],
-			'admin_firstname' => ['default' => 'John'],
-			'admin_lastname' => ['default' => 'Doe'],
-			'admin_email' => ['default' => 'pub@prestashop.com'],
-			'admin_password' => ['default' => '123456789']
-		];
-
-		if (isset($defaults[$name]) && isset($defaults[$name][$prop]))
-			return $defaults[$name][$prop];
-
-		return false;
 	}
 
 	private static function prepare($options)

@@ -4,6 +4,9 @@ namespace PrestaShop\ShopCapability;
 
 class TaxManagement extends ShopCapability
 {
+	private $tax_rules_cache = [];
+	private $tax_rules_groups_cache = [];
+
 	/**
 	 * Enable / Disable taxes
 	 * @param  boolean $on
@@ -218,7 +221,7 @@ class TaxManagement extends ShopCapability
 	 * 			- ziprange: a string representing a range of postcodes
 	 *
 	 */
-	public function createTaxRuleGroup($name, array $taxRules, $enabled = true)
+	public function createTaxRulesGroup($name, array $taxRules, $enabled = true, $nocheck = false)
 	{
 		$shop = $this->getShop();
 
@@ -238,7 +241,7 @@ class TaxManagement extends ShopCapability
 		$actual_enabled = $browser->prestaShopSwitchValue('active');
 
 		if ($actual_name !== $name || $actual_enabled !== $enabled)
-			throw new \PrestaShop\Exception\TaxRuleGroupCreationIncorrectException();
+			throw new \PrestaShop\Exception\TaxRulesGroupCreationIncorrectException();
 
 		$behavior_names = null;
 		$country_names = null;
@@ -381,58 +384,61 @@ class TaxManagement extends ShopCapability
 				->select('#behavior', $behavior)
 				->select('#id_tax', $taxRule['id_tax'])
 				->clickButtonNamed('create_ruleAndStay')
-				->ensureStandardSuccessMessageDisplayed('Could not add rule to TaxRuleGroup');
+				->ensureStandardSuccessMessageDisplayed('Could not add rule to TaxRulesGroup');
 			}
 		}
 
-		$paginator = $shop->getBackOfficePaginator()->getPaginatorFor('AdminTaxRulesGroup');
-
-		$actual = [];
-
-		foreach ($paginator->scrapeAll() as $row)
+		if (!$nocheck)
 		{
-			$actual[] = [
-				'country' => $row['country'],
-				'state' => $row['state'],
-				'behavior' => $row['behavior'],
-				'ziprange' =>  str_replace('--', '', $row['ziprange']),
-				'tax' => $row['tax'],
-			];
-		}
+			$paginator = $shop->getBackOfficePaginator()->getPaginatorFor('AdminTaxRulesGroup');
 
-		$makeComparableResult = function(array $list)
-		{
-			$out = [];
-			foreach ($list as $item)
+			$actual = [];
+
+			foreach ($paginator->scrapeAll() as $row)
 			{
-				$sort_key = $item['country'].':'.$item['state'];
-
-				if (!isset($out[$sort_key]))
-				{
-					$out[$sort_key] = $item['country'].'['.$item['state'].'] =';
-				}
-
-				$zr = '';
-				if (isset($item['ziprange']) && $item['ziprange'])
-					$zr = preg_replace('/\s+/', '', $item['ziprange'].' => ');
-
-				$out[$sort_key] .= ' ('.$zr.$item['tax'].':'.$item['behavior'].')';
+				$actual[] = [
+					'country' => $row['country'],
+					'state' => $row['state'],
+					'behavior' => $row['behavior'],
+					'ziprange' =>  str_replace('--', '', $row['ziprange']),
+					'tax' => $row['tax'],
+				];
 			}
-			ksort($out);
-			return implode("\n", $out);
-		};
 
-		$actual = $makeComparableResult($actual);
-		$expected = $makeComparableResult($expected);
+			$makeComparableResult = function(array $list)
+			{
+				$out = [];
+				foreach ($list as $item)
+				{
+					$sort_key = $item['country'].':'.$item['state'];
 
-		
+					if (!isset($out[$sort_key]))
+					{
+						$out[$sort_key] = $item['country'].'['.$item['state'].'] =';
+					}
 
-		if ($actual !== $expected)
-		{
-			/*$differ = new \SebastianBergmann\Diff\Differ();
-			$diff = $differ->diff($expected, $actual);*/
-			echo "Results differ!\n\nExpected:\n$expected\n\nActual:\n$actual\n";
-			throw new \PrestaShop\Exception\TaxRuleGroupCreationIncorrectException();
+					$zr = '';
+					if (isset($item['ziprange']) && $item['ziprange'])
+						$zr = preg_replace('/\s+/', '', $item['ziprange'].' => ');
+
+					$out[$sort_key] .= ' ('.$zr.$item['tax'].':'.$item['behavior'].')';
+				}
+				ksort($out);
+				return implode("\n", $out);
+			};
+
+			$actual = $makeComparableResult($actual);
+			$expected = $makeComparableResult($expected);
+
+			
+
+			if ($actual !== $expected)
+			{
+				/*$differ = new \SebastianBergmann\Diff\Differ();
+				$diff = $differ->diff($expected, $actual);*/
+				echo "Results differ!\n\nExpected:\n$expected\n\nActual:\n$actual\n";
+				throw new \PrestaShop\Exception\TaxRulesGroupCreationIncorrectException();
+			}
 		}
 
 		$id_tax_rules_group = $browser->getURLParameter('id_tax_rules_group');
@@ -443,12 +449,50 @@ class TaxManagement extends ShopCapability
 		return $id_tax_rules_group;
 	}
 
+	public function getOrCreateTaxRule($name, $rate)
+	{
+		if ($name === null)
+			$name = 'Tax Rule With '.$rate.'% Rate';
+
+		if (!isset($this->tax_rules_cache[$name]))
+			$this->tax_rules_cache[$name] = $this->createTaxRule($name, $rate);
+
+		return $this->tax_rules_cache[$name];
+	}
+
+	public function getOrCreateTaxRulesGroupFromString($desc, $nocheck = false)
+	{
+		if (!isset($this->tax_rules_groups_cache[$desc]))
+		{
+			$parts = preg_split('/([+*!])/', $desc, -1, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
+			if (!preg_match('/^[+*!]$/', $parts[0]))
+				$parts = array_merge([isset($parts[1]) ? $parts[1] : '!'], $parts);
+
+			
+			$tax_rules = [];
+
+			for ($i = 0; $i < count($parts) - 1; $i += 2)
+			{
+				$tax_rules[] = [
+					'country' => null,
+					'behavior' => $parts[$i],
+					'description' => $parts[$i + 1].'% all countries',
+					'id_tax' => $this->getOrCreateTaxRule(null, $parts[$i + 1])
+				];
+			}
+
+			$this->tax_rules_groups_cache[$desc] = $this->createTaxRulesGroup("$desc TRG", $tax_rules, true, $nocheck);
+		}
+
+		return $this->tax_rules_groups_cache[$desc];
+	}
+
 	/**
 	 * Delete a tax rules group
 	 * @param  int $id_tax_rules_group
 	 * @return $this
 	 */
-	public function deleteTaxRuleGroup($id_tax_rules_group)
+	public function deleteTaxRulesGroup($id_tax_rules_group)
 	{
 		$link = $this->getShop()->getBackOfficeNavigator()->getCRUDLink('AdminTaxRulesGroup', 'delete', $id_tax_rules_group);
 		$this->getShop()->getBrowser()

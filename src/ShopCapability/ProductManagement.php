@@ -23,7 +23,7 @@ class ProductManagement extends ShopCapability
 	 * - name
 	 * - price: price before tax
 	 * - quantity: quantity (only regular stock, not advanced one)
-	 * - tax_rule: id of the tax group to use for this product
+	 * - tax_rules_group: id of the tax group to use for this product
 	 *
 	 * Returns an array with keys:
 	 * - id: the id of the product
@@ -38,7 +38,7 @@ class ProductManagement extends ShopCapability
 		->click('#link-Prices')
 		->waitFor('#priceTE')
 		->fillIn('#priceTE', $options['price'])
-		->select('#id_tax_rules_group', empty($options['tax_rule']) ? 0 : $options['tax_rule']);
+		->select('#id_tax_rules_group', empty($options['tax_rules_group']) ? 0 : $options['tax_rules_group']);
 
 		$this->saveProduct();
 
@@ -48,6 +48,8 @@ class ProductManagement extends ShopCapability
 			->click('#link-Quantities')
 			->waitFor('#qty_0')
 			->fillIn('#qty_0 input', $options['quantity']);
+
+			sleep(1);
 
 			$this->saveProduct();
 

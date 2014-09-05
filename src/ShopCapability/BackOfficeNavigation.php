@@ -16,7 +16,8 @@ class BackOfficeNavigation extends ShopCapability
 			'AdminTaxRulesGroup' => ['object_name' => 'tax_rules_group'],
 			'AdminCategories' => ['object_name' => 'category'],
 			'AdminProducts' => ['object_name' => 'product'],
-			'AdminCarriers' => ['object_name' => 'carrier']
+			'AdminCarriers' => ['object_name' => 'carrier'],
+			'AdminOrders' => ['object_name' => 'order']
 		];
 	}
 
@@ -114,6 +115,9 @@ class BackOfficeNavigation extends ShopCapability
 		->click('button[name=submitLogin]')
 		->ensureElementShowsUpOnPage('#maintab-AdminDashboard', 15);
 
+		if (!static::$controller_links)
+				static::$controller_links = $this->getMenuLinks();
+		
 		return $this;
 	}
 
