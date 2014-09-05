@@ -27,6 +27,12 @@ class InvoiceTest extends \PrestaShop\TestCase\LazyTestCase
 
 		$scenario = json_decode(file_get_contents($scenario_file), true);
 
+		if (isset($scenario['meta']['rounding_mode']))
+			$shop->getPreferencesManager()->setRoundingMode($scenario['meta']['rounding_mode']);
+
+		if (isset($scenario['meta']['rounding_type']))
+			$shop->getPreferencesManager()->setRoundingType($scenario['meta']['rounding_type']);
+
 		$shop->getCarrierManager()->createCarrier($scenario['carrier']);
 
 		if (isset($scenario['discounts']))
