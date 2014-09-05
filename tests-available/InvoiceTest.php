@@ -29,6 +29,12 @@ class InvoiceTest extends \PrestaShop\TestCase\LazyTestCase
 
 		$shop->getCarrierManager()->createCarrier($scenario['carrier']);
 
+		if (isset($scenario['discounts']))
+		{
+			foreach ($scenario['discounts'] as $name => $discount)
+				$shop->getCartRulesManager()->createCartRule(['name' => $name, 'discount' => $discount]);
+		}
+
 		foreach ($scenario['products'] as $name => $data)
 		{
 			$tax_rules_group = 0;
@@ -87,8 +93,52 @@ class InvoiceTest extends \PrestaShop\TestCase\LazyTestCase
 
 		$json = json_decode($browser->find('body')->getText(), true);
 
-		print_r($json);
+		$total_mapping = [
+			'to_pay_tax_included' => 'total_paid_tax_incl',
+			'to_pay_tax_excluded' => 'total_paid_tax_excl',
+			'products_tax_included' => 'total_products_wt',
+			'products_tax_excluded' => 'total_products',
+			'shipping_tax_included' => 'total_shipping_tax_incl',
+			'shipping_tax_excluded' => 'total_shipping_tax_excl',
+			'discounts_tax_included' => 'total_discounts_tax_incl',
+			'discounts_tax_excluded' => 'total_discounts_tax_excl',
+			'wrapping_tax_included' => 'total_wrapping_tax_incl',
+			'wrapping_tax_excluded' => 'total_wrapping_tax_excl'
+		];
 
-		$browser->waitForUserInput();
+		$errors = [];
+
+		if (isset($scenario['expect']['invoice']['total']))
+		{
+			foreach ($scenario['expect']['invoice']['total'] as $e_key => $e_value)
+			{
+				$a_value = (float)$json['order'][$total_mapping[$e_key]];
+				if($e_value !== $a_value)
+					$errors[] = "Got `$a_value` instead of `$e_value` for `$e_key`.";
+			}
+		}
+
+		if (isset($scenario['expect']['invoice']['tax']['products']))
+		{	
+			$a = [];
+
+			foreach ($json['tax_tab']['product_tax_breakdown'] as $a_rate => $a_amount)
+				$a[(float)$a_rate] = (float)$a_amount['total_amount'];
+		
+			foreach ($scenario['expect']['invoice']['tax']['products'] as $e_rate => $e_amount)
+			{
+				$e_rate = (float)$e_rate;
+				$e_amount = (float)$e_amount;
+
+				if (!isset($a[$e_rate]) || $a[$e_rate] !== $e_amount)
+				{
+					$a_amount = isset($a[$e_rate]) ? $a[$e_rate] : null;
+					$errors[] = "Invalid actual tax amount for rate `$e_rate`: got `$a_amount` instead of `$e_amount`.";
+				}
+			}
+		}
+
+		if (!empty($errors))
+			throw new \PrestaShop\Exception\InvoiceIncorrectException(implode("\n", $errors));
 	}
 }

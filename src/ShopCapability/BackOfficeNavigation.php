@@ -17,7 +17,8 @@ class BackOfficeNavigation extends ShopCapability
 			'AdminCategories' => ['object_name' => 'category'],
 			'AdminProducts' => ['object_name' => 'product'],
 			'AdminCarriers' => ['object_name' => 'carrier'],
-			'AdminOrders' => ['object_name' => 'order']
+			'AdminOrders' => ['object_name' => 'order'],
+			'AdminCartRules' => ['object_name' => 'cart_rule']
 		];
 	}
 
@@ -117,7 +118,7 @@ class BackOfficeNavigation extends ShopCapability
 
 		if (!static::$controller_links)
 				static::$controller_links = $this->getMenuLinks();
-		
+
 		return $this;
 	}
 
