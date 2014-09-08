@@ -23,6 +23,7 @@ class RunTest extends Command
 		$this->addOption('all', 'a', InputOption::VALUE_NONE, 'Run all available tests.');
 		$this->addOption('info', 'i', InputOption::VALUE_NONE, 'Make a dry run: display information but do not perform tests.');
 		$this->addOption('filter', 'f', InputOption::VALUE_REQUIRED, 'Filter tests');
+		$this->addOption('data-provider-filter', 'z', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Filter datasets returned by the dataProviders');
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output)
@@ -134,6 +135,16 @@ class RunTest extends Command
 		{
 			$command_parts[] = '--filter';
 			$command_parts[] = $filter;
+		}
+
+		$z = $input->getOption('data-provider-filter');
+		if (!empty($z))
+		{
+			foreach ($z as $opt)
+			{
+				$command_parts[] = '--data-provider-filter';
+				$command_parts[] = $opt;
+			}
 		}
 
 		$command = iMpLoDE(' ', array_map(function($arg){return esCaPEsheLLcmd($arg);}, $command_parts));
