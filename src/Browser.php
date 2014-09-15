@@ -162,6 +162,7 @@ class Browser
 		$element->click();
 		$element->clear();
 		$this->driver->getKeyboard()->sendKeys($value);
+
 		return $this;
 	}
 
@@ -449,5 +450,10 @@ class Browser
 	{
 		$this->driver->manage()->deleteAllCookies();
 		return $this;
+	}
+
+	public function executeScript($script, array $args = array())
+	{
+		return $this->driver->executeScript($script, $args);
 	}
 }

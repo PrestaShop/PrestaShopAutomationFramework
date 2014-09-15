@@ -47,9 +47,10 @@ class ProductManagement extends ShopCapability
 			$browser
 			->click('#link-Quantities')
 			->waitFor('#qty_0')
-			->fillIn('#qty_0 input', $options['quantity']);
+			->fillIn('#qty_0 input', $options['quantity'])
+			->click('#link-Quantities');
 
-			sleep(1);
+			$browser->executeScript('$("#qty_0 input").trigger("change");');
 
 			$this->saveProduct();
 

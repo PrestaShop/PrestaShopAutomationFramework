@@ -19,6 +19,7 @@ class FrontOfficeNavigation extends ShopCapability
 		$browser
 		->visit($this->getShop()->getFrontOfficeURL())
 		->click('div.header_user_info a.login')
+		->waitFor('#email')
 		->fillIn('#email', $options['customer_email'])
 		->fillIn('#passwd', $options['customer_password'])
 		->click('#SubmitLogin');

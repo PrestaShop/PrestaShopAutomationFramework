@@ -9,6 +9,8 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 {
 	private static $shops = [];
 	private static $shop_managers = [];
+	private static $test_numbers = [];
+
 	protected static $cache_initial_state = true;
 
 	public static function setUpBeforeClass()
@@ -61,9 +63,22 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 	public function setUp()
 	{
 		$this->shop = static::getShop();
+
+		if (!isset(self::$test_numbers[get_called_class()]))
+			self::$test_numbers[get_called_class()] = 0;
+		else
+			self::$test_numbers[get_called_class()]++;
 		
-		static::getShop()->getBrowser()->clearCookies();
-		// TODO: Save state of shop
+		
+		if (self::$test_numbers[get_called_class()] > 0)
+		{
+			// clean current shop
+			static::getShopManager()->cleanUp(static::getShop());
+			unset(self::$shops[$class]);
+
+			// get a new one
+			self::$shops[$class] = static::getShopManager()->getShop(static::initialState(), true, static::$cache_initial_state);
+		}
 	}
 
 	public function tearDown()

@@ -1,0 +1,41 @@
+{
+	"meta": {
+		"rounding_type": "line",
+		"rounding_mode": "half_even"
+	},
+	"carrier": {
+		"name": "SeleniumShipping",
+		"delay": "28 days later",
+		"handling": false,
+		"free": true
+	},
+	"products": {
+		"Mars La Rouge": {
+			"price": 13.799,
+			"vat": 0,
+			"quantity": 1
+		},
+		"Tablette Bling Bling": {
+			"price": 18.249,
+			"vat": 0,
+			"quantity": 97
+		},
+		"License Office": {
+			"price": 19.555,
+			"vat": 0,
+			"quantity": 99
+		},
+		"Housse balladeur": {
+			"price": 24.505,
+			"vat": 0,
+			"quantity": 99
+		}
+	},
+	"expect": {
+		"invoice": {
+			"total": {
+				"to_pay_tax_included": 6145.89
+			}
+		}
+	}
+}

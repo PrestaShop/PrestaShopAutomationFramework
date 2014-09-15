@@ -2,7 +2,7 @@
 
 namespace PrestaShop\FunctionalTest;
 
-class InvoiceTest extends \PrestaShop\TestCase\LazyTestCase
+class InvoiceTest extends \PrestaShop\TestCase\TestCase
 {
 	public function getScenarios()
 	{
@@ -17,6 +17,7 @@ class InvoiceTest extends \PrestaShop\TestCase\LazyTestCase
 
 	/**
 	 * @dataProvider getScenarios
+	 * @parallelize 4
 	 */
 	public function testInvoice($scenario_file)
 	{
@@ -79,7 +80,11 @@ class InvoiceTest extends \PrestaShop\TestCase\LazyTestCase
 		->clickButtonNamed('processAddress')
 		->clickLabelFor('cgv')
 		->click('{xpath}//tr[contains(., "'.$scenario['carrier']['name'].'")]//input[@type="radio"]')
-		->clickButtonNamed('processCarrier')
+		->clickButtonNamed('processCarrier');
+
+		$cart_total = $browser->getAttribute('#total_price', 'data-selenium-total-price');
+
+		$browser
 		->click('a.bankwire')
 		->click('#center_column button[type="submit"]');
 
@@ -114,12 +119,17 @@ class InvoiceTest extends \PrestaShop\TestCase\LazyTestCase
 
 		$errors = [];
 
+		if ($cart_total != $json['order']['total_paid_tax_incl'])
+		{
+			$errors[] = "Cart total `$cart_total` differs from invoice total of `{$json['order']['total_paid_tax_incl']}`.";
+		}
+
 		if (isset($scenario['expect']['invoice']['total']))
 		{
 			foreach ($scenario['expect']['invoice']['total'] as $e_key => $e_value)
 			{
 				$a_value = (float)$json['order'][$total_mapping[$e_key]];
-				if($e_value !== $a_value)
+				if((float)$e_value !== $a_value)
 					$errors[] = "Got `$a_value` instead of `$e_value` for `$e_key`.";
 			}
 		}
