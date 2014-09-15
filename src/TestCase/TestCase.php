@@ -62,15 +62,16 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 
 	public function setUp()
 	{
+		$class = get_called_class();
 		$this->shop = static::getShop();
 
-		if (!isset(self::$test_numbers[get_called_class()]))
-			self::$test_numbers[get_called_class()] = 0;
+		if (!isset(self::$test_numbers[$class]))
+			self::$test_numbers[$class] = 0;
 		else
-			self::$test_numbers[get_called_class()]++;
+			self::$test_numbers[$class]++;
 		
 		
-		if (self::$test_numbers[get_called_class()] > 0)
+		if (self::$test_numbers[$class] > 0)
 		{
 			// clean current shop
 			static::getShopManager()->cleanUp(static::getShop());
@@ -84,5 +85,10 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 	public function tearDown()
 	{
 		// TODO: restore state of shop
+	}
+
+	public function onException($e, $files_prefix)
+	{
+		static::getShop()->getBrowser()->takeScreenshot($files_prefix.'.png');
 	}
 }

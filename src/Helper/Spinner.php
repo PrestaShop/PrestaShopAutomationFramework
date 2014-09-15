@@ -57,4 +57,20 @@ class Spinner
 			}
 		}
 	}
+
+	public function assertNoException(callable $cb)
+	{
+		$elapsed = 0;
+		while (true)
+		{
+			try {
+				return call_user_func($cb);
+			} catch (\Exception $e) {
+				if ($elapsed >= $this->timeout_in_seconds)
+					throw $e;
+			}
+			usleep($this->interval_in_milliseconds * 1000);
+			$elapsed += $this->interval_in_milliseconds / 1000;
+		}
+	}
 }

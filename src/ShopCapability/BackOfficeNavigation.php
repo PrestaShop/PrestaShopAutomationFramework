@@ -7,7 +7,7 @@ use PrestaShop\OptionProvider;
 class BackOfficeNavigation extends ShopCapability
 {
 	public static $crud_url_settings;
-	private static $controller_links;
+	private $controller_links;
 
 	public function setup()
 	{
@@ -62,18 +62,18 @@ class BackOfficeNavigation extends ShopCapability
 	{		
 		if (isset(static::$crud_url_settings[$controller_name]) || $action === null)
 		{
-			if (!static::$controller_links)
-				static::$controller_links = $this->getMenuLinks();
+			if (!$this->controller_links)
+				$this->controller_links = $this->getMenuLinks();
 
 			$data = isset(static::$crud_url_settings[$controller_name]) ? static::$crud_url_settings[$controller_name] : null;
 
 			if ($id === null && $action !== null && $action !== 'new')
 				throw new \Exception('Missing id parameter for action other than `new`.');
 			
-			if (!isset(static::$controller_links[$controller_name]))
+			if (!isset($this->controller_links[$controller_name]))
 				throw new \PrestaShop\Exception\AdminControllerNotFoundException($controller_name);
 			
-			$base = static::$controller_links[$controller_name];
+			$base = $this->controller_links[$controller_name];
 
 			if ($action === null)
 				return $base;
@@ -116,8 +116,8 @@ class BackOfficeNavigation extends ShopCapability
 		->click('button[name=submitLogin]')
 		->ensureElementShowsUpOnPage('#maintab-AdminDashboard', 15);
 
-		if (!static::$controller_links)
-				static::$controller_links = $this->getMenuLinks();
+		if (!$this->controller_links)
+				$this->controller_links = $this->getMenuLinks();
 
 		return $this;
 	}

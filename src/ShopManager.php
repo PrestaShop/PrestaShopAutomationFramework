@@ -37,7 +37,7 @@ class ShopManager
 	{
 		$suffix = $options['suffix'];
 
-		$configuration = ConfigurationFile::getInstance($this->configuration_file_path);
+		$configuration = ConfigurationFile::getInstance($this->configuration_file_path, true);
 		$seleniumPort = SeleniumManager::getMyPort();
 		$seleniumHost = 'http://localhost:'.(int)$seleniumPort.'/wd/hub';
 		$shopSettings = $configuration->get('shop');
@@ -51,6 +51,8 @@ class ShopManager
 			$configuration->get('shop.path_to_web_root'),
 			$target_folder_name
 		);
+
+		echo "Creating shop in $target_path\n";
 		
 		// Move the files to their location if they are not already there
 		if (!is_dir($target_path))

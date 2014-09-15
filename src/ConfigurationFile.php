@@ -52,13 +52,13 @@ class ConfigurationFile implements Util\DataStoreInterface
 		return $this->options->toArray();
 	}
 
-	public static function getInstance($from_specific_path = null)
+	public static function getInstance($from_specific_path = null, $new = false)
 	{
 		$path = $from_specific_path ? $from_specific_path : 'pstaf.conf.json';
 
 		$base_path = dirname(realpath($path));
 
-		if (!isset(static::$instances[$path]))
+		if (!isset(static::$instances[$path]) || $new)
 		{
 			$conf = new ConfigurationFile($path);
 			if (!$conf->get("shop.filesystem_path"))

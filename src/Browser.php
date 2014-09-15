@@ -100,8 +100,12 @@ class Browser
 			$tos = 'cssSelector';
 		
 		$method = $unique ? 'findElement' : 'findElements';
-		$e =  $this->driver->$method(\WebDriverBy::$tos($selector));
-		return $e;
+
+		$spin = new \PrestaShop\Helper\Spinner('Could not find element.', 5);
+
+		return $spin->assertNoException(function() use ($method, $tos, $selector) {
+			return $this->driver->$method(\WebDriverBy::$tos($selector));
+		});
 	}
 
 	public function all($selector)
@@ -455,5 +459,11 @@ class Browser
 	public function executeScript($script, array $args = array())
 	{
 		return $this->driver->executeScript($script, $args);
+	}
+
+	public function takeScreenshot($save_as = null)
+	{
+		$this->driver->takeScreenshot($save_as);
+		return $this;
 	}
 }
