@@ -52,7 +52,7 @@ class ShopManager
 			$target_folder_name
 		);
 
-		echo "Creating shop in $target_path\n";
+		// echo "Creating shop in $target_path\n";
 		
 		// Move the files to their location if they are not already there
 		if (!is_dir($target_path))

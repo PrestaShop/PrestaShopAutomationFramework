@@ -35,11 +35,12 @@ class FileManagement extends ShopCapability
 		
 		mkdir($dstDir);
 		if (!chmod($dstDir, 0777))
-			{
-				throw new \Exception("Can't chmod $dstDir", 1);
-			}
+		{
+			throw new \Exception("Can't chmod $dstDir", 1);
+		}
 
-		foreach ($files as $src) {
+		foreach ($files as $src) 
+		{
 			$dst = FS::join($dstDir, substr($src, strlen($srcDir)+1));
 
 			if (is_dir($src))
@@ -92,7 +93,8 @@ EOS;
 		$this->getBrowser()->visit($this->getShop()->getFrontOfficeURL().'/selfkill.php');
 
 		$spinner = new \PrestaShop\Helper\Spinner(
-			sprintf('Selfkill failed: file `%s` should not exist anymore.', $this->getShop()->getFilesystemPath())
+			sprintf('Selfkill failed: file `%s` should not exist anymore.', $this->getShop()->getFilesystemPath()),
+			30
 		);
 
 		$spinner->assertBecomesTrue(function() {

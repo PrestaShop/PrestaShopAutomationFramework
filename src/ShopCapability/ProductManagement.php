@@ -7,6 +7,7 @@ class ProductManagement extends ShopCapability
 
 	private function saveProduct()
 	{
+		sleep(5);
 		$browser = $this->getBrowser();
 
 		$assert = new \PrestaShop\Helper\Spinner('Save button did not appear in time.', 10);
@@ -47,8 +48,7 @@ class ProductManagement extends ShopCapability
 			$browser
 			->click('#link-Quantities')
 			->waitFor('#qty_0')
-			->fillIn('#qty_0 input', $options['quantity'])
-			->click('#link-Quantities');
+			->fillIn('#qty_0 input', $options['quantity']);
 
 			$browser->executeScript('$("#qty_0 input").trigger("change");');
 
@@ -58,11 +58,15 @@ class ProductManagement extends ShopCapability
 			->click('#link-Quantities')
 			->waitFor('#qty_0');
 
-			$a = (int)$this->i18nParse($browser->getValue('#qty_0 input'), 'float');
-			$e = (int)$options['quantity'];
+			$spinner = new \PrestaShop\Helper\Spinner();
 
-			if ($e !== $a)
-				throw new \PrestaShop\Exception\ProductCreationIncorrectException('quantity', $e, $a);
+			$spinner->assertNoException(function() use ($browser, $options) {
+				$a = (int)$this->i18nParse($browser->getValue('#qty_0 input'), 'float');
+				$e = (int)$options['quantity'];
+
+				if ($e !== $a)
+					throw new \PrestaShop\Exception\ProductCreationIncorrectException('quantity', $e, $a);
+			});
 		}
 
 		$browser
