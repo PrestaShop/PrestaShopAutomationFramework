@@ -19,7 +19,6 @@
 		"sebastian/diff": "*"
 	},
 	"require-dev": {
-        "phpdocumentor/phpdocumentor": "2.*"
     },
 	"autoload": {
 		"psr-4": {
