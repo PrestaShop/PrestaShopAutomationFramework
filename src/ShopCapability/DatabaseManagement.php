@@ -2,6 +2,8 @@
 
 namespace PrestaShop\ShopCapability;
 
+use djfm\Process\Process;
+
 class DatabaseManagement extends ShopCapability
 {
 	private $pdo;
@@ -34,8 +36,6 @@ class DatabaseManagement extends ShopCapability
 			return false;
 
 		
-
-
 		$sql = 'SHOW DATABASES LIKE \''.$database_name.'\'';
 		$stm = $h->prepare($sql);
 		$stm->execute();
@@ -61,24 +61,20 @@ class DatabaseManagement extends ShopCapability
 
 	public function buildMysqlCommand($command, array $arguments)
 	{
-		$command = $command
-		.' -u'.escapeshellcmd($this->getShop()->getMysqlUser());
-		
+		$options = [
+			'-u' => $this->getShop()->getMysqlUser(),
+			'-h' => $this->getShop()->getMysqlHost(),
+			'-P' => $this->getShop()->getMysqlPort(),
+		];
+
 		if ($this->getShop()->getMysqlPass())
-			$command .= ' -p'.escapeshellcmd($this->getShop()->getMysqlPass());
+		{
+			$options['-p'] = $this->getShop()->getMysqlPass();
+		}
 
-		$command = $command
-		.' -h'.escapeshellcmd($this->getShop()->getMysqlHost())
-		.' -P'.escapeshellcmd($this->getShop()->getMysqlPort())
-		.implode('', array_map(function($arg){
-			if (is_array($arg))
-				return ' '.$arg[0];
-			else
-				return ' '.escapeshellcmd($arg);
-		}, $arguments))
-		.' 2>/dev/null'; // quickfix for warning about using password on command line
+		
 
-		return $command;
+		return new Process($command, $arguments, $options, ['wait' => true]);
 	}
 
 	public function duplicateDatabaseTo($new_database_name)
@@ -93,14 +89,14 @@ class DatabaseManagement extends ShopCapability
 
 		foreach ($commands as $command)
 		{
-			exec($command);
+			$command->run();
 		}
 	}
 
 	public function dumpTo($path)
 	{
 		$command = $this->buildMysqlCommand('mysqldump', [$this->getShop()->getMysqlDatabase(), ['>'], $path]);
-		exec($command);
+		$command->run();
 	}
 
 	public function loadDump($dump_path, $database_name = null)
@@ -111,11 +107,11 @@ class DatabaseManagement extends ShopCapability
 		if (!$this->databaseExists($database_name))
 		{
 			$command = $this->buildMysqlCommand('mysqladmin', ['create', $database_name]);
-			exec($command);
+			$command->run();
 		}
 
-		$command = $this->buildMysqlCommand('mysql', [$database_name, ['<'], $dump_path]);
-		exec($command);
+		$command = $this->buildMysqlCommand('mysql', [$database_name, '<', $dump_path]);
+		$command->run();
 
 		return $this;
 	}
