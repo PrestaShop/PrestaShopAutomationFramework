@@ -42,6 +42,11 @@ class FileSystem
 		return file_exists(call_user_func_array(__NAMESPACE__.'\FileSystem::join', func_get_args()));
 	}
 
+	private static function standardizePath($path)
+	{
+		return str_replace('\\', '/', $path);
+	}
+
 	private static function _lsRecursive($dir, array $exclude_exceptions = array(), array $exclude_regexps = array(), $topLevelDirectory)
 	{
 		$files = array();
@@ -59,7 +64,7 @@ class FileSystem
 
 			foreach ($exclude_exceptions as $exp)
 			{
-				if (preg_match($exp, $relpath))
+				if (preg_match($exp, self::standardizePath($relpath)))
 				{
 					$dont_exclude = true;
 					break;
@@ -70,7 +75,7 @@ class FileSystem
 			{
 				foreach ($exclude_regexps as $exp)
 				{
-					if (preg_match($exp, $relpath))
+					if (preg_match($exp, self::standardizePath($relpath)))
 						continue 2;
 				}
 			}
