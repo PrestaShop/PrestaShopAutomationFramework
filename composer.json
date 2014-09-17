@@ -3,6 +3,10 @@
         {
             "type": "git",
             "url": "https://github.com/djfm/ptest"
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/djfm/process"
         }
     ],
 	"require": {
@@ -11,6 +15,7 @@
 		"phpunit/phpunit": "4.1.*",
 		"brianium/paratest": "dev-master",
 		"djfm/ptest": "dev-master",
+		"djfm/process": "dev-master",
 		"sebastian/diff": "*"
 	},
 	"require-dev": {
