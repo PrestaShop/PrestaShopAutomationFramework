@@ -81,21 +81,16 @@ class DatabaseManagement extends ShopCapability
 	{
 		$old_database_name = $this->getShop()->getMysqlDatabase();
 
-		$commands = [
-			$this->buildMysqlCommand('mysqladmin', ['create', $new_database_name]),
-			$this->buildMysqlCommand('mysqldump', [$old_database_name])
-			.' | '.$this->buildMysqlCommand('mysql', [$new_database_name])
-		];	
-
-		foreach ($commands as $command)
-		{
-			$command->run();
-		}
+		$this->buildMysqlCommand('mysqladmin', ['create', $new_database_name])->run();
+		Process::pipe(
+			$this->buildMysqlCommand('mysqldump', [$old_database_name]),
+			$this->buildMysqlCommand('mysql', [$new_database_name])
+		);
 	}
 
 	public function dumpTo($path)
 	{
-		$command = $this->buildMysqlCommand('mysqldump', [$this->getShop()->getMysqlDatabase(), ['>'], $path]);
+		$command = $this->buildMysqlCommand('mysqldump', [$this->getShop()->getMysqlDatabase(), '>', $path]);
 		$command->run();
 	}
 
