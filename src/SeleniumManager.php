@@ -37,21 +37,13 @@ class SeleniumManager
 		return $path;
 	}
 
-	public static function isMySeleniumPID($pid)
-	{
-		// TODO: Will not work on windows
-		$cmd = 'ps '.escapeshellarg($pid);
-		$info = `$cmd`;
-		return (strpos($info, static::getSeleniumJARPath()) !== false);
-	}
-
 	public static function isSeleniumStarted()
 	{
 		// TODO: Will not work on windows
 		if (file_exists('selenium.pid'))
 		{
-			$pid = (int)json_decode(file_get_contents('selenium.pid'), true)['pid'];
-			return static::isMySeleniumPID($pid) ? $pid : false;
+			$pid = json_decode(file_get_contents('selenium.pid'), true)['pid'];
+			return \djfm\Process\Process::runningByUPID($pid) ? $pid : false;
 		}
 		else
 			return false;
@@ -64,7 +56,6 @@ class SeleniumManager
 
 	public static function startSelenium()
 	{
-		// TODO Windows
 		if (static::isSeleniumStarted() !== false)
 			return;
 
@@ -72,31 +63,22 @@ class SeleniumManager
 
 		$port = static::findOpenPort();
 
-		$cmd = 'exec java -jar '.escapeshellcmd($sjp).' -port '.escapeshellcmd($port);
+		$process = new \djfm\Process\Process('java', [], [
+			'-jar' => $sjp,
+			'-port' => $port
+		]);
 
-		$io = [
-			0 => ['file', 'selenium.log', 'a'],
-			1 => ['file', '/dev/null', 'r'],
-			2 => ['file', 'selenium.log', 'a']
-		];
+		$upid = $process->run(STDIN, 'selenium.log', 'selenium.log');
 
-		$pipes = [];
-
-		$res = proc_open($cmd, $io, $pipes);
-		if (is_resource($res))
-		{
-			$pid = proc_get_status($res)['pid'];
-			file_put_contents('selenium.pid', json_encode(['pid' => $pid, 'port' => $port]));
-		}
+		file_put_contents('selenium.pid', json_encode(['pid' => $upid, 'port' => $port]));
 	}
 
 	public static function stopSelenium()
 	{
-		// TODO Windows
 		$pid = static::isSeleniumStarted();
 		if (false !== $pid)
 		{
-			posix_kill($pid, 15);
+			\djfm\Process\Process::killByUPID($pid);
 			unlink('selenium.pid');
 		}
 	}
