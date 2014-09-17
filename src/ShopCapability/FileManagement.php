@@ -94,12 +94,12 @@ EOS;
 
 		$spinner = new \PrestaShop\Helper\Spinner(
 			sprintf('Selfkill failed: file `%s` should not exist anymore.', $this->getShop()->getFilesystemPath()),
-			30
+			300
 		);
 
-		$spinner->assertBecomesTrue(function() {
-			$path = $this->getShop()->getFilesystemPath();
+		$path = $this->getShop()->getFilesystemPath();
 
+		$spinner->assertBecomesTrue(function() use ($path) {
 			if (file_exists($path))
 				@rmdir($path);
 			

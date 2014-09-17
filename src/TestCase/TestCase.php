@@ -19,6 +19,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 		$class = get_called_class();
 		$manager = ShopManager::getInstance();
 		self::$shops[$class] = $manager->getShop(static::initialState(), true, static::$cache_initial_state);
+		self::$shops[$class]->getBrowser()->clearCookies(); // who knows
 		self::$shop_managers[$class] = $manager;
 		register_shutdown_function([$class, 'tearDownAfterClass']);
 	}
@@ -79,6 +80,10 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 
 			// get a new one
 			self::$shops[$class] = static::getShopManager()->getShop(static::initialState(), true, static::$cache_initial_state);
+			$this->shop = self::$shops[$class];
+
+			// can't hurt
+			self::$shops[$class]->getBrowser()->clearCookies();
 		}
 	}
 
