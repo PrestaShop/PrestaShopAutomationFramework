@@ -133,11 +133,11 @@ class ShopManager
 		flock($h, LOCK_EX);
 		$uid = (int)fgets($h) + 1;
 		ftruncate($h, 0);
+		rewind($h);
 		fwrite($h, "$uid");
 		fflush($h);
 		flock($h, LOCK_UN);
 		fclose($h);
-
 		return $uid;
 	}
 
