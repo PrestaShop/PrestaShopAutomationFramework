@@ -126,17 +126,18 @@ class ShopManager
 	public function getUID()
 	{
 		$uid_lock_path = FS::join($this->getWorkingDirectory(), 'pstaf.maxuid');
-			
+
 		$h = fopen($uid_lock_path, 'c+');
 		if (!$h)
 			throw new \Exception('Could not get pstaf.maxuid file.');
 		flock($h, LOCK_EX);
-		$uid = (int)file_get_contents($uid_lock_path) + 1;
-		file_put_contents($uid_lock_path, $uid);
+		$uid = (int)fgets($h) + 1;
+		ftruncate($h, 0);
+		rewind($h);
+		fwrite($h, "$uid");
 		fflush($h);
 		flock($h, LOCK_UN);
 		fclose($h);
-
 		return $uid;
 	}
 
