@@ -38,20 +38,20 @@ class FileManagement extends ShopCapability
 
 		foreach ($files as $src) 
 		{
-			$dst = FS::join($dstDir, substr($src, strlen($srcDir)+1));
+			$dst = FS::join($dstDir, substr($src, strlen(realpath($srcDir))+1));
 
 			if (is_dir($src))
 			{
-				if (!mkdir($dst) || !chmod($dst, 0777))
+				if (!@mkdir($dst) || !@chmod($dst, 0777))
 				{
-					throw new \Exception("Can't create directory: $dst", 1);
+					throw new \Exception("Can't create / chmod directory: $dst", 1);
 				}
 			}
 			else
 			{
-				if (!copy($src, $dst) || !chmod($dst, 0777))
+				if (!@copy($src, $dst) || !@chmod($dst, 0777))
 				{
-					throw new \Exception("Can't copy $src to $dst", 1);
+					throw new \Exception("Can't copy / chmod $src to $dst", 1);
 				}
 			}
 		}

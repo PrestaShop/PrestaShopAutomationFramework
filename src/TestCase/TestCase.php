@@ -13,20 +13,25 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 
 	protected static $cache_initial_state = true;
 
-	public static function setUpBeforeClass()
+	private static function newShop()
 	{
-		\PrestaShop\SeleniumManager::ensureSeleniumIsRunning();
 		$class = get_called_class();
-		$manager = ShopManager::getInstance();
-		
-		self::$shops[$class] = $manager->getShop([
+		self::$shops[$class] = self::getShopManager()->getShop([
 			'initial_state' => static::initialState(),
 			'temporary' => true,
 			'use_cache' => true
 		]);
 
-		self::$shops[$class]->getBrowser()->clearCookies(); // who knows
+		self::$shops[$class]->getBrowser()->clearCookies();
+	}
+
+	public static function setUpBeforeClass()
+	{
+		\PrestaShop\SeleniumManager::ensureSeleniumIsRunning();
+		$class = get_called_class();
+		$manager = ShopManager::getInstance();
 		self::$shop_managers[$class] = $manager;
+		self::newShop();
 		register_shutdown_function([$class, 'tearDownAfterClass']);
 	}
 
@@ -61,7 +66,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 		return self::$shops[$class];
 	}
 
-	public static function getShopManager()
+	private static function getShopManager()
 	{
 		$class = get_called_class();
 		return self::$shop_managers[$class];
@@ -70,7 +75,6 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 	public function setUp()
 	{
 		$class = get_called_class();
-		$this->shop = static::getShop();
 
 		if (!isset(self::$test_numbers[$class]))
 			self::$test_numbers[$class] = 0;
@@ -82,15 +86,11 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 		{
 			// clean current shop
 			static::getShopManager()->cleanUp(static::getShop());
-			unset(self::$shops[$class]);
-
 			// get a new one
-			self::$shops[$class] = static::getShopManager()->getShop(static::initialState(), true, static::$cache_initial_state);
-			$this->shop = self::$shops[$class];
-
-			// can't hurt
-			self::$shops[$class]->getBrowser()->clearCookies();
+			self::newShop();
 		}
+
+		$this->shop = static::getShop();
 	}
 
 	public function tearDown()
