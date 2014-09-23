@@ -182,7 +182,7 @@ class ShopManager
 
 		// At this point, we know where to take the files from, i.e.,
 		// from $source_files_path
-		// We now determine where to copy them to
+		// We now determine where to copy them to...
 		
 		$shop_name = basename($conf->getAsAbsolutePath('shop.filesystem_path'));
 		
@@ -199,19 +199,24 @@ class ShopManager
 			$shop_name
 		);
 
+		$target_same_as_source = realpath($source_files_path) === realpath($target_files_path);
+
 		// We say we are doing a new installation if the target files are not there
 		$new_install = !file_exists($target_files_path);
 
-		if (!$new_install && $options['overwrite'])
+		if (!$new_install && $options['overwrite'] && !$target_same_as_source)
 		{
 			FS::webRmR($target_files_path, $url);
 		}
 
 		// Finally put the shop files in place!
-		\PrestaShop\ShopCapability\FileManagement::copyShopFiles(
-			$source_files_path,
-			$target_files_path
-		);
+		if (!$target_same_as_source)
+		{
+			\PrestaShop\ShopCapability\FileManagement::copyShopFiles(
+				$source_files_path,
+				$target_files_path
+			);
+		}
 
 		// Update the configuration with the new values
 		$conf->set('shop.front_office_url', $url);

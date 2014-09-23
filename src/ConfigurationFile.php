@@ -23,7 +23,7 @@ class ConfigurationFile implements Util\DataStoreInterface
 
 		if (!$this->get("shop.filesystem_path"))
 		{
-			$conf->set("shop.filesystem_path", realpath(dirname($this->path)));
+			$this->set("shop.filesystem_path", realpath(dirname($this->path)));
 		}
 	}
 
