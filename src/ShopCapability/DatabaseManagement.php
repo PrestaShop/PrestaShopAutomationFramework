@@ -128,5 +128,7 @@ class DatabaseManagement extends ShopCapability
 		$sql = sprintf($sql, $this->getShop()->getDatabasePrefix());
 		$stm = $h->prepare($sql);
 		$stm->execute(['new' => $new_physical_uri, 'old' => $old_physical_uri]);
+
+		return $this;
 	}
 }

@@ -98,4 +98,42 @@ class FileSystem
 	{
 		return static::_lsRecursive($dir, $exclude_exceptions, $exclude_regexps, $dir);
 	}
+
+	public static function webRmR($directory, $url)
+	{
+		$kill_script = <<<'EOS'
+				<?php
+
+				$dir = dirname(__FILE__);
+
+				foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST) as $path) {
+				    $path->isDir() ? @rmdir($path->getPathname()) : @unlink($path->getPathname());
+				}
+				@rmdir($dir);
+				echo "done.";
+
+EOS;
+		$target = self::join($directory, 'pstaf.selfkill.php');
+
+		if (!file_put_contents($target, $kill_script))
+		{
+			throw new \Exception('Could not put selfkill script in place.');
+		}
+
+		$got = trim(file_get_contents($url.'/pstaf.selfkill.php'));
+
+		if ($got !== 'done.')
+			throw new \Exception('Invalid output from selfkill script.');
+
+		$spinner = new Spinner(
+			sprintf('Selfkill failed: file `%s` should not exist anymore.', $directory),
+			300
+		);
+
+		$spinner->assertBecomesTrue(function() use ($directory) {
+			if (file_exists($directory))
+				@rmdir($directory);
+			return !file_exists($directory);
+		});
+	}
 }

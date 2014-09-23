@@ -22,6 +22,8 @@ class Browser
 		$this->driver = \RemoteWebDriver::create($seleniumSettings['host'], [
 			'browserName' => 'firefox'
 		]);
+
+		$this->driver->manage()->window()->setSize(new \WebDriverDimension(1600, 1200));
 	}
 
 	public function __destruct()

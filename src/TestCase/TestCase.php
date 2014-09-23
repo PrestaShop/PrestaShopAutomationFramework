@@ -18,7 +18,13 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 		\PrestaShop\SeleniumManager::ensureSeleniumIsRunning();
 		$class = get_called_class();
 		$manager = ShopManager::getInstance();
-		self::$shops[$class] = $manager->getShop(static::initialState(), true, static::$cache_initial_state);
+		
+		self::$shops[$class] = $manager->getShop([
+			'initial_state' => static::initialState(),
+			'temporary' => true,
+			'use_cache' => true
+		]);
+
 		self::$shops[$class]->getBrowser()->clearCookies(); // who knows
 		self::$shop_managers[$class] = $manager;
 		register_shutdown_function([$class, 'tearDownAfterClass']);

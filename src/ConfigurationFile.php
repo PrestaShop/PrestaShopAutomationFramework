@@ -20,6 +20,11 @@ class ConfigurationFile implements Util\DataStoreInterface
 			$data = json_decode(file_get_contents($path), true);
 			$this->update($data);
 		}
+
+		if (!$this->get("shop.filesystem_path"))
+		{
+			$conf->set("shop.filesystem_path", realpath(dirname($this->path)));
+		}
 	}
 
 	public function update($options)
@@ -52,31 +57,29 @@ class ConfigurationFile implements Util\DataStoreInterface
 		return $this->options->toArray();
 	}
 
-	public static function getInstance($from_specific_path = null, $new = false)
+	/**
+	 * Returns a key that may represent a relative path
+	 * relative to $this->path as an absolute path
+	 * @param  boolean $ensure_exists throw exception if final path does not exist
+	 * @return string
+	 */
+	public function getAsAbsolutePath($key, $ensure_exists = true)
 	{
-		$path = $from_specific_path ? $from_specific_path : 'pstaf.conf.json';
+		$path = $this->get($key);
+		if (!$path)
+			throw new \Exception("Configuration key `$key` not found in `{$this->path}`.");
 
-		$base_path = dirname(realpath($path));
+		if (!FS::isAbsolutePath($path))
+			$path = realpath(FS::join(dirname($this->path), $path));
 
-		if (!isset(static::$instances[$path]) || $new)
-		{
-			$conf = new ConfigurationFile($path);
-			if (!$conf->get("shop.filesystem_path"))
-			{
-				$conf->set("shop.filesystem_path", $base_path);
-			}
+		if ($ensure_exists && !file_exists($path))
+			throw new \Exception("File or folder `$path` doesn't exist!");
 
-			$filesystem_path = $conf->get('shop.filesystem_path');
-			if (FS::isRelativePath($filesystem_path))
-				$conf->set('shop.filesystem_path', realpath(FS::join($base_path, $filesystem_path)));
+		return $path;
+	}
 
-			$path_to_web_root = $conf->get('shop.path_to_web_root');
-			if (FS::isRelativePath($path_to_web_root))
-				$conf->set('shop.path_to_web_root', realpath(FS::join($base_path, $path_to_web_root)));			
-
-			static::$instances[$path] = $conf;
-		}
-
-		return static::$instances[$path];
+	public static function getDefaultPath()
+	{
+		return 'pstaf.conf.json';
 	}
 }
