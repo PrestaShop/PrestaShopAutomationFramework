@@ -110,6 +110,9 @@ class ShopManager
 	 */
 	public function getShop(array $options)
 	{
+		$inplace_allowed = getenv('PSTAF_INPLACE') === '1';
+		$inplace = false;
+
 		$conf = new ConfigurationFile($this->configuration_file_path);
 
 		$options['temporary'] = !empty($options['temporary']);
@@ -119,6 +122,8 @@ class ShopManager
 		if (!isset($options['initial_state']) || !is_array($options['initial_state']))
 			$options['initial_state'] = [];
 
+		if ($inplace_allowed)
+			$options['use_cache'] = false;
 
 		// this may become a file resource
 		// if it is, then we must close it and unlock it once
@@ -187,7 +192,7 @@ class ShopManager
 		$shop_name = basename($conf->getAsAbsolutePath('shop.filesystem_path'));
 		
 		// Temporary shop needs unique URL / folder-name
-		if ($options['temporary'])
+		if ($options['temporary'] && !$inplace_allowed)
 			$shop_name .= '_tmpshpcpy_'.$this->getUID();
 
 		// Our shop URL
@@ -200,6 +205,7 @@ class ShopManager
 		);
 
 		$target_same_as_source = realpath($source_files_path) === realpath($target_files_path);
+		$inplace = $inplace_allowed && $target_same_as_source;
 
 		// We say we are doing a new installation if the target files are not there
 		$new_install = !file_exists($target_files_path);
@@ -231,9 +237,13 @@ class ShopManager
 		$shop = new \PrestaShop\Shop($conf->get('shop'), $seleniumSettings);
 
 
+		if ($inplace)
+		{
+			// nothing for now
+		}
 		// if we're not using the cache, we need to setup the initial state
 		// and maybe create a cache
-		if (!$using_cache && ($new_install || $options['overwrite']))
+		else if (!$using_cache && ($new_install || $options['overwrite']))
 		{
 			$shop->getFixtureManager()->setupInitialState($options['initial_state']);
 
@@ -262,7 +272,7 @@ class ShopManager
 			->changeHtaccessPhysicalURI("/$shop_name/");
 		}
 
-		$shop->setTemporary($options['temporary']);
+		$shop->setTemporary($options['temporary'] && !$inplace);
 
 		if ($lock)
 		{

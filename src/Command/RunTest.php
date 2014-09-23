@@ -148,7 +148,14 @@ class RunTest extends Command
 		);
 
 		if ($input->getOption('inplace'))
+		{
+			echo "-----------------------------------------------------\n";
+			echo "-    Warning, running test inplace (as asked).      -\n";
+			echo "- Initial states will not be changed, nor restored. -\n";
+			echo "-----------------------------------------------------\n";
+			echo "\n";
 			$process->setEnv('PSTAF_INPLACE', 1);
+		}
 
 		$process->run(STDIN, STDOUT, STDERR);
 	}
