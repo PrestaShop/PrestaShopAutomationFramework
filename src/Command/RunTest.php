@@ -22,8 +22,9 @@ class RunTest extends Command
 		$this->addOption('runner', 'r', InputOption::VALUE_REQUIRED, 'Test runner to use: phpunit, paratest or ptest.', 'ptest');
 		$this->addOption('all', 'a', InputOption::VALUE_NONE, 'Run all available tests.');
 		$this->addOption('info', 'i', InputOption::VALUE_NONE, 'Make a dry run: display information but do not perform tests.');
-		$this->addOption('filter', 'f', InputOption::VALUE_REQUIRED, 'Filter tests');
+		$this->addOption('filter', 'f', InputOption::VALUE_REQUIRED, 'Filter tests.');
 		$this->addOption('data-provider-filter', 'z', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Filter datasets returned by the dataProviders');
+		$this->addOption('inplace', 'I', InputOption::VALUE_NONE, 'Run tests against the current shop, when its source dir and target dir are the same.');
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output)
@@ -114,55 +115,41 @@ class RunTest extends Command
 			$output->writeln('<error>Could not find requested test.</error>');
 		}
 
-		$command_parts = [$runner_path];
+		$arguments = [];
+		$options = [];
 
 		if ($runner === 'ptest')
-			$command_parts[] = 'run';
+			$arguments[] = 'run';
 
 		if ($info)
-			$command_parts[] = '-i';
+			$options['-i'] = '';
 
-		$command_parts[] = $tests_path;
+		$arguments[] = $tests_path;
 
 		if ($runner === 'ptest' || $runner === 'paratest')
-		{
-			$command_parts[] = '-p';
-			$command_parts[] = $parallel;
-		}
+			$options['-p'] = $parallel; 
 
 		$filter = $input->getOption('filter');
 		if ($filter)
-		{
-			$command_parts[] = '--filter';
-			$command_parts[] = $filter;
-		}
+			$options['--filter'] = $filter;
 
 		$z = $input->getOption('data-provider-filter');
 		if (!empty($z))
 		{
 			foreach ($z as $opt)
-			{
-				$command_parts[] = '--data-provider-filter';
-				$command_parts[] = $opt;
-			}
+				$options['--data-provider-filter'] = $opt;
 		}
 
-		$command = iMpLoDE(' ', array_map(function($arg){return esCaPEsheLLcmd($arg);}, $command_parts));
-		$io = [STDIN, STDOUT, STDOUT];
-		$pipes = [];
-		$h = proc_open($command, $io, $pipes);
+		$process = new \djfm\Process\Process(
+			$runner_path,
+			$arguments,
+			$options,
+			['wait' => true]
+		);
 
-		$status = proc_get_status($h);
+		if ($input->getOption('inplace'))
+			$process->setEnv('PSTAF_INPLACE', 1);
 
-		if (extension_loaded('pcntl'))
-		{
-			$st = null;
-			pcntl_waitpid($status['pid'], $st);
-		}
-		else
-		{
-			while (proc_get_status($h)['running'])
-				sleep(1);
-		}
+		$process->run(STDIN, STDOUT, STDERR);
 	}
 }
