@@ -147,13 +147,11 @@ class ShopManager
 
 		// if caching is allowed, we first check
 		// whether the source files exist or not
-		if ($options['use_cache'])
+		if ($options['use_cache'] && $options['initial_state'] !== [])
 		{
 			// since the source files may still be under build
 			// we acquire a lock on a file that describes the initial state
-			$initial_state_key = $this->getInitialStateKey(
-				isset($options['initial_state']) ? $options['initial_state'] : []
-			);
+			$initial_state_key = $this->getInitialStateKey($options['initial_state']);
 
 			// acquire lock
 			$lock_path = FS::join($this->getWorkingDirectory(), "pstaf.$initial_state_key.istate.lock");

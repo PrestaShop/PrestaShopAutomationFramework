@@ -7,7 +7,6 @@ class ProductManagement extends ShopCapability
 
 	private function saveProduct()
 	{
-		sleep(5);
 		$browser = $this->getBrowser();
 
 		$assert = new \PrestaShop\Helper\Spinner('Save button did not appear in time.', 10);
