@@ -119,6 +119,8 @@ class Shop
 		$this->addShopCapability('\PrestaShop\ShopCapability\CarrierManagement', 'getCarrierManager');
 		$this->addShopCapability('\PrestaShop\ShopCapability\CartRulesManagement', 'getCartRulesManager');
 		$this->addShopCapability('\PrestaShop\ShopCapability\PreferencesManagement', 'getPreferencesManager');
+		$this->addShopCapability('\PrestaShop\ShopCapability\CheckoutManagement', 'getCheckoutManager');
+		$this->addShopCapability('\PrestaShop\ShopCapability\OrderManagement', 'getOrderManager');
 	}
 
 	/**

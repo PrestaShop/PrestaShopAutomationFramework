@@ -4,9 +4,10 @@ namespace PrestaShop\PageObject;
 
 class AdminTranslations extends PageObject
 {
-	public function visit()
+	public function visit($url = null)
 	{
 		$this->getShop()->getBackOfficeNavigator()->visit('AdminTranslations');
+		return $this;
 	}
 
 	public function addOrUpdateLanguage($lc)
@@ -15,5 +16,6 @@ class AdminTranslations extends PageObject
 		->jqcSelect('#params_import_language', $lc.'|'.$this->getShop()->getPrestaShopVersion())
 		->clickButtonNamed('submitAddLanguage')
 		->ensureStandardSuccessMessageDisplayed();
+		return $this;
 	}
 }

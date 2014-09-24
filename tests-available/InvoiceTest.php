@@ -65,44 +65,22 @@ class InvoiceTest extends \PrestaShop\TestCase\TestCase
 
 		foreach ($scenario['products'] as $name => $data)
 		{
-			$browser
+			$shop
+			->getPageObject('FrontOfficeProductSheet')
 			->visit($data['info']['fo_url'])
-			->fillIn('#quantity_wanted', $data['quantity'])
-			->click('#add_to_cart button');
-
-			sleep(1);
+			->setQuantity($data['quantity'])
+			->addToCart();
 		}
 
-		$browser
-		->visit($shop->getFrontOfficeURL())
-		->click('div.shopping_cart a')
-		->click('a.standard-checkout')
-		->clickButtonNamed('processAddress')
-		->clickLabelFor('cgv')
-		->click('{xpath}//tr[contains(., "'.$scenario['carrier']['name'].'")]//input[@type="radio"]')
-		->clickButtonNamed('processCarrier');
+		$data = $shop->getCheckoutManager()->orderCurrentCartFiveSteps([
+			'carrier' => $scenario['carrier']['name'],
+			'payment' => 'bankwire'
+		]);
 
-		$cart_total = $browser->getAttribute('#total_price', 'data-selenium-total-price');
+		$cart_total = $data['cart_total'];
+		$id_order = $data['id_order'];
 
-		$browser
-		->click('a.bankwire')
-		->click('#center_column button[type="submit"]');
-
-		$id_order = (int)$browser->getURLParameter('id_order');
-
-		if ($id_order <= 0)
-			throw new \Exception('Could not create order: no valid id_order found after payment.');
-
-		$shop->getBackOfficeNavigator()
-		->visit('AdminOrders', 'view', $id_order)
-		->jqcSelect('#id_order_state', 2)
-		->clickButtonNamed('submitState');
-
-		$invoice_json_link = $browser->getAttribute('[data-selenium-id="view_invoice"]', 'href').'&debug=1';
-
-		$browser->visit($invoice_json_link);
-
-		$json = json_decode($browser->find('body')->getText(), true);
+		$json = $shop->getOrderManager()->visit($id_order)->validate()->getInvoiceAsJSON();
 
 		$total_mapping = [
 			'to_pay_tax_included' => 'total_paid_tax_incl',
