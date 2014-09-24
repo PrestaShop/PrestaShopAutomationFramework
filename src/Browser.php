@@ -172,6 +172,23 @@ class Browser
 		return $this;
 	}
 
+	public function setFile($selector, $path)
+	{
+		$element = $this->find($selector);
+		if (!$element->isDisplayed())
+		{
+			$this->executeScript("
+				arguments[0].style.setProperty('display', 'inherit', 'important');
+				arguments[0].style.setProperty('visibility', 'visible', 'important');
+				arguments[0].style.setProperty('width', 'auto', 'important');
+				arguments[0].style.setProperty('height', 'auto', 'important');
+			", [$element]);
+		}
+		$element->sendKeys($path);
+
+		return $this;
+	}
+
 	public function sendKeys($keys)
 	{
 		$this->driver->getKeyboard()->sendKeys($keys);
