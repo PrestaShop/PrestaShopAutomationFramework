@@ -102,4 +102,46 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 	{
 		static::getShop()->getBrowser()->takeScreenshot($files_prefix.'.png');
 	}
+
+	public function getExamplesPath()
+	{
+		$class = end(explode('\\', get_called_class()));
+		
+		$path = realpath(__DIR__.'/../../tests-available/'.$class.'/examples/');
+
+		if (!$path)
+			throw new \PrestaShop\Exception\FailedTestException("No example files found for $class.\nThey should have been in tests-available/$class/examples/.");
+
+		return $path;
+	}
+
+	public function getExamplePath($name)
+	{
+		return \PrestaShop\Helper\FileSystem::join($this->getExamplesPath(), $name);
+	}
+
+	public function getJSONExample($example)
+	{
+		return json_decode(file_get_contents($this->getExamplePath($example)), true);
+	}
+
+	public function jsonExampleFiles()
+	{
+		return $this->exampleFiles('json');
+	}
+
+	public function exampleFiles($ext)
+	{
+		$files = [];
+		$src_dir = $this->getExamplesPath();
+
+		if (!$src_dir)
+			return $files;
+
+		foreach (scandir($src_dir) as $entry)
+			if (preg_match('/\.'.$ext.'$/', $entry))
+				$files[] = [$entry];
+
+		return $files;
+	}
 }

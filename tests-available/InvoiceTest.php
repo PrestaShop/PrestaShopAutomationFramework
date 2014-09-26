@@ -4,17 +4,6 @@ namespace PrestaShop\FunctionalTest;
 
 class InvoiceTest extends \PrestaShop\TestCase\TestCase
 {
-	public function getScenarios()
-	{
-		$scenarios = [];
-		$src_dir = __DIR__.'/data/InvoiceTest';
-		foreach (scandir($src_dir) as $entry)
-			if (preg_match('/\.json$/', $entry))
-				$scenarios[] = ["$src_dir/$entry"];
-
-		return $scenarios;
-	}
-
 	public static function checkInvoiceJson($expected, $actual)
 	{
 		$total_mapping = [
@@ -67,17 +56,17 @@ class InvoiceTest extends \PrestaShop\TestCase\TestCase
 	}
 
 	/**
-	 * @dataProvider getScenarios
+	 * @dataProvider jsonExampleFiles
 	 * @parallelize 4
 	 */
-	public function testInvoice($scenario_file)
+	public function testInvoice($exampleFile)
 	{
 		$shop = static::getShop();
 		$browser = $shop->getBrowser();
 
 		$shop->getBackOfficeNavigator()->login();
 
-		$scenario = json_decode(file_get_contents($scenario_file), true);
+		$scenario = $this->getJSONExample($exampleFile);
 
 		if (isset($scenario['meta']['rounding_mode']))
 			$shop->getPreferencesManager()->setRoundingMode($scenario['meta']['rounding_mode']);

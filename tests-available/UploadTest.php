@@ -32,6 +32,6 @@ class UploadTest extends \PrestaShop\TestCase\LazyTestCase
 		->setFile('#file', '/home/fram/Documents/Pictures/logo.jpg')
 		->setFile('#file', '/home/fram/Documents/Pictures/pleo.jpg');
 
-		$browser->waitForUserInput();
+		// $browser->waitForUserInput();
 	}
 }
