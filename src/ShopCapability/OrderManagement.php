@@ -24,7 +24,7 @@ class OrderManagement extends ShopCapability
 		return $this;
 	}
 
-	public function getInvoiceAsJSON()
+	public function getInvoiceFromJSON()
 	{
 		$browser = $this->getBrowser();
 

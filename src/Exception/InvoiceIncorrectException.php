@@ -2,7 +2,7 @@
 
 namespace PrestaShop\Exception;
 
-class InvoiceIncorrectException extends \Exception
+class InvoiceIncorrectException extends FailedTestException
 {
 	
 }
