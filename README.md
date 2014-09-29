@@ -70,7 +70,7 @@ mkdir ~/pstaf-project
 cd ~/pstaf-project
 
 # get the files against which we're going to run tests
-git clone https://github.com/PrestaShop/PrestaShop -b 1.6
+git clone https://github.com/PrestaShop/PrestaShop -b 1.6 --recursive
 
 # put the pstaf tool in the path, for convenience
 export PATH=/path/to/PrestaShopAutomationFramework:$PATH
