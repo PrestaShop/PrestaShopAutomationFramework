@@ -2,6 +2,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
+- [PrestaShopAutomationFramework](#prestashopautomationframework)
 - [Framework Setup](#framework-setup)
   - [Preparing your system](#preparing-your-system)
   - [Getting the framework's code](#getting-the-frameworks-code)
@@ -10,9 +11,10 @@
   - [Setting up a PrestaShopAutomationFramework project](#setting-up-a-prestashopautomationframework-project)
   - [Checking it works](#checking-it-works)
   - [Running a test suite](#running-a-test-suite)
-    - [All tests from the suite](#all-tests-from-the-suite)
+    - [Running all tests from the suite](#running-all-tests-from-the-suite)
     - [The invoice case: running just one of the multiple invoice tests](#the-invoice-case-running-just-one-of-the-multiple-invoice-tests)
   - [Running all tests](#running-all-tests)
+- [Going further](#going-further)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -139,3 +141,8 @@ pstaf test:run -ap4
 
 Warning, this will take a looong time, unless you use an optimized testing setup (apache and mysql both in RAM, will be described later).
 
+# Going further
+
+- learn how to tune your Linux setup to [improve test execution speed](https://github.com/PrestaShop/PrestaShopAutomationFramework/blob/master/FASTER.md)
+- read about our recommended workflows with pstaf [TODO]
+- write your own tests [TODO]

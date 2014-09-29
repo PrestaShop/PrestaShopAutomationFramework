@@ -1,3 +1,20 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Speeding up the functional tests](#speeding-up-the-functional-tests)
+- [Apache vhost in RAM](#apache-vhost-in-ram)
+  - [Ramdisk setup](#ramdisk-setup)
+  - [Apache setup](#apache-setup)
+- [MySQL datadir in RAM](#mysql-datadir-in-ram)
+  - [Ramdisk setup](#ramdisk-setup-1)
+  - [MySQL setup](#mysql-setup)
+    - [Things to do once](#things-to-do-once)
+    - [Things to do after each boot](#things-to-do-after-each-boot)
+- [HHVM ?](#hhvm-)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 Speeding up the functional tests
 =============================
 
