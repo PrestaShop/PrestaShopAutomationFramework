@@ -4,10 +4,9 @@
 
 - [PrestaShopAutomationFramework](#prestashopautomationframework)
 - [Framework Setup](#framework-setup)
-  - [Linux](#linux)
-    - [Preparing your system](#preparing-your-system)
-    - [Getting the framework's code](#getting-the-frameworks-code)
-    - [Installing the dependencies](#installing-the-dependencies)
+  - [Preparing your system](#preparing-your-system)
+  - [Getting the framework's code](#getting-the-frameworks-code)
+  - [Installing the dependencies](#installing-the-dependencies)
 - [Framework Usage](#framework-usage)
   - [Setting up a PrestaShopAutomationFramework project](#setting-up-a-prestashopautomationframework-project)
 - [Checking it works](#checking-it-works)
@@ -25,9 +24,15 @@ The tests are written in PHP, and communicate with a browser using Selenium.
 
 # Framework Setup
 
-## Linux
+The Framework should be working on any major platform where PHP runs.
 
-### Preparing your system
+It is being developed primarily for Linux, but special efforts are made to keep it compatible with windows.
+
+Windows compatibility is, however, much less tested (feedback welcome!).
+
+The procedure to install on windows is roughly the same as outlined below, except you will need to add more binaries to your system PATH.
+
+## Preparing your system
 
 Make sure your system is configured properly to use PrestaShop, i.e. that you can install PrestaShop without any error and prefereably with all the optional parameters (as indicated by the installer) in the green.
 
@@ -38,13 +43,13 @@ Then check that the following other programs are installed and available in your
 - firefox
 - mysql, mysqldump, musqladmin
 
-### Getting the framework's code
+## Getting the framework's code
 
 ```bash
 git clone https://github.com/PrestaShop/PrestaShopAutomationFramework
 ```
 
-### Installing the dependencies
+## Installing the dependencies
 
 ```bash
 cd PrestaShopAutomationFramework
