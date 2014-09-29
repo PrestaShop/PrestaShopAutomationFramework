@@ -72,7 +72,7 @@ Most questions should be straightforward, let's give further details on 3 option
 
 Here we're going to try and install PrestaShop using the framework.
 
-```
+```bash
 # fire up selenium
 pstaf selenium:start
 
@@ -80,4 +80,29 @@ pstaf selenium:start
 pstaf shop:install
 ```
 Sit back and relax, if all goes well PrestaShop should install itself according to the settings you've input.
+
+# Running a test
+
+All tests live under the `tests-available` folder of PrestaShopAutomationFramework.
+
+
+To run a test, type `pstaf test:run TestName` where test name is any filename from `tests-available`, without the 'Test' suffix nor the '.php' extension.
+
+To run one of the simplest test:
+```bash
+pstaf test:run BackOfficeNavigation
+```
+
+On first run, it will make a fresh installation of PrestaShop, that's normal.
+
+It will be put in cache for later tests.
+
+# Running all tests
+
+```bash
+# run all tests, in parallel, 4 at a time
+pstaf test:run -ap4
+```
+
+Warning, this will take a looong time, unless you use an optimized testing setup (apache and mysql both in RAM, will be described later).
 
