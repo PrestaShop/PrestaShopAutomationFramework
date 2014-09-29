@@ -5,11 +5,15 @@ Or how I learned to stop worrying and love installing PrestaShop.
 
 Functional tests are slow by nature (need to launch a browser, setup a complex application state...).
 
-To speed this up, several optimizations can be made.
+To speed things up, several optimizations can be made.
 
 We list the ones we found effective here.
 
-# Apache VHOST in RAM
+The tips we outline here are based on a standard, recent Ubuntu installation (14.04 at the time of writing).
+
+With Apache vhost and mysql datadir in ram, we get an overall x10 speed boost on stock hardware (4 core CPU, 8Go RAM).
+
+# Apache vhost in RAM
 
 ## Ramdisk setup
 
@@ -80,3 +84,9 @@ In `/etc/apparmor.d/usr.sbin.mysqld`, add to the list of permissions:
 sudo mysql_install_db --datadir="/mysql"
 sudo mysqld_multi start 2
 ```
+
+# HHVM ?
+
+As of right now, PrestaShop installs correctly on HHVM, but some tests make the HHVM server crash, so right now it is not such a good idea.
+
+We leave this here for further consideration, as HHVM is likely to give a big performance boost.
