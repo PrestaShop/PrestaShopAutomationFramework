@@ -1,0 +1,31 @@
+{
+	"meta": {
+		"rounding_type": "total",
+		"rounding_mode": "half_up"
+	},
+	"carrier": {
+		"name": "SeleniumShipping",
+		"delay": "28 days later",
+		"handling": false,
+		"free": true
+	},
+	"products": {
+		"A Product": {
+			"price": 33.64,
+			"vat": 7,
+			"quantity": 1
+		}
+	},
+	"expect": {
+		"invoice": {
+			"total": {
+				"to_pay_tax_included": 35.99
+			},
+			"tax": {
+				"products": {
+					"7.0": 2.35
+				}
+			}
+		}
+	}
+}
