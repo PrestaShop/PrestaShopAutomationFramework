@@ -1,3 +1,21 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [PrestaShopAutomationFramework](#prestashopautomationframework)
+- [Framework Setup](#framework-setup)
+  - [Linux](#linux)
+    - [Preparing your system](#preparing-your-system)
+    - [Getting the framework's code](#getting-the-frameworks-code)
+    - [Installing the dependencies](#installing-the-dependencies)
+- [Framework Usage](#framework-usage)
+  - [Setting up a PrestaShopAutomationFramework project](#setting-up-a-prestashopautomationframework-project)
+- [Checking it works](#checking-it-works)
+- [Running a test](#running-a-test)
+- [Running all tests](#running-all-tests)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 PrestaShopAutomationFramework
 =============================
 
