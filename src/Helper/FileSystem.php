@@ -146,7 +146,7 @@ EOS;
 
 		$spinner->assertBecomesTrue(function() use ($directory) {
 			if (file_exists($directory))
-				@rmdir($directory);
+				@self::rmR($directory);
 			return !file_exists($directory);
 		});
 	}
