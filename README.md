@@ -26,7 +26,7 @@ The tests are written in PHP, and communicate with a browser using Selenium.
 
 The Framework should be working on any major platform where PHP runs.
 
-It is being developed primarily for Linux, but special efforts are made to keep it compatible with windows.
+It is being developed primarily for Linux, but special efforts are made to keep it compatible with Windows.
 
 Windows compatibility is, however, much less tested (feedback welcome!).
 
@@ -34,7 +34,7 @@ The procedure to install on windows is roughly the same as outlined below, excep
 
 ## Preparing your system
 
-Make sure your system is configured properly to use PrestaShop, i.e. that you can install PrestaShop without any error and prefereably with all the optional parameters (as indicated by the installer) in the green.
+Make sure your system is configured properly to use PrestaShop, i.e. that you can install PrestaShop without any error and preferably with all the optional parameters (as indicated by the installer) in the green.
 
 In particular, you will *need* the php cURL extension.
 
