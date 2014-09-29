@@ -100,18 +100,18 @@ Here we're going to try and install PrestaShop using the framework.
 # fire up selenium
 pstaf selenium:start
 
-## install our shop
+# install our shop
 pstaf shop:install
 ```
 Sit back and relax, if all goes well PrestaShop should install itself according to the settings you've input.
 
 ## Running a test suite
 
-All test suites live under the `tests-available` folder of PrestaShopAutomationFramework.
+All test suites live under the [tests-available](https://github.com/PrestaShop/PrestaShopAutomationFramework/tree/master/tests-available) folder of PrestaShopAutomationFramework.
 
-### All tests from the suite
+### Running all tests from the suite
 
-To run a test suite, type `pstaf test:run TestName` where test name is any filename from `tests-available`, without the 'Test' suffix nor the '.php' extension.
+To run all the tests contained in a test suite, type `pstaf test:run TestName` where test name is any filename from `tests-available`, without the 'Test' suffix nor the '.php' extension.
 
 To run one of the simplest test suites:
 ```bash
