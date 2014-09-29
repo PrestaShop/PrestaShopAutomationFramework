@@ -9,9 +9,9 @@
   - [Installing the dependencies](#installing-the-dependencies)
 - [Framework Usage](#framework-usage)
   - [Setting up a PrestaShopAutomationFramework project](#setting-up-a-prestashopautomationframework-project)
-- [Checking it works](#checking-it-works)
-- [Running a test](#running-a-test)
-- [Running all tests](#running-all-tests)
+  - [Checking it works](#checking-it-works)
+  - [Running a test](#running-a-test)
+  - [Running all tests](#running-all-tests)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -91,7 +91,7 @@ Most questions should be straightforward, let's give further details on 3 option
 	<dd>This is the root folder of your virtual host, for instance `/var/www`.<br>That's where the framework will create the shops it needs.</dd>
 </dl>
 
-# Checking it works
+## Checking it works
 
 Here we're going to try and install PrestaShop using the framework.
 
@@ -99,12 +99,12 @@ Here we're going to try and install PrestaShop using the framework.
 # fire up selenium
 pstaf selenium:start
 
-# install our shop
+## install our shop
 pstaf shop:install
 ```
 Sit back and relax, if all goes well PrestaShop should install itself according to the settings you've input.
 
-# Running a test
+## Running a test
 
 All tests live under the `tests-available` folder of PrestaShopAutomationFramework.
 
@@ -120,7 +120,7 @@ On first run, it will make a fresh installation of PrestaShop, that's normal.
 
 It will be put in cache for later tests.
 
-# Running all tests
+## Running all tests
 
 ```bash
 # run all tests, in parallel, 4 at a time
