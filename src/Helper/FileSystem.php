@@ -99,6 +99,20 @@ class FileSystem
 		return static::_lsRecursive($dir, $exclude_exceptions, $exclude_regexps, $dir);
 	}
 
+	public static function rmR($dir)
+	{
+		foreach (
+			new \RecursiveIteratorIterator(
+				new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
+				\RecursiveIteratorIterator::CHILD_FIRST
+			) as $path
+		)
+		{
+		    $path->isDir() ? rmdir($path->getPathname()) : unlink($path->getPathname());
+		}
+		rmdir($dir);
+	}
+
 	public static function webRmR($directory, $url)
 	{
 		$kill_script = <<<'EOS'

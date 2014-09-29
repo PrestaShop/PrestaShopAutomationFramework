@@ -3,6 +3,7 @@
 namespace PrestaShop;
 
 use \PrestaShop\Helper\FileSystem as FS;
+use \djfm\Process\Process as Process;
 
 class ShopManager
 {
@@ -288,5 +289,68 @@ class ShopManager
 			$shop->getFileManager()->deleteAllFiles();
 		}
 		$shop->getBrowser()->quit();
+	}
+
+	public function cleanDirectory()
+	{
+		$home = $this->getWorkingDirectory();
+		foreach (scandir($home) as $entry)
+		{
+			$path = FS::join($home, $entry);
+			$m = [];
+			if (preg_match('/pstaf\.(\w+)\.istate\.shop/', $entry, $m))
+			{
+				echo "Removing cached shop $entry...\n";
+				FS::rmR($path);
+				$lock = "pstaf.{$m[1]}.istate.lock";
+				echo "Removing useless lock file $lock...\n";
+				unlink($path);
+			}
+			elseif (preg_match('/\.png$/', $entry))
+			{
+				echo "Removing screenshot $entry...\n";
+				unlink($path);
+			}
+			elseif ($entry === 'selenium.log')
+			{
+				echo "Removing selenium log file $entry...\n";
+				unlink($path);
+			}
+			elseif ($entry === 'php_errors.log')
+			{
+				echo "Removing local php error log file $entry...\n";
+				unlink($path);
+			}
+			elseif ($entry === 'test-results')
+			{
+				echo "Removing test results folder $entry...\n";
+				FS::rmR($path);
+			}
+			elseif ($entry === 'selenium.pid' && !\PrestaShop\SeleniumManager::isSeleniumStarted())
+			{
+				echo "Removing stale pid file $entry...\n";
+				unlink($path);
+			}
+		}
+	}
+
+	public function updateRepo()
+	{
+		$conf = new ConfigurationFile($this->configuration_file_path);
+		$repo = $conf->getAsAbsolutePath('shop.filesystem_path');
+
+		if (0 !== (new Process('git', ['status']))->setWorkingDir($repo)->run(null, null, null, ['wait' => true]))
+			echo "Not a github repository: $repo, so not updating.\n";
+		else
+		{
+			$pulled = (new Process('git', ['pull']))
+			->setWorkingDir($repo)
+			->run(null, STDOUT, STDERR, ['wait' => true]);
+
+			if ($pulled === 0)
+				echo "Successfully updated repo!\n";
+			else
+				echo "Could not update repository, please check manually.\n";	
+		} 
 	}
 }

@@ -11,6 +11,7 @@ class CommandLineTool extends Application
 		parent::__construct();
 
 		$this->add(new Command\ProjectInit());
+		$this->add(new Command\ProjectClean());
 		$this->add(new Command\Install());
 		$this->add(new Command\StartSelenium());
 		$this->add(new Command\StopSelenium());
