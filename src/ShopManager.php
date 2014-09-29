@@ -299,8 +299,11 @@ class ShopManager
 				echo "Removing cached shop $entry...\n";
 				FS::rmR($path);
 				$lock = "pstaf.{$m[1]}.istate.lock";
-				echo "Removing useless lock file $lock...\n";
-				unlink($path);
+				if (file_exists($lock))
+				{
+					echo "Removing useless lock file $lock...\n";
+					unlink($lock);
+				}
 			}
 			elseif (preg_match('/\.png$/', $entry))
 			{
