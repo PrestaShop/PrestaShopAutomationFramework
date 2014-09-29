@@ -2,7 +2,6 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [PrestaShopAutomationFramework](#prestashopautomationframework)
 - [Framework Setup](#framework-setup)
   - [Preparing your system](#preparing-your-system)
   - [Getting the framework's code](#getting-the-frameworks-code)
@@ -10,7 +9,9 @@
 - [Framework Usage](#framework-usage)
   - [Setting up a PrestaShopAutomationFramework project](#setting-up-a-prestashopautomationframework-project)
   - [Checking it works](#checking-it-works)
-  - [Running a test](#running-a-test)
+  - [Running a test suite](#running-a-test-suite)
+    - [All tests from the suite](#all-tests-from-the-suite)
+    - [The invoice case: running just one of the multiple invoice tests](#the-invoice-case-running-just-one-of-the-multiple-invoice-tests)
   - [Running all tests](#running-all-tests)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -104,14 +105,15 @@ pstaf shop:install
 ```
 Sit back and relax, if all goes well PrestaShop should install itself according to the settings you've input.
 
-## Running a test
+## Running a test suite
 
-All tests live under the `tests-available` folder of PrestaShopAutomationFramework.
+All test suites live under the `tests-available` folder of PrestaShopAutomationFramework.
 
+### All tests from the suite
 
-To run a test, type `pstaf test:run TestName` where test name is any filename from `tests-available`, without the 'Test' suffix nor the '.php' extension.
+To run a test suite, type `pstaf test:run TestName` where test name is any filename from `tests-available`, without the 'Test' suffix nor the '.php' extension.
 
-To run one of the simplest test:
+To run one of the simplest test suites:
 ```bash
 pstaf test:run BackOfficeNavigation
 ```
@@ -119,6 +121,14 @@ pstaf test:run BackOfficeNavigation
 On first run, it will make a fresh installation of PrestaShop, that's normal.
 
 It will be put in cache for later tests.
+
+### The invoice case: running just one of the multiple invoice tests
+
+```bash
+pstaf test:run Invoice -ztestInvoice:^A1
+```
+
+This `-z` options instruct the test runner (only available with the default `ptest` runner) to filter the first argument passed to the `testInvoice` method, and only take the ones matching the `^A1` regexp, i.e. here only `A1.json`, which is a file living in the [InvoiceTest examples folder](https://github.com/PrestaShop/PrestaShopAutomationFramework/tree/master/tests-available/InvoiceTest/examples).
 
 ## Running all tests
 
