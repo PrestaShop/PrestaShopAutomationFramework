@@ -111,20 +111,16 @@ class ShopManager
 	 */
 	public function getShop(array $options)
 	{
-		$inplace_allowed = getenv('PSTAF_INPLACE') === '1';
-		$inplace = false;
+		$inplace = getenv('PSTAF_INPLACE') === '1';
 
 		$conf = new ConfigurationFile($this->configuration_file_path);
 
-		$options['temporary'] = !empty($options['temporary']);
+		$options['temporary'] = !empty($options['temporary']) && !$inplace;
 		$options['overwrite'] = !empty($options['overwrite']);
-		$options['use_cache'] = !empty($options['use_cache']);
+		$options['use_cache'] = !empty($options['use_cache']) && !$inplace;
 		
 		if (!isset($options['initial_state']) || !is_array($options['initial_state']))
 			$options['initial_state'] = [];
-
-		if ($inplace_allowed)
-			$options['use_cache'] = false;
 
 		// this may become a file resource
 		// if it is, then we must close it and unlock it once
@@ -191,7 +187,7 @@ class ShopManager
 		$shop_name = basename($conf->getAsAbsolutePath('shop.filesystem_path'));
 		
 		// Temporary shop needs unique URL / folder-name
-		if ($options['temporary'] && !$inplace_allowed)
+		if ($options['temporary'])
 			$shop_name .= '_tmpshpcpy_'.$this->getUID();
 
 		// Our shop URL
@@ -204,7 +200,6 @@ class ShopManager
 		);
 
 		$target_same_as_source = realpath($source_files_path) === realpath($target_files_path);
-		$inplace = $inplace_allowed && $target_same_as_source;
 
 		// We say we are doing a new installation if the target files are not there
 		$new_install = !file_exists($target_files_path);
@@ -212,10 +207,11 @@ class ShopManager
 		if (!$new_install && $options['overwrite'] && !$target_same_as_source)
 		{
 			FS::webRmR($target_files_path, $url);
+			$new_install = true;
 		}
 
 		// Finally put the shop files in place!
-		if (!$target_same_as_source)
+		if (!$target_same_as_source && $new_install)
 		{
 			\PrestaShop\ShopCapability\FileManagement::copyShopFiles(
 				$source_files_path,
@@ -236,7 +232,7 @@ class ShopManager
 		$shop = new \PrestaShop\Shop($conf->get('shop'), $seleniumSettings);
 
 
-		if ($inplace)
+		if ($inplace && !$new_install)
 		{
 			// nothing for now
 		}
