@@ -23,7 +23,7 @@ class InvoiceTest extends \PrestaShop\TestCase\TestCase
 
 		$actual_tax_amount = (float)$invoice['order']['total_paid_tax_incl'] - (float)$invoice['order']['total_paid_tax_excl'];
 
-		if ((float)$tax_amount !== $actual_tax_amount)
+		if ("$tax_amount" != "$actual_tax_amount")
 			throw new \PrestaShop\Exception\InvoiceIncorrectException(
 				"Actual tax amount `$actual_tax_amount` differs from sum of VAT amount in the tax breakdown (`$tax_amount`)."
 			);
