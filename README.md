@@ -139,7 +139,7 @@ This `-z` options instruct the test runner (only available with the default `pte
 pstaf test:run -ap4
 ```
 
-Warning, this will take a looong time, unless you use an [optimized testing setup](https://github.com/PrestaShop/PrestaShopAutomationFramework/blob/master/FASTER.md) (apache and mysql both in RAM, will be described later).
+Warning, this will take a looong time, unless you use an [optimized testing setup](https://github.com/PrestaShop/PrestaShopAutomationFramework/blob/master/FASTER.md).
 
 # Going further
 
