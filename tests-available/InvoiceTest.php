@@ -4,6 +4,31 @@ namespace PrestaShop\FunctionalTest;
 
 class InvoiceTest extends \PrestaShop\TestCase\TestCase
 {
+
+	public static function checkInvoiceCoherence($invoice)
+	{
+		$tax_amount = 0;
+		// Check VAT total
+		$breakdowns = ['product_tax_breakdown', 'shipping_tax_breakdown', 'ecotax_tax_breakdown', 'wrapping_tax_breakdown'];
+		foreach ($breakdowns as $bd)
+		{
+			if (isset($invoice['tax_tab'][$bd]))
+			{
+				foreach ($invoice['tax_tab'][$bd] as $rate => $data)
+				{
+					$tax_amount += $data['total_amount'];
+				}
+			}
+		}
+
+		$actual_tax_amount = (float)$invoice['order']['total_paid_tax_incl'] - (float)$invoice['order']['total_paid_tax_excl'];
+
+		if ((float)$tax_amount !== $actual_tax_amount)
+			throw new \PrestaShop\Exception\InvoiceIncorrectException(
+				"Actual tax amount `$actual_tax_amount` differs from sum of VAT amount in the tax breakdown (`$tax_amount`)."
+			);
+	}
+
 	public static function checkInvoiceJson($expected, $actual)
 	{
 		$total_mapping = [
@@ -50,6 +75,8 @@ class InvoiceTest extends \PrestaShop\TestCase\TestCase
 				}
 			}
 		}
+
+		self::checkInvoiceCoherence($actual);
 
 		if (!empty($errors))
 			throw new \PrestaShop\Exception\InvoiceIncorrectException(implode("\n", $errors));
