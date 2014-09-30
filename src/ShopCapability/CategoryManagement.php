@@ -46,6 +46,6 @@ class CategoryManagement extends ShopCapability
 			if (trim($row['name']) === $options['name'] && (int)$row['id'] > 0)
 				return (int)$row['id'];
 
-		throw new \PrestaShop\Exception\TestFailedException('Could not find ID of created category.');
+		throw new \PrestaShop\Exception\FailedTestException('Could not find ID of created category.');
 	}
 }

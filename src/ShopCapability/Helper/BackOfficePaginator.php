@@ -37,10 +37,14 @@ class BackOfficePaginator
 
 	public function getLastPageNumber()
 	{
-		return (int)$this->pagination->getShop()
-				->getBrowser()->getAttribute(
-					$this->settings['container_selector'].' ul.pagination li:last-child a', 'data-page'
-				);
+		$browser = $this->pagination->getShop()->getBrowser();
+
+		try {
+			$elem = $browser->find($this->settings['container_selector'].' ul.pagination li:last-child a', ['wait' => false]);
+			return (int)$elem->getAttribute('data-page');
+		} catch (\Exception $e) {
+			return null;
+		}
 	}
 
 	public function gotoPage($n)

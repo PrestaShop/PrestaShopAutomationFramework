@@ -133,4 +133,11 @@ class BackOfficeNavigation extends ShopCapability
 		$browser = $this->getShop()->getBrowser();
 		return $browser->visit($this->getCRUDLink($controller_name, $action, $id));
 	}
+
+	public function visitModuleConfigurationPage($module_name)
+	{
+		$browser = $this->getShop()->getBrowser();
+		$url = $this->getCRUDLink('AdminModules', null, null).'&configure='.$module_name;
+		return $browser->visit($url);
+	}
 }

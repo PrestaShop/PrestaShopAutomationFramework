@@ -144,6 +144,16 @@ class Browser
 		return $this;
 	}
 
+	public function hover($selector)
+	{
+		$element = $this->find($selector);
+		/*
+		$coords = $element->getCoordinates();
+		$this->driver->getMouse()->mouseMove($coords, 5, 5);*/
+		$this->driver->action()->moveToElement($element)->perform();
+		return $this;
+	}
+
 	public function clickButtonNamed($name)
 	{
 		$buttons = $this->find("button[name=$name]", ['unique' => false]);

@@ -26,4 +26,9 @@ class FrontOfficeNavigation extends ShopCapability
 
 		return $this;
 	}
+
+	public function visitHome()
+	{
+		return $this->getBrowser()->visit($this->getShop()->getFrontOfficeURL());
+	}
 }
