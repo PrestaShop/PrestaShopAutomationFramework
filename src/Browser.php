@@ -103,6 +103,9 @@ class Browser
 		
 		$method = $unique ? 'findElement' : 'findElements';
 
+		if (isset($options['wait']) && $options['wait'] === false)
+			return $this->driver->$method(\WebDriverBy::$tos($selector));
+
 		$spin = new \PrestaShop\Helper\Spinner('Could not find element.', 5);
 
 		return $spin->assertNoException(function() use ($method, $tos, $selector) {
@@ -391,7 +394,7 @@ class Browser
 	public function ensureStandardErrorMessageNotDisplayed($error_explanation = null)
 	{
 		try {
-			$this->find('div.alert.alert-error');
+			$this->find('div.alert.alert-error', ['wait' => false]);
 			throw new \PrestaShop\Exception\StandardErrorMessageDisplayedException($error_explanation);
 		} catch (\Exception $e)
 		{
