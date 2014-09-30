@@ -32,6 +32,14 @@ class BackOfficePagination extends ShopCapability
 					['name' => 'tax', 'type' => 'i18n:percent'],
 					'description'
 				]
+			],
+			'AdminCategories' => [
+				'container_selector' => '#form-category',
+				'table_selector' => '#table-category',
+				'columns' => [
+					'id',
+					'name'
+				]
 			]
 		];
 	}

@@ -121,6 +121,7 @@ class Shop
 		$this->addShopCapability('\PrestaShop\ShopCapability\PreferencesManagement', 'getPreferencesManager');
 		$this->addShopCapability('\PrestaShop\ShopCapability\CheckoutManagement', 'getCheckoutManager');
 		$this->addShopCapability('\PrestaShop\ShopCapability\OrderManagement', 'getOrderManager');
+		$this->addShopCapability('\PrestaShop\ShopCapability\CategoryManagement', 'getCategoryManager');
 	}
 
 	/**
@@ -256,5 +257,14 @@ class Shop
 	public function isTemporary()
 	{
 		return $this->temporary;
+	}
+
+	public function expectStandardSuccessMessage()
+	{
+		$this->getBrowser()
+		->ensureStandardSuccessMessageDisplayed()
+		->ensureStandardErrorMessageNotDisplayed();
+		
+		return $this;
 	}
 }

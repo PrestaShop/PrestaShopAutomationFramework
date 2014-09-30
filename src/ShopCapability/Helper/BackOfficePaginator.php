@@ -27,7 +27,7 @@ class BackOfficePaginator
 		$next = $this->getCurrentPageNumber() + 1;
 		try {
 			$this->pagination->getShop()->getBrowser()
-			->find($this->settings['container_selector'].' ul.pagination li a[data-page="'.$next.'"]');
+			->find($this->settings['container_selector'].' ul.pagination li a[data-page="'.$next.'"]', ['wait' => false]);
 			return $next;
 		} catch (\Exception $e)
 		{
