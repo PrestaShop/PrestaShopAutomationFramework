@@ -1,7 +1,8 @@
 {
 	"meta": {
 		"rounding_type": "line",
-		"rounding_mode": "up"
+		"rounding_mode": "up",
+		"tax_breakdown_on_invoices": true
 	},
 	"carrier": {
 		"name": "SeleniumShipping",

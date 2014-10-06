@@ -101,6 +101,9 @@ class InvoiceTest extends \PrestaShop\TestCase\TestCase
 		if (isset($scenario['meta']['rounding_type']))
 			$shop->getPreferencesManager()->setRoundingType($scenario['meta']['rounding_type']);
 
+		if (isset($scenario['meta']['tax_breakdown_on_invoices']))
+			$shop->getTaxManager()->enableTaxBreakdownOnInvoices($scenario['meta']['tax_breakdown_on_invoices']);
+
 		$shop->getCarrierManager()->createCarrier($scenario['carrier']);
 
 		if (isset($scenario['discounts']))
