@@ -187,8 +187,16 @@ class ShopManager
 		$shop_name = basename($conf->getAsAbsolutePath('shop.filesystem_path'));
 		
 		// Temporary shop needs unique URL / folder-name
+		
 		if ($options['temporary'])
-			$shop_name .= '_tmpshpcpy_'.$this->getUID();
+		{
+			$suffix = '_tmpshpcpy_'.$this->getUID();
+			$shop_name .= $suffix;
+		}
+		else
+		{
+			$suffix = '';
+		}
 
 		// Our shop URL
 		$url = preg_replace('#[^/]+/?$#', $shop_name.'/', $conf->get('shop.front_office_url'));
@@ -222,7 +230,7 @@ class ShopManager
 		// Update the configuration with the new values
 		$conf->set('shop.front_office_url', $url);
 		$conf->set('shop.filesystem_path', $target_files_path);
-		$conf->set('shop.mysql_database', $shop_name);
+		$conf->set('shop.mysql_database', $conf->get('shop.mysql_database').$suffix);
 
 		// Prepare to fire up selenium
 		$seleniumHost = 'http://localhost:'.(int)SeleniumManager::getMyPort().'/wd/hub';
