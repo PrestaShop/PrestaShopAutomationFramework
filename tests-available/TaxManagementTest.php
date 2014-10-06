@@ -51,6 +51,16 @@ class TaxManagementTest extends \PrestaShop\TestCase\LazyTestCase
 		->ensureElementIsOnPage('#PS_TAX_on');
 	}
 
+	public function testTaxBreakdownCanBeEnabled()
+	{
+		static::getShop()->getTaxManager()->enableTaxBreakdownOnInvoices(true);
+	}
+	
+	public function testTaxBreakdownCanBeDisabled()
+	{
+		static::getShop()->getTaxManager()->enableTaxBreakdownOnInvoices(false);
+	}
+
 	public function testTaxCanBeDisabled()
 	{
 		static::getShop()->getTaxManager()->enableTax(false);

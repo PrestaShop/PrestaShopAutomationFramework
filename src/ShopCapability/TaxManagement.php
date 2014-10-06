@@ -7,6 +7,26 @@ class TaxManagement extends ShopCapability
 	private $tax_rules_cache = [];
 	private $tax_rules_groups_cache = [];
 
+
+	/**
+	 * Enable / Disable tax breakdown for composite taxes
+	 * @param  boolean $on
+	 * @return $this
+	 */
+	public function enableTaxBreakdownOnInvoices($on = true)
+	{
+		$browser = $this->getShop()->getBackOfficeNavigator()->visit('AdminInvoices');
+		$browser
+		->prestaShopSwitch('PS_INVOICE_TAXES_BREAKDOWN', $on)
+		->clickButtonNamed('submitOptionsinvoice')
+		->ensureStandardSuccessMessageDisplayed();
+
+		if ($browser->prestaShopSwitchValue('PS_INVOICE_TAXES_BREAKDOWN') != $on)
+			throw new \Exception(sprintf('Could not set tax to: %s', $on ? 'on' : 'off'));
+
+		return $this;
+	}
+
 	/**
 	 * Enable / Disable taxes
 	 * @param  boolean $on
