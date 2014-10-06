@@ -320,13 +320,13 @@ class ShopManager
 			}
 			elseif ($entry === 'selenium.log')
 			{
-				echo "Removing selenium log file $entry...\n";
-				unlink($path);
+				echo "Cleaning selenium log file $entry...\n";
+				file_put_contents($entry, '');
 			}
 			elseif ($entry === 'php_errors.log')
 			{
-				echo "Removing local php error log file $entry...\n";
-				unlink($path);
+				echo "Cleaning local php error log file $entry...\n";
+				file_put_contents($entry, '');
 			}
 			elseif ($entry === 'test-results')
 			{
