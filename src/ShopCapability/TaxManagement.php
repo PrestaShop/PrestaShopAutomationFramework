@@ -477,7 +477,7 @@ class TaxManagement extends ShopCapability
 					'country' => null,
 					'behavior' => $parts[$i],
 					'description' => $parts[$i + 1].'% all countries',
-					'id_tax' => $this->getOrCreateTaxRule(null, $parts[$i + 1])
+					'id_tax' => $this->getOrCreateTaxRule(null, trim($parts[$i + 1]))
 				];
 			}
 
