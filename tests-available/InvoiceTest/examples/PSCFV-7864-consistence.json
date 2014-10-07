@@ -1,0 +1,46 @@
+{
+	"meta": {
+		"rounding_type": "line",
+		"rounding_mode": "up"
+	},
+	"carrier": {
+		"name": "SeleniumShipping",
+		"delay": "28 days later",
+		"handling": false,
+		"free": true
+	},
+	"products": {
+		"Product 1": {
+			"price": 0.049587,
+			"vat": 21,
+			"quantity": 15
+		},
+		"Product 2": {
+			"price": 2.066116,
+			"vat": 21,
+			"quantity": 1
+		},
+		"Product 3": {
+			"price": 0.066116,
+			"vat": 21,
+			"quantity": 15
+		},
+		"Product 4": {
+			"price": 0.049587,
+			"vat": 21,
+			"quantity": 10
+		}
+	},
+	"expect": {
+		"invoice": {
+			"total": {
+				"to_pay_tax_included": 5.24
+			},
+			"tax": {
+				"products": {
+					"21": 0.92
+				}
+			}
+		}
+	}
+}
