@@ -10,6 +10,21 @@ class CartRulesManagementTest extends \PrestaShop\TestCase\LazyTestCase {
 		static::getShop()->getBackOfficeNavigator()->login();
 	}
 
+	public function testCreateCartRuleAppliedToProduct()
+	{
+		$shop = static::getShop();
+
+		$product_name = 'My Cool Product';
+
+		$shop->getProductManager()->createProduct(['name' => $product_name, 'price' => 42]);
+
+		$data = $shop->getCartRulesManager()->createCartRule(array(
+			'name' => "Discount After Tax On $product_name",
+			'discount' => '10 after tax',
+			'apply_to_product' => $product_name
+		));
+	}
+
 	public function testCreateCartRule()
 	{
 		$shop = static::getShop();

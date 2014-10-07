@@ -57,6 +57,14 @@ class CartRulesManagement extends ShopCapability
 			$browser->prestaShopSwitch('free_shipping', $options['free_shipping']);
 		}
 
+		if (isset($options['apply_to_product']))
+		{
+			$browser
+			->clickLabelFor('apply_discount_to_product')
+			->fillIn('#reductionProductFilter', $options['apply_to_product'])
+			->click('div.ac_results li');
+		}
+
 		$browser
 		->click('#desc-cart_rule-save-and-stay')
 		->ensureStandardSuccessMessageDisplayed();
