@@ -105,7 +105,8 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 
 	public function getExamplesPath()
 	{
-		$class = end(explode('\\', get_called_class()));
+		$class = explode('\\', get_called_class());
+		$class = end($class);
 		
 		$path = realpath(__DIR__.'/../../tests-available/'.$class.'/examples/');
 
