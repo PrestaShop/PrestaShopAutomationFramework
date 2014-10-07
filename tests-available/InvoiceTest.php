@@ -125,18 +125,6 @@ class InvoiceTest extends \PrestaShop\TestCase\TestCase
 		}
 		$shop->getCarrierManager()->createCarrier($carrier);
 
-		if (isset($scenario['discounts']))
-		{
-			foreach ($scenario['discounts'] as $name => $discount)
-				
-				if (is_string($discount))
-					$discount = ['name' => $name, 'discount' => $discount];
-				else
-					$discount['name'] = $name;
-
-				$shop->getCartRulesManager()->createCartRule($discount);
-		}
-
 		foreach ($scenario['products'] as $name => $data)
 		{
 			$tax_rules_group = 0;
@@ -154,6 +142,18 @@ class InvoiceTest extends \PrestaShop\TestCase\TestCase
 			$data['name'] = $name;
 
 			$scenario['products'][$name]['info'] = $shop->getProductManager()->createProduct($data);
+		}
+
+		if (isset($scenario['discounts']))
+		{
+			foreach ($scenario['discounts'] as $name => $discount)
+				
+				if (is_string($discount))
+					$discount = ['name' => $name, 'discount' => $discount];
+				else
+					$discount['name'] = $name;
+
+				$shop->getCartRulesManager()->createCartRule($discount);
 		}
 
 		$shop->getFrontOfficeNavigator()->login();
