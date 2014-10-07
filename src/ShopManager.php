@@ -233,7 +233,7 @@ class ShopManager
 		$conf->set('shop.mysql_database', $conf->get('shop.mysql_database').$suffix);
 
 		// Prepare to fire up selenium
-		$seleniumHost = 'http://localhost:'.(int)SeleniumManager::getMyPort().'/wd/hub';
+		$seleniumHost = 'http://127.0.0.1:'.(int)SeleniumManager::getMyPort().'/wd/hub';
 		$seleniumSettings = ['host' => $seleniumHost];
 
 		// Hoorah! Build our shop
