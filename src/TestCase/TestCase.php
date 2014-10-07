@@ -145,4 +145,23 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 
 		return $files;
 	}
+
+	public function writeArtefact($name, $contents)
+	{
+		$class = explode('\\', get_called_class());
+		$class = end($class);
+
+		$dir = 'test-results/'.$class;
+
+		if (!is_dir($dir))
+		{
+			mkdir($dir, 0777, true);
+		}
+
+		$path = $dir.'/'.$name;
+
+		file_put_contents($path, $contents);
+
+		return $this;
+	}
 }
