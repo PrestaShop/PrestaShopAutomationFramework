@@ -112,7 +112,7 @@ class InvoiceTest extends \PrestaShop\TestCase\TestCase
 			$carrier['tax_rule'] = $shop
 									->getTaxManager()
 									->getOrCreateTaxRulesGroupFromString($carrier['vat'], true);
-			
+
 			unset($carrier['vat']);
 		}
 
@@ -169,7 +169,9 @@ class InvoiceTest extends \PrestaShop\TestCase\TestCase
 		$cart_total = $data['cart_total'];
 		$id_order = $data['id_order'];
 
-		$json = $shop->getOrderManager()->visit($id_order)->validate()->getInvoiceFromJSON();
+		$orderPage = $shop->getOrderManager()->visit($id_order)->validate();
+		$this->writeArtefact(basename($exampleFile, '.json').'.pdf', $orderPage->getInvoicePDFData());
+		$json = $orderPage->getInvoiceFromJSON();
 
 		if ($cart_total != $json['order']['total_paid_tax_incl'])
 			throw new \Exception(

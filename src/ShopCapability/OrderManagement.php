@@ -24,6 +24,13 @@ class OrderManagement extends ShopCapability
 		return $this;
 	}
 
+	public function getInvoicePDFData()
+	{
+		$browser = $this->getBrowser();
+		$invoice_link = $browser->getAttribute('[data-selenium-id="view_invoice"]', 'href');
+		return $browser->curl($invoice_link);
+	}
+
 	public function getInvoiceFromJSON()
 	{
 		$browser = $this->getBrowser();
