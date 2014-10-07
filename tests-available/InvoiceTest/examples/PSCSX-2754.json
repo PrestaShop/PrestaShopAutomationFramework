@@ -7,7 +7,7 @@
 		"name": "SeleniumShipping",
 		"delay": "28 days later",
 		"handling": false,
-		"price": 10
+		"free": true
 	},
 	"products": {
 		"T-Shirt à manches courtes Selenium": {
