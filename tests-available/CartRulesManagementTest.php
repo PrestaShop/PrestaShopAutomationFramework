@@ -14,8 +14,17 @@ class CartRulesManagementTest extends \PrestaShop\TestCase\LazyTestCase {
 	{
 		$shop = static::getShop();
 		$data = $shop->getCartRulesManager()->createCartRule(array(
-			'name' => 'Toto Rulez',
+			'name' => 'Discount After Tax',
 			'discount' => '10 after tax'
+		));
+	}
+
+	public function testCreateCartRuleWithDiscount()
+	{
+		$shop = static::getShop();
+		$data = $shop->getCartRulesManager()->createCartRule(array(
+			'name' => 'Free Shipping!',
+			'free_shipping' => true
 		));
 	}
 

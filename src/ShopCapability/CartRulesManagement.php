@@ -10,6 +10,7 @@ class CartRulesManagement extends ShopCapability
 	 * $options may contain
 	 * - name
 	 * - discount: e.g. 10 %, 10 before tax, 10 after tax
+	 * - free_shipping: boolean
 	 */
 	public function createCartRule(array $options)
 	{
@@ -23,29 +24,38 @@ class CartRulesManagement extends ShopCapability
 		->click('#cart_rule_link_actions');
 
 		$m = [];
-		if (preg_match('/^\s*(\d+(?:.\d+)?)\s*((?:%|before|after))/', $options['discount'], $m))
-		{
-			$amount = $m[1];
-			$type = $m[2];
 
-			if ($type === '%')
+		if (isset($options['discount']))
+		{
+			if (preg_match('/^\s*(\d+(?:.\d+)?)\s*((?:%|before|after))/', $options['discount'], $m))
 			{
-				$browser
-				->clickLabelFor('apply_discount_percent')
-				->waitFor('#reduction_percent')
-				->fillIn('#reduction_percent', $amount);
+				$amount = $m[1];
+				$type = $m[2];
+
+				if ($type === '%')
+				{
+					$browser
+					->clickLabelFor('apply_discount_percent')
+					->waitFor('#reduction_percent')
+					->fillIn('#reduction_percent', $amount);
+				}
+				else
+				{
+					$browser
+					->clickLabelFor('apply_discount_amount')
+					->waitFor('#reduction_amount')
+					->fillIn('#reduction_amount', $amount)
+					->select('select[name="reduction_tax"]', ['before' => 0, 'after' => 1][$type]);
+				}
 			}
 			else
-			{
-				$browser
-				->clickLabelFor('apply_discount_amount')
-				->waitFor('#reduction_amount')
-				->fillIn('#reduction_amount', $amount)
-				->select('select[name="reduction_tax"]', ['before' => 0, 'after' => 1][$type]);
-			}
+				throw new \Exception("Incorrect discount spec: {$options['discount']}.");
 		}
-		else
-			throw new \Exception("Incorrect discount spec: {$options['discount']}.");
+
+		if (isset($options['free_shipping']))
+		{
+			$browser->prestaShopSwitch('free_shipping', $options['free_shipping']);
+		}
 
 		$browser
 		->click('#desc-cart_rule-save-and-stay')
