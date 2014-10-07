@@ -1,0 +1,42 @@
+{
+	"meta": {
+		"rounding_type": "line",
+		"rounding_mode": "up"
+	},
+	"carrier": {
+		"name": "SeleniumShipping",
+		"delay": "28 days later",
+		"handling": false,
+		"price": 10
+	},
+	"products": {
+		"T-Shirt à manches courtes": {
+			"price": 16.51,
+			"vat": 5.5,
+			"quantity": 1
+		},
+		"Robe imprimée": {
+			"price": 50.99,
+			"vat": 20,
+			"quantity": 1
+		}
+	},
+	"discounts": {
+		"Free Shipping!": {
+			"free_shipping": true
+		}
+	},
+	"expect": {
+		"invoice": {
+			"total": {
+				"to_pay_tax_included": 78.61
+			},
+			"tax": {
+				"products": {
+					"5.5": 0.91,
+					"20": 10.2
+				}
+			}
+		}
+	}
+}

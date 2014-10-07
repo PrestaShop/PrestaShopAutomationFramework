@@ -128,7 +128,13 @@ class InvoiceTest extends \PrestaShop\TestCase\TestCase
 		if (isset($scenario['discounts']))
 		{
 			foreach ($scenario['discounts'] as $name => $discount)
-				$shop->getCartRulesManager()->createCartRule(['name' => $name, 'discount' => $discount]);
+				
+				if (is_string($discount))
+					$discount = ['name' => $name, 'discount' => $discount];
+				else
+					$discount['name'] = $name;
+
+				$shop->getCartRulesManager()->createCartRule($discount);
 		}
 
 		foreach ($scenario['products'] as $name => $data)
