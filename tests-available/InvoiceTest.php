@@ -104,7 +104,26 @@ class InvoiceTest extends \PrestaShop\TestCase\TestCase
 		if (isset($scenario['meta']['tax_breakdown_on_invoices']))
 			$shop->getTaxManager()->enableTaxBreakdownOnInvoices($scenario['meta']['tax_breakdown_on_invoices']);
 
-		$shop->getCarrierManager()->createCarrier($scenario['carrier']);
+
+		$carrier = $scenario['carrier'];
+
+		if (isset($carrier['vat']))
+		{
+			$carrier['tax_rule'] = $shop
+									->getTaxManager()
+									->getOrCreateTaxRulesGroupFromString($carrier['vat'], true);
+			
+			unset($carrier['vat']);
+		}
+
+		if (isset($carrier['price']))
+		{
+			$carrier['ranges'] = [1000 => $carrier['price']];
+			$carrier['free'] = false;
+			$carrier['oorb'] = 'highest';
+			unset($carrier['price']);
+		}
+		$shop->getCarrierManager()->createCarrier($carrier);
 
 		if (isset($scenario['discounts']))
 		{
