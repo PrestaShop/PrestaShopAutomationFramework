@@ -123,7 +123,7 @@ class W3CValidityTest extends \PrestaShop\TestCase\LazyTestCase {
 
 			if ($errorCount > 0)
 			{
-				$failing[] = $name;
+				$failing[$name] = $errorCount;
 				$this->writeArtefact("$name.html", self::formatReport($validation, $name));
 				$this->writeArtefact("{$name}_source.html", $source);
 			}
@@ -132,7 +132,13 @@ class W3CValidityTest extends \PrestaShop\TestCase\LazyTestCase {
 		if ($totalErrorCount > 0) {
 			$messages[] = "Found $totalErrorCount W3C validation errors in the BackOffice.";
 			$messages[] = "Individual reports can be found under test-results/W3CValidityTest";
-			$messages[] = "The following controllers have errors: ".implode(', ', $failing);
+
+			arsort($failing, SORT_NUMERIC);
+			$tmp = [];
+			foreach ($failing as $name => $n) {
+				$tmp[] = "$name ($n)";
+			}
+			$messages[] = "The following controllers have errors: ".implode(', ', $tmp);
 		}
 
 		if (count($incomplete) > 0) {
