@@ -109,7 +109,8 @@ class W3CValidityTest extends \PrestaShop\TestCase\LazyTestCase {
 		foreach ($controllers as $name => $url)
 		{
 			$bo->visit($name);
-			$validation = self::w3cValidateHTML($browser->getPageSource());
+			$source = $browser->getPageSource();
+			$validation = self::w3cValidateHTML($source);
 
 			if ($validation === false)
 			{
@@ -124,6 +125,7 @@ class W3CValidityTest extends \PrestaShop\TestCase\LazyTestCase {
 			{
 				$failing[] = $name;
 				$this->writeArtefact("$name.html", self::formatReport($validation, $name));
+				$this->writeArtefact("{$name}_source.html", $source);
 			}
 		}
 
