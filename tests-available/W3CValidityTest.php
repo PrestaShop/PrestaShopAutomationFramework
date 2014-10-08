@@ -14,7 +14,7 @@ class W3CValidityTest extends \PrestaShop\TestCase\LazyTestCase {
 			$last_called_at = time();
 		}
 
-		$options = array_merge(['ignore &amp;' => true], $options);
+		$options = array_merge(['ignore &amp;' => false], $options);
 
 		$ch = curl_init('http://validator.w3.org/check');
 
@@ -76,7 +76,6 @@ class W3CValidityTest extends \PrestaShop\TestCase\LazyTestCase {
 	{
 		$html  = '<html><body>';
 		$html .= "<h1>$name: {$validation['errorCount']} errors.</h1>";
-		$html .= "<p>(and I'm not even counting &amp;amp; errors!)</p>";
 
 		foreach ($validation['errors'] as $error)
 		{
