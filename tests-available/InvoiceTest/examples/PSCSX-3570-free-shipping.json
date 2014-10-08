@@ -1,0 +1,37 @@
+{
+	"meta": {
+		"rounding_type": "line",
+		"rounding_mode": "up"
+	},
+	"carrier": {
+		"name": "SeleniumShipping",
+		"delay": "28 days later",
+		"handling": false,
+		"price": 3.5,
+		"vat": 21
+	},
+	"products": {
+		"ST-TEST": {
+			"price": 1,
+			"vat": 21,
+			"quantity": 1
+		}
+	},
+	"discounts": {
+		"free shipping using free shipping option of cart rule": {
+			"free_shipping": true
+		}
+	},
+	"expect": {
+		"invoice": {
+			"total": {
+				"to_pay_tax_included": 1.21
+			},
+			"tax": {
+				"products": {
+					"21": 0.21
+				}
+			}
+		}
+	}
+}
