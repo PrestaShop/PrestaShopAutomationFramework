@@ -35,7 +35,10 @@ class W3CValidityTest extends \PrestaShop\TestCase\LazyTestCase {
 		if (!$ok)
 			return false;
 
-		$xml = simplexml_load_string($response);
+		$xml = @simplexml_load_string($response);
+
+		if (!$xml)
+			return false;
 
 		$ns = $xml->getNamespaces(true);
 		$soap = $xml->children($ns['env']);
