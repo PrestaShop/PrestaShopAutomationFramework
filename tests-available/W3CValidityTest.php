@@ -7,10 +7,12 @@ class W3CValidityTest extends \PrestaShop\TestCase\LazyTestCase {
 	public static function w3cValidateHTML($html, $options = array())
 	{
 		static $last_called_at = 0;
+		static $dt = 2;
+
 		// Ensure we don't call this too often, as per the validator guidelines.
-		if (time() < $last_called_at + 1)
+		if (time() < $last_called_at + $dt)
 		{
-			sleep(1);
+			sleep($dt);
 			$last_called_at = time();
 		}
 
@@ -37,7 +39,7 @@ class W3CValidityTest extends \PrestaShop\TestCase\LazyTestCase {
 
 		$xml = @simplexml_load_string($response);
 
-		if (!$xml)
+		if (!is_object($xml))
 			return false;
 
 		$ns = $xml->getNamespaces(true);
