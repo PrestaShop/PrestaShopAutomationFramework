@@ -39,6 +39,10 @@ class SeleniumManager
 
 	public static function isSeleniumStarted()
 	{
+		if (getenv('SELENIUM_HOST')) {
+			return true;
+		}
+
 		// TODO: Will not work on windows
 		if (file_exists('selenium.pid'))
 		{
@@ -52,6 +56,15 @@ class SeleniumManager
 	public static function getMyPort()
 	{
 		return (int)json_decode(file_get_contents('selenium.pid'), true)['port'];
+	}
+
+	public static function getHost()
+	{
+		if (($sh = getenv('SELENIUM_HOST'))) {
+			return $sh;
+		}
+
+		return 'http://127.0.0.1:'.SeleniumManager::getMyPort().'/wd/hub';
 	}
 
 	public static function startSelenium()

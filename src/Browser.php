@@ -9,16 +9,6 @@ class Browser
 
 	public function __construct($seleniumSettings)
 	{
-		//'http://localhost:'.(int)$seleniumPort.'/wd/hub';
-
-		/*
-		$profile = new \FirefoxProfile();
-		$profile->setPreference('network.http.phishy-userpass-length', 255);
-		$profile->setPreference('network.automatic-ntlm-auth.trusted-uris', 'http://v3.prestashop.com,https://v3.prestashop.com');
-		echo $profile->encode();
-		'firefox_profile' => $profile->encode()
-		*/
-
 		$this->driver = \RemoteWebDriver::create($seleniumSettings['host'], [
 			'browserName' => 'firefox'
 		]);
