@@ -10,16 +10,26 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 	private static $shops = [];
 	private static $shop_managers = [];
 	private static $test_numbers = [];
+	private static $browsers = [];
 
 	protected static $cache_initial_state = true;
 
 	private static function newShop()
 	{
 		$class = get_called_class();
+
+		if (!isset(self::$browsers[$class])) {
+			$browser = new \PrestaShop\Browser([
+				'host' => \PrestaShop\SeleniumManager::getHost()
+			]);
+			self::$browsers[$class] = $browser;
+		}
+
 		self::$shops[$class] = self::getShopManager()->getShop([
 			'initial_state' => static::initialState(),
 			'temporary' => true,
-			'use_cache' => true
+			'use_cache' => true,
+			'browser' => self::$browsers[$class]
 		]);
 
 		self::$shops[$class]->getBrowser()->clearCookies();

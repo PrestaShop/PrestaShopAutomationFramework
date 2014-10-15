@@ -232,12 +232,18 @@ class ShopManager
 		$conf->set('shop.filesystem_path', $target_files_path);
 		$conf->set('shop.mysql_database', $conf->get('shop.mysql_database').$suffix);
 
-		// Prepare to fire up selenium
-		$seleniumHost = SeleniumManager::getHost();
-		$seleniumSettings = ['host' => $seleniumHost];
+		if (!isset($options['browser'])) {
+			// Prepare to fire up selenium
+			$seleniumHost = SeleniumManager::getHost();
+			$seleniumSettings = ['host' => $seleniumHost];
 
-		// Hoorah! Build our shop
-		$shop = new \PrestaShop\Shop($conf->get('shop'), $seleniumSettings);
+			// Hoorah! Build our shop
+			$shop = new \PrestaShop\Shop($conf->get('shop'), $seleniumSettings);
+		} else {
+			$shop = new \PrestaShop\Shop($conf->get('shop'), null);
+			$shop->setBrowser($options['browser']);
+		}
+		
 
 
 		if ($inplace && !$new_install)
