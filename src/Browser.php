@@ -9,9 +9,17 @@ class Browser
 
 	public function __construct($seleniumSettings)
 	{
-		$this->driver = \RemoteWebDriver::create($seleniumSettings['host'], [
-			'browserName' => 'firefox'
-		]);
+		$caps = [
+			'browserName' => 'firefox',
+		];
+
+		$tunnel_identifier = getenv('TRAVIS_JOB_NUMBER');
+
+		if ($tunnel_identifier) {
+			$caps['tunnel-identifier'] = $tunnel_identifier;
+		}
+
+		$this->driver = \RemoteWebDriver::create($seleniumSettings['host'], $caps);
 
 		$this->driver->manage()->window()->setSize(new \WebDriverDimension(1600, 1200));
 	}

@@ -93,6 +93,12 @@ In `/etc/apparmor.d/usr.sbin.mysqld`, add to the list of permissions:
 /run/mysqld/mysqld2.pid rw,
 /var/run/mysqld/mysqld2.sock w,
 /run/mysqld/mysqld2.sock w,
+/mysql/** rwk
+```
+
+Then run:
+```bash
+sudo service apparmor restart
 ```
 
 ### Things to do after each boot
