@@ -182,6 +182,12 @@ class Shop
 		return $this->browser;
 	}
 
+	public function setBrowser(Browser $browser)
+	{
+		$this->browser = $browser;
+		return $this->browser;
+	}
+
 	/**
 	* Get the installer URL
 	*/
