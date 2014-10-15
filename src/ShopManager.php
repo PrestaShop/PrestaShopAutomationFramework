@@ -291,14 +291,16 @@ class ShopManager
 		return $shop;
 	}
 
-	public function cleanUp(\PrestaShop\Shop $shop)
+	public function cleanUp(\PrestaShop\Shop $shop, $leaveBrowserRunning = false)
 	{
 		if ($shop->isTemporary())
 		{
 			$shop->getDatabaseManager()->dropDatabaseIfExists();
 			$shop->getFileManager()->deleteAllFiles();
 		}
-		$shop->getBrowser()->quit();
+		if (!$leaveBrowserRunning) {
+			$shop->getBrowser()->quit();
+		}
 	}
 
 	public function cleanDirectory()

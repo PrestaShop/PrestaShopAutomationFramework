@@ -63,10 +63,13 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 	public static function tearDownAfterClass()
 	{
 		$class = get_called_class();
-		if (isset(self::$shops[$class]))
-		{
+		if (isset(self::$shops[$class])) {
 			static::getShopManager()->cleanUp(static::getShop());
 			unset(self::$shops[$class]);
+		}
+
+		if (isset(self::$browsers[$class])) {
+			unset(self::$browsers[$class]);
 		}
 	}
 
@@ -95,7 +98,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 		if (self::$test_numbers[$class] > 0)
 		{
 			// clean current shop
-			static::getShopManager()->cleanUp(static::getShop());
+			static::getShopManager()->cleanUp(static::getShop(), $leaveBrowserRunning = true);
 			// get a new one
 			self::newShop();
 		}
