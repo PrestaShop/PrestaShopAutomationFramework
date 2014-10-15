@@ -36,7 +36,8 @@ class InstallationTest extends \PrestaShop\TestCase\TestCase
 			['fa', 'ir'], ['fa', 'fr'],
 			['bn', 'bd'], ['bn', 'id'],
 			['tw', 'tw'], ['tw', 'us'],
-			['zh', 'cn'], ['zh', 'us']
+			['zh', 'cn'], ['zh', 'us'],
+			['he', 'il'], ['he', 'fr']
 		];
 	}
 
