@@ -11,6 +11,8 @@ class Browser
 	{
 		$caps = [
 			'browserName' => 'firefox',
+			'max-duration' => 6000,
+			'sauce-advisor' => true
 		];
 
 		$tunnel_identifier = getenv('TRAVIS_JOB_NUMBER');
