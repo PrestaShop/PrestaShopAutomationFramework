@@ -21,7 +21,7 @@ class Browser
 
 		$this->driver = \RemoteWebDriver::create($seleniumSettings['host'], $caps);
 
-		$this->driver->manage()->window()->setSize(new \WebDriverDimension(1600, 1200));
+		$this->driver->manage()->window()->setSize(new \WebDriverDimension(1920, 1200));
 	}
 
 	public function __destruct()
