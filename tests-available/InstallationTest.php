@@ -40,6 +40,7 @@ class InstallationTest extends \PrestaShop\TestCase\TestCase
 
 	/**
 	* @dataProvider languageAndCountryPairs
+	* @parallelize 3
 	*/
 	public function testInstallationForLanguageAndCountry($language, $country)
 	{
