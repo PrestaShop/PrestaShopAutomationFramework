@@ -20,16 +20,40 @@ class ProductManagementTest extends \PrestaShop\TestCase\LazyTestCase {
 			'quantity' => 100
 		));
 	}
-	
+
 	public function testCreateProductWithSpecificPrice()
 	{
 		$shop = static::getShop();
-		$data = $shop->getProductManager()->createProduct(array(
-			'name' => 'Hello',
-			'price' => 1.2345,
-			'quantity' => 1,
-			'specific_price' => '1%'
+		$browser = $shop->getBrowser();
+
+		$product = $shop->getProductManager()->createProduct(array(
+			'name' => 'Cheapy Product',
+			'price' => 0.01,
+			'quantity' => 2,
+			'specific_price' => '80%'
 		));
+
+		$shop
+		->getPageObject('FrontOfficeProductSheet')
+		->visit($product['fo_url'])
+		->setQuantity(1)
+		->addToCart();
+
+		$summary = $shop->getPageObject('ShoppingCartSummary')->visit();
+
+		$pct = $summary->getPercentReduction($product['id']);
+
+		$summary->setQuantity(2, $product['id']);
+
+		sleep(5);
+
+		$pct2 = $summary->getPercentReduction($product['id']);
+
+		if ($pct2 !== $pct) {
+			throw new \PrestaShop\Exception\FailedTestException(
+				"Reduction percent is wrong after adding a product in the Shopping Cart Summary. Changed from $pct to $pct2!"
+			);
+		}
 	}
 
 }

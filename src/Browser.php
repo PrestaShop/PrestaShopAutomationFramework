@@ -83,6 +83,11 @@ class Browser
 		return $this->getAttribute($selector, 'value');
 	}
 
+	public function getText($selector)
+	{
+		return $this->find($selector)->getText();
+	}
+
 	/**
 	* Find element(s)
 	*/
