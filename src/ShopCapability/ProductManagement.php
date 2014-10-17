@@ -42,6 +42,26 @@ class ProductManagement extends ShopCapability
 
 		$this->saveProduct();
 
+		if (isset($options['specific_price'])) {
+			$browser
+			->click('#link-Prices')
+			->waitFor('#priceTE');
+
+			$m = [];
+			if (preg_match('/^\s*(\d+(?:\.\d+)?)\s*%\s*$/', $options['specific_price'], $m)) {
+				$percentage = $m[1];
+			} else {
+				throw new \Exception("Invalid specific price specified: {$options['specific_price']}.");
+			}
+
+			$browser
+			->click('#show_specific_price')
+			->select('#sp_reduction_type', 'percentage')
+			->fillIn('#sp_reduction', $percentage);
+			
+			$this->saveProduct();
+		}
+		
 		if (!empty($options['quantity']))
 		{
 			$browser

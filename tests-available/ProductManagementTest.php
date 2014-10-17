@@ -20,5 +20,16 @@ class ProductManagementTest extends \PrestaShop\TestCase\LazyTestCase {
 			'quantity' => 100
 		));
 	}
+	
+	public function testCreateProductWithSpecificPrice()
+	{
+		$shop = static::getShop();
+		$data = $shop->getProductManager()->createProduct(array(
+			'name' => 'Hello',
+			'price' => 1.2345,
+			'quantity' => 1,
+			'specific_price' => '1%'
+		));
+	}
 
 }
