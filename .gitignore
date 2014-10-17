@@ -9,4 +9,4 @@ misc
 tests-available/tmp*
 fup.js
 tests-available/WIPTest.php
-bamboo.sh
+bamboo*
