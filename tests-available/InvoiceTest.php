@@ -76,6 +76,26 @@ class InvoiceTest extends \PrestaShop\TestCase\TestCase
 			}
 		}
 
+		if (isset($expected['tax']['shipping'])) {
+			$a = [];
+
+			foreach ($actual['tax_tab']['shipping_tax_breakdown'] as $data) {
+				$a[(float)$data['rate']] = (float)$data['total_amount'];
+			}
+
+			foreach ($expected['tax']['shipping'] as $e_rate => $e_amount)
+			{
+				$e_rate = (float)$e_rate;
+				$e_amount = (float)$e_amount;
+
+				if (!isset($a[$e_rate]) || $a[$e_rate] !== $e_amount)
+				{
+					$a_amount = isset($a[$e_rate]) ? $a[$e_rate] : null;
+					$errors[] = "Invalid actual shipping tax amount for rate `$e_rate`: got `$a_amount` instead of `$e_amount`.";
+				}
+			}
+		}
+
 		self::checkInvoiceCoherence($actual);
 
 		if (!empty($errors))
@@ -178,6 +198,7 @@ class InvoiceTest extends \PrestaShop\TestCase\TestCase
 		$orderPage = $shop->getOrderManager()->visit($id_order)->validate();
 		$this->writeArtefact(basename($exampleFile, '.json').'.pdf', $orderPage->getInvoicePDFData());
 		$json = $orderPage->getInvoiceFromJSON();
+		$this->writeArtefact(basename($exampleFile, '.json').'.invoice.json', json_encode($json, JSON_PRETTY_PRINT));
 
 		if ($cart_total != $json['order']['total_paid_tax_incl'])
 			throw new \Exception(
