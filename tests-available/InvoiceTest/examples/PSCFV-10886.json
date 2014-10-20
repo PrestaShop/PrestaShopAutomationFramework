@@ -1,7 +1,7 @@
 {
 	"meta": {
 		"rounding_type": "line",
-		"rounding_mode": "up"
+		"rounding_mode": "half_up"
 	},
 	"carrier": {
 		"name": "SeleniumShipping",
@@ -19,7 +19,7 @@
 	"expect": {
 		"invoice": {
 			"total": {
-				"to_pay_tax_included": 275.01
+				"to_pay_tax_included": 275
 			},
 			"tax": {
 				"products": {
