@@ -37,25 +37,42 @@ class SeleniumManager
 		return $path;
 	}
 
+	public static function getPIDFile()
+	{
+		$base = realpath('.');
+		$filename = 'selenium.pid';
+
+		for(;;) {
+			$candidate = \PrestaShop\Helper\FileSystem::join($base, $filename);
+			if (file_exists($candidate)) {
+				return $candidate;
+			} elseif (dirname($base) !== $base) {
+				// This condition checks we're not at the filesystem root
+				$base = dirname($base);
+			} else {
+				throw new \PrestaShop\Exception\SeleniumPIDFileNotFoundException();
+			}
+		}
+	}
+
 	public static function isSeleniumStarted()
 	{
 		if (getenv('SELENIUM_HOST')) {
 			return true;
 		}
 
-		// TODO: Will not work on windows
-		if (file_exists('selenium.pid'))
-		{
-			$pid = json_decode(file_get_contents('selenium.pid'), true)['pid'];
+		try {
+			$pid = json_decode(file_get_contents(static::getPIDFile()), true)['pid'];
 			return \djfm\Process\Process::runningByUPID($pid) ? $pid : false;
-		}
-		else
+		} catch (\PrestaShop\Exception\SeleniumPIDFileNotFoundException $e) {
 			return false;
+		}
+		
 	}
 
 	public static function getMyPort()
 	{
-		return (int)json_decode(file_get_contents('selenium.pid'), true)['port'];
+		return (int)json_decode(file_get_contents(static::getPIDFile()), true)['port'];
 	}
 
 	public static function getHost()
