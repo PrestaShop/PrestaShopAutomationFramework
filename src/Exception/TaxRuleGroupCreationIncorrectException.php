@@ -2,7 +2,7 @@
 
 namespace PrestaShop\Exception;
 
-class TaxRulesGroupCreationIncorrectException extends \Exception
+class TaxRuleGroupCreationIncorrectException extends \Exception
 {
 
 }

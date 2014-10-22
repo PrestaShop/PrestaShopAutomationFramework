@@ -4,145 +4,139 @@ namespace PrestaShop\ShopCapability\Helper;
 
 class BackOfficePaginator
 {
-	private $pagination;
-	private $settings;
+    private $pagination;
+    private $settings;
 
-	public function __construct(
-		\PrestaShop\ShopCapability\BackOfficePagination $pagination,
-		array $settings
-	)
-	{
-		$this->pagination = $pagination;
-		$this->settings = $settings;
-	}
+    public function __construct(
+        \PrestaShop\ShopCapability\BackOfficePagination $pagination,
+        array $settings
+    )
+    {
+        $this->pagination = $pagination;
+        $this->settings = $settings;
+    }
 
-	public function getCurrentPageNumber()
-	{
-		$browser = $this->pagination->getShop()->getBrowser();
-		return (int)$browser->getAttribute($this->settings['container_selector'].' ul.pagination li.active a', 'data-page');
-	}
+    public function getCurrentPageNumber()
+    {
+        $browser = $this->pagination->getShop()->getBrowser();
 
-	public function getNextPageNumber()
-	{
-		$next = $this->getCurrentPageNumber() + 1;
-		try {
-			$this->pagination->getShop()->getBrowser()
-			->find($this->settings['container_selector'].' ul.pagination li a[data-page="'.$next.'"]', ['wait' => false]);
-			return $next;
-		} catch (\Exception $e)
-		{
-			return false;
-		}
-	}
+        return (int) $browser->getAttribute($this->settings['container_selector'].' ul.pagination li.active a', 'data-page');
+    }
 
-	public function getLastPageNumber()
-	{
-		$browser = $this->pagination->getShop()->getBrowser();
+    public function getNextPageNumber()
+    {
+        $next = $this->getCurrentPageNumber() + 1;
+        try {
+            $this->pagination->getShop()->getBrowser()
+            ->find($this->settings['container_selector'].' ul.pagination li a[data-page="'.$next.'"]', ['wait' => false]);
 
-		try {
-			$elem = $browser->find($this->settings['container_selector'].' ul.pagination li:last-child a', ['wait' => false]);
-			return (int)$elem->getAttribute('data-page');
-		} catch (\Exception $e) {
-			return null;
-		}
-	}
+            return $next;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
 
-	public function gotoPage($n)
-	{
-		$this->pagination->getShop()->getBrowser()
-		->click($this->settings['container_selector'].' ul.pagination li a[data-page="'.$n.'"]');
-	}
+    public function getLastPageNumber()
+    {
+        $browser = $this->pagination->getShop()->getBrowser();
 
-	private function getHeaderName($header)
-	{
-		if (is_string($header))
-			return $header;
-		else
-			return $header['name'];
-	}
+        try {
+            $elem = $browser->find($this->settings['container_selector'].' ul.pagination li:last-child a', ['wait' => false]);
 
-	private function getTDValue($header, $td)
-	{
-		$type = is_string($header) ? 'verbatim' : $header['type'];
-		$m = [];
+            return (int) $elem->getAttribute('data-page');
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
 
-		if ($type === 'verbatim')
-		{
-			return $td->getText();
-		}
-		elseif (preg_match('/^switch:(.+)$/', $type, $m))
-		{
-			return $td->findElement(\WebDriverBy::cssSelector('.'.$m[1]))->isDisplayed();
-		}
-		elseif (preg_match('/^i18n:(.+)$/', $type, $m))
-		{
-			$value = $this->pagination->i18nParse($td->getText(), $m[1]);
-			return $value;
-		}
-		else
-		{
-			return null;
-		}
-	}
+    public function gotoPage($n)
+    {
+        $this->pagination->getShop()->getBrowser()
+        ->click($this->settings['container_selector'].' ul.pagination li a[data-page="'.$n.'"]');
+    }
 
-	public function scrape()
-	{
-		$rows = [];
+    private function getHeaderName($header)
+    {
+        if (is_string($header))
+            return $header;
+        else
+            return $header['name'];
+    }
 
-		$ths = $this->pagination->getShop()->getBrowser()->find(
-			$this->settings['container_selector'].' '.$this->settings['table_selector'].' thead tr th',
-			['unique' => false]
-		);
+    private function getTDValue($header, $td)
+    {
+        $type = is_string($header) ? 'verbatim' : $header['type'];
+        $m = [];
 
-		foreach ($this->pagination->getShop()->getBrowser()->find(
-			$this->settings['container_selector'].' '.$this->settings['table_selector'].' tbody tr',
-			['unique' => false]
-		) as $tr)
-		{
-			$row = [];
-			$n = 0;
-			foreach ($tr->findElements(\WebDriverBy::cssSelector('td')) as $i => $td)
-			{
-				/**
+        if ($type === 'verbatim') {
+            return $td->getText();
+        } elseif (preg_match('/^switch:(.+)$/', $type, $m)) {
+            return $td->findElement(\WebDriverBy::cssSelector('.'.$m[1]))->isDisplayed();
+        } elseif (preg_match('/^i18n:(.+)$/', $type, $m)) {
+            $value = $this->pagination->i18nParse($td->getText(), $m[1]);
+
+            return $value;
+        } else {
+            return null;
+        }
+    }
+
+    public function scrape()
+    {
+        $rows = [];
+
+        $ths = $this->pagination->getShop()->getBrowser()->find(
+            $this->settings['container_selector'].' '.$this->settings['table_selector'].' thead tr th',
+            ['unique' => false]
+        );
+
+        foreach ($this->pagination->getShop()->getBrowser()->find(
+            $this->settings['container_selector'].' '.$this->settings['table_selector'].' tbody tr',
+            ['unique' => false]
+        ) as $tr)
+        {
+            $row = [];
+            $n = 0;
+            foreach ($tr->findElements(\WebDriverBy::cssSelector('td')) as $i => $td) {
+                /**
 				 * Ignore cells corresponding to columns without text
 				 * this is useful because an extra column appears when there are bulk actions
 				 */
-				if (!$ths[$i]->getText())
-					continue;
+                if (!$ths[$i]->getText())
+                    continue;
 
-				if (!empty($this->settings['columns'][$n]))
-				{
-					$header = $this->settings['columns'][$n];
-					$row[$this->getHeaderName($header)] = $this->getTDValue($header, $td);
-				}
+                if (!empty($this->settings['columns'][$n])) {
+                    $header = $this->settings['columns'][$n];
+                    $row[$this->getHeaderName($header)] = $this->getTDValue($header, $td);
+                }
 
-				$n++;
-			}
-			$rows[] = $row;
-		}
+                $n++;
+            }
+            $rows[] = $row;
+        }
 
-		return $rows;
-	}
+        return $rows;
+    }
 
-	public function scrapeAll()
-	{
-		try {
-			$max_page = $this->getLastPageNumber();
-		} catch (\Exception $e) {
-			$max_page = null;
-		}
+    public function scrapeAll()
+    {
+        try {
+            $max_page = $this->getLastPageNumber();
+        } catch (\Exception $e) {
+            $max_page = null;
+        }
 
-		if ($max_page === null)
-			return $this->scrape();
+        if ($max_page === null)
+            return $this->scrape();
 
-		$rows = [];
-		for($p = 1; $p <= $max_page; $p++)
-		{
-			$this->gotoPage($p);
-			$data = $this->scrape();
-			$rows = array_merge($rows, $data);
-		}
-		return $rows;
-	}
+        $rows = [];
+        for ($p = 1; $p <= $max_page; $p++) {
+            $this->gotoPage($p);
+            $data = $this->scrape();
+            $rows = array_merge($rows, $data);
+        }
+
+        return $rows;
+    }
 
 }

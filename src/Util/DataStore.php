@@ -10,16 +10,15 @@ class DataStore implements DataStoreInterface
     {
         $path = explode('.', $key);
         $value = $this->values;
-        foreach ($path as $name)
-        {
+        foreach ($path as $name) {
             if (isset($value[$name]))
                 $value = $value[$name];
-            else
-            {
+            else {
                 $value = null;
                 break;
             }
         }
+
         return $value;
     }
 
@@ -27,18 +26,15 @@ class DataStore implements DataStoreInterface
     {
         $path = explode('.', $key);
         $value = &$this->values;
-        foreach ($path as $n => $name)
-        {
-            if ($n === count($path) - 1)
-            {
+        foreach ($path as $n => $name) {
+            if ($n === count($path) - 1) {
                 $value[$name] = $v;
-            }
-            elseif (!isset($value[$name]))
-            {
+            } elseif (!isset($value[$name])) {
                 $value[$name] = [];
             }
             $value = &$value[$name];
         }
+
         return $this;
     }
 

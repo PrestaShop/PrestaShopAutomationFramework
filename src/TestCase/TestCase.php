@@ -7,174 +7,173 @@ use \PrestaShop\Shop;
 
 abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaShop\Ptest\TestClass\Basic
 {
-	private static $shops = [];
-	private static $shop_managers = [];
-	private static $test_numbers = [];
-	private static $browsers = [];
+    private static $shops = [];
+    private static $shop_managers = [];
+    private static $test_numbers = [];
+    private static $browsers = [];
 
-	protected static $cache_initial_state = true;
+    protected static $cache_initial_state = true;
 
-	private static function newShop()
-	{
-		$class = get_called_class();
+    private static function newShop()
+    {
+        $class = get_called_class();
 
-		if (!isset(self::$browsers[$class])) {
-			$browser = new \PrestaShop\Browser([
-				'host' => \PrestaShop\SeleniumManager::getHost()
-			]);
-			self::$browsers[$class] = $browser;
-		}
+        if (!isset(self::$browsers[$class])) {
+            $browser = new \PrestaShop\Browser([
+                'host' => \PrestaShop\SeleniumManager::getHost()
+            ]);
+            self::$browsers[$class] = $browser;
+        }
 
-		self::$shops[$class] = self::getShopManager()->getShop([
-			'initial_state' => static::initialState(),
-			'temporary' => true,
-			'use_cache' => true,
-			'browser' => self::$browsers[$class]
-		]);
+        self::$shops[$class] = self::getShopManager()->getShop([
+            'initial_state' => static::initialState(),
+            'temporary' => true,
+            'use_cache' => true,
+            'browser' => self::$browsers[$class]
+        ]);
 
-		self::$shops[$class]->getBrowser()->clearCookies();
-	}
+        self::$shops[$class]->getBrowser()->clearCookies();
+    }
 
-	public static function setUpBeforeClass()
-	{
-		\PrestaShop\SeleniumManager::ensureSeleniumIsRunning();
-		$class = get_called_class();
-		$manager = ShopManager::getInstance();
-		self::$shop_managers[$class] = $manager;
-		self::newShop();
-		register_shutdown_function([$class, 'tearDownAfterClass']);
-	}
+    public static function setUpBeforeClass()
+    {
+        \PrestaShop\SeleniumManager::ensureSeleniumIsRunning();
+        $class = get_called_class();
+        $manager = ShopManager::getInstance();
+        self::$shop_managers[$class] = $manager;
+        self::newShop();
+        register_shutdown_function([$class, 'tearDownAfterClass']);
+    }
 
-	public static function initialState()
-	{
-		return [
-			'ShopInstallation' => [
-				'language' => 'en',
-				'country' => 'us'
-			]
-		];
-	}
+    public static function initialState()
+    {
+        return [
+            'ShopInstallation' => [
+                'language' => 'en',
+                'country' => 'us'
+            ]
+        ];
+    }
 
-	public static function beforeAll()
-	{
+    public static function beforeAll()
+    {
 
-	}
+    }
 
-	public static function tearDownAfterClass()
-	{
-		$class = get_called_class();
-		if (isset(self::$shops[$class])) {
-			static::getShopManager()->cleanUp(static::getShop());
-			unset(self::$shops[$class]);
-		}
+    public static function tearDownAfterClass()
+    {
+        $class = get_called_class();
+        if (isset(self::$shops[$class])) {
+            static::getShopManager()->cleanUp(static::getShop());
+            unset(self::$shops[$class]);
+        }
 
-		if (isset(self::$browsers[$class])) {
-			unset(self::$browsers[$class]);
-		}
-	}
+        if (isset(self::$browsers[$class])) {
+            unset(self::$browsers[$class]);
+        }
+    }
 
-	public static function getShop()
-	{
-		$class = get_called_class();
-		return self::$shops[$class];
-	}
+    public static function getShop()
+    {
+        $class = get_called_class();
 
-	private static function getShopManager()
-	{
-		$class = get_called_class();
-		return self::$shop_managers[$class];
-	}
+        return self::$shops[$class];
+    }
 
-	public function setUp()
-	{
-		$class = get_called_class();
+    private static function getShopManager()
+    {
+        $class = get_called_class();
 
-		if (!isset(self::$test_numbers[$class]))
-			self::$test_numbers[$class] = 0;
-		else
-			self::$test_numbers[$class]++;
-		
-		
-		if (self::$test_numbers[$class] > 0)
-		{
-			// clean current shop
-			static::getShopManager()->cleanUp(static::getShop(), $leaveBrowserRunning = true);
-			// get a new one
-			self::newShop();
-		}
+        return self::$shop_managers[$class];
+    }
 
-		$this->shop = static::getShop();
-	}
+    public function setUp()
+    {
+        $class = get_called_class();
 
-	public function tearDown()
-	{
-		// TODO: restore state of shop
-	}
+        if (!isset(self::$test_numbers[$class]))
+            self::$test_numbers[$class] = 0;
+        else
+            self::$test_numbers[$class]++;
 
-	public function onException($e, $files_prefix)
-	{
-		static::getShop()->getBrowser()->takeScreenshot($files_prefix.'.png');
-	}
+        if (self::$test_numbers[$class] > 0) {
+            // clean current shop
+            static::getShopManager()->cleanUp(static::getShop(), $leaveBrowserRunning = true);
+            // get a new one
+            self::newShop();
+        }
 
-	public function getExamplesPath()
-	{
-		$class = explode('\\', get_called_class());
-		$class = end($class);
-		
-		$path = realpath(__DIR__.'/../../tests-available/'.$class.'/examples/');
+        $this->shop = static::getShop();
+    }
 
-		if (!$path)
-			throw new \PrestaShop\Exception\FailedTestException("No example files found for $class.\nThey should have been in tests-available/$class/examples/.");
+    public function tearDown()
+    {
+        // TODO: restore state of shop
+    }
 
-		return $path;
-	}
+    public function onException($e, $files_prefix)
+    {
+        static::getShop()->getBrowser()->takeScreenshot($files_prefix.'.png');
+    }
 
-	public function getExamplePath($name)
-	{
-		return \PrestaShop\Helper\FileSystem::join($this->getExamplesPath(), $name);
-	}
+    public function getExamplesPath()
+    {
+        $class = explode('\\', get_called_class());
+        $class = end($class);
 
-	public function getJSONExample($example)
-	{
-		return json_decode(file_get_contents($this->getExamplePath($example)), true);
-	}
+        $path = realpath(__DIR__.'/../../tests-available/'.$class.'/examples/');
 
-	public function jsonExampleFiles()
-	{
-		return $this->exampleFiles('json');
-	}
+        if (!$path)
+            throw new \PrestaShop\Exception\FailedTestException("No example files found for $class.\nThey should have been in tests-available/$class/examples/.");
 
-	public function exampleFiles($ext)
-	{
-		$files = [];
-		$src_dir = $this->getExamplesPath();
+        return $path;
+    }
 
-		if (!$src_dir)
-			return $files;
+    public function getExamplePath($name)
+    {
+        return \PrestaShop\Helper\FileSystem::join($this->getExamplesPath(), $name);
+    }
 
-		foreach (scandir($src_dir) as $entry)
-			if (preg_match('/\.'.$ext.'$/', $entry))
-				$files[] = [$entry];
+    public function getJSONExample($example)
+    {
+        return json_decode(file_get_contents($this->getExamplePath($example)), true);
+    }
 
-		return $files;
-	}
+    public function jsonExampleFiles()
+    {
+        return $this->exampleFiles('json');
+    }
 
-	public function writeArtefact($name, $contents)
-	{
-		$class = explode('\\', get_called_class());
-		$class = end($class);
+    public function exampleFiles($ext)
+    {
+        $files = [];
+        $src_dir = $this->getExamplesPath();
 
-		$dir = 'test-results/'.$class;
+        if (!$src_dir)
+            return $files;
 
-		if (!is_dir($dir))
-		{
-			mkdir($dir, 0777, true);
-		}
+        foreach (scandir($src_dir) as $entry)
+            if (preg_match('/\.'.$ext.'$/', $entry))
+                $files[] = [$entry];
 
-		$path = $dir.'/'.$name;
+        return $files;
+    }
 
-		file_put_contents($path, $contents);
+    public function writeArtefact($name, $contents)
+    {
+        $class = explode('\\', get_called_class());
+        $class = end($class);
 
-		return $this;
-	}
+        $dir = 'test-results/'.$class;
+
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
+
+        $path = $dir.'/'.$name;
+
+        file_put_contents($path, $contents);
+
+        return $this;
+    }
 }

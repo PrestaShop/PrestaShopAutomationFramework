@@ -4,43 +4,44 @@ namespace PrestaShop\PageObject;
 
 class ShoppingCartSummary extends PageObject
 {
-	public static $setQuantityDefaults = [
-		'id_product_attribute' => 0,
-		'id_customization' => 0,
-		'id_address_delivery' => 0
-	];
+    public static $setQuantityDefaults = [
+        'id_product_attribute' => 0,
+        'id_customization' => 0,
+        'id_address_delivery' => 0
+    ];
 
-	public function visit($url = null)
-	{
-		$this->getBrowser()
-		->visit($this->getShop()->getFrontOfficeURL())
-		->click('div.shopping_cart a');
-		return $this;
-	}
+    public function visit($url = null)
+    {
+        $this->getBrowser()
+        ->visit($this->getShop()->getFrontOfficeURL())
+        ->click('div.shopping_cart a');
 
-	public function setQuantity($quantity, $id_product, $options = array())
-	{
-		$options = array_merge(static::$setQuantityDefaults, $options);
-		$selector =  "quantity_{$id_product}_{$options['id_product_attribute']}"
-					."_{$options['id_customization']}_{$options['id_address_delivery']}";
+        return $this;
+    }
 
-		$selector = "input[name='$selector']";
+    public function setQuantity($quantity, $id_product, $options = array())
+    {
+        $options = array_merge(static::$setQuantityDefaults, $options);
+        $selector =  "quantity_{$id_product}_{$options['id_product_attribute']}"
+                    ."_{$options['id_customization']}_{$options['id_address_delivery']}";
 
-		$this
-		->getBrowser()
-		->fillIn($selector, $quantity);
+        $selector = "input[name='$selector']";
 
-		return $this;
-	}
+        $this
+        ->getBrowser()
+        ->fillIn($selector, $quantity);
 
-	public function getPercentReduction($id_product, $options = array())
-	{
-		$options = array_merge(static::$setQuantityDefaults, $options);
-		$selector =  "product_price_{$id_product}_{$options['id_product_attribute']}"
-					."_{$options['id_customization']}";
+        return $this;
+    }
 
-		$selector = "#$selector .price-percent-reduction";
+    public function getPercentReduction($id_product, $options = array())
+    {
+        $options = array_merge(static::$setQuantityDefaults, $options);
+        $selector =  "product_price_{$id_product}_{$options['id_product_attribute']}"
+                    ."_{$options['id_customization']}";
 
-		return trim($this->getBrowser()->getText($selector));
-	}
+        $selector = "#$selector .price-percent-reduction";
+
+        return trim($this->getBrowser()->getText($selector));
+    }
 }

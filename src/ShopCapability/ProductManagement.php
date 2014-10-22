@@ -5,19 +5,20 @@ namespace PrestaShop\ShopCapability;
 class ProductManagement extends ShopCapability
 {
 
-	private function saveProduct()
-	{
-		$browser = $this->getBrowser();
+    private function saveProduct()
+    {
+        $browser = $this->getBrowser();
 
-		$assert = new \PrestaShop\Helper\Spinner('Save button did not appear in time.', 10);
-		$assert->assertBecomesTrue(function() use ($browser) {
-			$browser->clickButtonNamed('submitAddproductAndStay');
-			return true;
-		});
-		$browser->ensureStandardSuccessMessageDisplayed();
-	}
+        $assert = new \PrestaShop\Helper\Spinner('Save button did not appear in time.', 10);
+        $assert->assertBecomesTrue(function () use ($browser) {
+            $browser->clickButtonNamed('submitAddproductAndStay');
 
-	/**
+            return true;
+        });
+        $browser->ensureStandardSuccessMessageDisplayed();
+    }
+
+    /**
 	 * Create a product
 	 * $options is an array with the the following keys:
 	 * - name
@@ -29,82 +30,81 @@ class ProductManagement extends ShopCapability
 	 * - id: the id of the product
 	 * - fo_url: the URL to access this product in FO
 	 */
-	public function createProduct($options)
-	{
-		$browser = $this->getShop()->getBackOfficeNavigator()->visit('AdminProducts', 'new');
+    public function createProduct($options)
+    {
+        $browser = $this->getShop()->getBackOfficeNavigator()->visit('AdminProducts', 'new');
 
-		$browser
-		->fillIn($this->i18nFieldName('#name'), $options['name'])
-		->click('#link-Prices')
-		->waitFor('#priceTE')
-		->fillIn('#priceTE', $options['price'])
-		->select('#id_tax_rules_group', empty($options['tax_rules_group']) ? 0 : $options['tax_rules_group']);
+        $browser
+        ->fillIn($this->i18nFieldName('#name'), $options['name'])
+        ->click('#link-Prices')
+        ->waitFor('#priceTE')
+        ->fillIn('#priceTE', $options['price'])
+        ->select('#id_tax_rules_group', empty($options['tax_rules_group']) ? 0 : $options['tax_rules_group']);
 
-		$this->saveProduct();
+        $this->saveProduct();
 
-		if (isset($options['specific_price'])) {
-			$browser
-			->click('#link-Prices')
-			->waitFor('#priceTE');
+        if (isset($options['specific_price'])) {
+            $browser
+            ->click('#link-Prices')
+            ->waitFor('#priceTE');
 
-			$m = [];
-			if (preg_match('/^\s*(\d+(?:\.\d+)?)\s*%\s*$/', $options['specific_price'], $m)) {
-				$percentage = $m[1];
-			} else {
-				throw new \Exception("Invalid specific price specified: {$options['specific_price']}.");
-			}
+            $m = [];
+            if (preg_match('/^\s*(\d+(?:\.\d+)?)\s*%\s*$/', $options['specific_price'], $m)) {
+                $percentage = $m[1];
+            } else {
+                throw new \Exception("Invalid specific price specified: {$options['specific_price']}.");
+            }
 
-			$browser
-			->click('#show_specific_price')
-			->select('#sp_reduction_type', 'percentage')
-			->fillIn('#sp_reduction', $percentage);
-			
-			$this->saveProduct();
-		}
-		
-		if (!empty($options['quantity']))
-		{
-			$browser
-			->click('#link-Quantities')
-			->waitFor('#qty_0')
-			->fillIn('#qty_0 input', $options['quantity']);
+            $browser
+            ->click('#show_specific_price')
+            ->select('#sp_reduction_type', 'percentage')
+            ->fillIn('#sp_reduction', $percentage);
 
-			$browser->executeScript('$("#qty_0 input").trigger("change");');
+            $this->saveProduct();
+        }
 
-			$this->saveProduct();
+        if (!empty($options['quantity'])) {
+            $browser
+            ->click('#link-Quantities')
+            ->waitFor('#qty_0')
+            ->fillIn('#qty_0 input', $options['quantity']);
 
-			$browser
-			->click('#link-Quantities')
-			->waitFor('#qty_0');
+            $browser->executeScript('$("#qty_0 input").trigger("change");');
 
-			$spinner = new \PrestaShop\Helper\Spinner();
+            $this->saveProduct();
 
-			$spinner->assertNoException(function() use ($browser, $options) {
-				$a = (int)$this->i18nParse($browser->getValue('#qty_0 input'), 'float');
-				$e = (int)$options['quantity'];
+            $browser
+            ->click('#link-Quantities')
+            ->waitFor('#qty_0');
 
-				if ($e !== $a)
-					throw new \PrestaShop\Exception\ProductCreationIncorrectException('quantity', $e, $a);
-			});
-		}
+            $spinner = new \PrestaShop\Helper\Spinner();
 
-		$browser
-		->click('#link-Prices')
-		->waitFor('#priceTE');
+            $spinner->assertNoException(function () use ($browser, $options) {
+                $a = (int) $this->i18nParse($browser->getValue('#qty_0 input'), 'float');
+                $e = (int) $options['quantity'];
 
-		$expected_price = (float)$options['price'];
-		$actual_price = $this->i18nParse($browser->getValue('#priceTE'));
-		if ($actual_price !== $expected_price)
-			throw new \PrestaShop\Exception\ProductCreationIncorrectException('price', $expected_price, $actual_price);
+                if ($e !== $a)
+                    throw new \PrestaShop\Exception\ProductCreationIncorrectException('quantity', $e, $a);
+            });
+        }
 
-		$id_product = (int)$browser->getURLParameter('id_product');
+        $browser
+        ->click('#link-Prices')
+        ->waitFor('#priceTE');
 
-		if ($id_product <= 0)
-			throw new \PrestaShop\Exception\ProductCreationIncorrectException();
+        $expected_price = (float) $options['price'];
+        $actual_price = $this->i18nParse($browser->getValue('#priceTE'));
+        if ($actual_price !== $expected_price)
+            throw new \PrestaShop\Exception\ProductCreationIncorrectException('price', $expected_price, $actual_price);
 
-		return [
-			'id' => $id_product,
-			'fo_url' => $browser->getAttribute('#page-header-desc-product-preview', 'href')
-		];
-	}
+        $id_product = (int) $browser->getURLParameter('id_product');
+
+        if ($id_product <= 0)
+            throw new \PrestaShop\Exception\ProductCreationIncorrectException();
+
+        return [
+            'id' => $id_product,
+            'fo_url' => $browser->getAttribute('#page-header-desc-product-preview', 'href')
+        ];
+    }
 }

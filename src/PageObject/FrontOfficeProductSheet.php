@@ -4,28 +4,30 @@ namespace PrestaShop\PageObject;
 
 class FrontOfficeProductSheet extends PageObject
 {
-	public function visit($url = null)
-	{
-		$this->getBrowser()->visit($url);
-		return $this;
-	}
+    public function visit($url = null)
+    {
+        $this->getBrowser()->visit($url);
 
-	public function setQuantity($q)
-	{
-		$this->getBrowser()->fillIn('#quantity_wanted', $q);
-		return $this;
-	}
+        return $this;
+    }
 
-	public function addToCart()
-	{
-		$this->getBrowser()->click('#add_to_cart button');
+    public function setQuantity($q)
+    {
+        $this->getBrowser()->fillIn('#quantity_wanted', $q);
 
-		try {
-			$this->getBrowser()->click('#layer_cart span.cross');
-		} catch (\Exception $e) {
-			// we don't care, maybe the popin was disabled
-		}
+        return $this;
+    }
 
-		return $this;
-	}
+    public function addToCart()
+    {
+        $this->getBrowser()->click('#add_to_cart button');
+
+        try {
+            $this->getBrowser()->click('#layer_cart span.cross');
+        } catch (\Exception $e) {
+            // we don't care, maybe the popin was disabled
+        }
+
+        return $this;
+    }
 }

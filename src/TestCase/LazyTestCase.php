@@ -12,13 +12,13 @@ use \PrestaShop\Shop;
 
 class LazyTestCase extends TestCase
 {
-	public function setUp()
-	{
-		$this->shop = static::getShop();
-	}
+    public function setUp()
+    {
+        $this->shop = static::getShop();
+    }
 
-	public function tearDown()
-	{
-		// Do nothing
-	}
+    public function tearDown()
+    {
+        // Do nothing
+    }
 }

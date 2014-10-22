@@ -6,29 +6,29 @@ use PrestaShop\OptionProvider;
 
 class FrontOfficeNavigation extends ShopCapability
 {
-	public function setup()
-	{
-		
-	}
-	
-	public function login($options = [])
-	{
-		$options = OptionProvider::addDefaults('FrontOfficeLogin', $options);
+    public function setup()
+    {
 
-		$browser = $this->getShop()->getBrowser();
-		$browser
-		->visit($this->getShop()->getFrontOfficeURL())
-		->click('div.header_user_info a.login')
-		->waitFor('#email')
-		->fillIn('#email', $options['customer_email'])
-		->fillIn('#passwd', $options['customer_password'])
-		->click('#SubmitLogin');
+    }
 
-		return $this;
-	}
+    public function login($options = [])
+    {
+        $options = OptionProvider::addDefaults('FrontOfficeLogin', $options);
 
-	public function visitHome()
-	{
-		return $this->getBrowser()->visit($this->getShop()->getFrontOfficeURL());
-	}
+        $browser = $this->getShop()->getBrowser();
+        $browser
+        ->visit($this->getShop()->getFrontOfficeURL())
+        ->click('div.header_user_info a.login')
+        ->waitFor('#email')
+        ->fillIn('#email', $options['customer_email'])
+        ->fillIn('#passwd', $options['customer_password'])
+        ->click('#SubmitLogin');
+
+        return $this;
+    }
+
+    public function visitHome()
+    {
+        return $this->getBrowser()->visit($this->getShop()->getFrontOfficeURL());
+    }
 }
