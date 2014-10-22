@@ -115,6 +115,20 @@ class InvoiceTest extends \PrestaShop\TestCase\TestCase
 
 		$scenario = $this->getJSONExample($exampleFile);
 
+		if (isset($scenario['discounts']))
+		{
+			foreach ($scenario['discounts'] as $name => $discount) {	
+				if (is_string($discount)) {
+					$discount = ['name' => $name, 'discount' => $discount];
+				}
+				else {
+					$discount['name'] = $name;
+				}
+
+				$shop->getCartRulesManager()->createCartRule($discount);
+			}
+		}
+
 		if (isset($scenario['meta']['rounding_mode']))
 			$shop->getPreferencesManager()->setRoundingMode($scenario['meta']['rounding_mode']);
 
@@ -162,18 +176,6 @@ class InvoiceTest extends \PrestaShop\TestCase\TestCase
 			$data['name'] = $name;
 
 			$scenario['products'][$name]['info'] = $shop->getProductManager()->createProduct($data);
-		}
-
-		if (isset($scenario['discounts']))
-		{
-			foreach ($scenario['discounts'] as $name => $discount)
-				
-				if (is_string($discount))
-					$discount = ['name' => $name, 'discount' => $discount];
-				else
-					$discount['name'] = $name;
-
-				$shop->getCartRulesManager()->createCartRule($discount);
 		}
 
 		$shop->getFrontOfficeNavigator()->login();
