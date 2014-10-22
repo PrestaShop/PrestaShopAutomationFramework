@@ -190,6 +190,15 @@ class Browser
         return $this;
     }
 
+    public function setElementValue($element, $value)
+    {
+        $element->click();
+        $element->clear();
+        $element->sendKeys($value);
+
+        return $this;
+    }
+
     public function setFile($selector, $path)
     {
         $element = $this->find($selector);

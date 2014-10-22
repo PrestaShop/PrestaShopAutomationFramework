@@ -49,10 +49,24 @@ class CarrierManagement extends ShopCapability
                 ->fillIn('tr.range_sup td:nth-child('.$index.') input', $upper_limit)
                 // Check all zones
                 ->checkbox('tr.fees_all td:nth-child(2) input', true)
-                ->sleep(1)
+                ->sleep(1);
+
+                /*
                 // Fill in price / weight
                 ->fillIn('tr.fees_all td:nth-child('.$index.') input', $value)
-                ->click('tr.range_inf');
+                ->click('tr.range_inf');*/
+
+                foreach ($browser->find('tr.fees td:nth-child('.$index.') input', ['unique' => false]) as $input) {
+                    $browser->setElementValue($input, $value);
+                }
+                /*$spinner = new \PrestaShop\Helper\Spinner('Could not set price range.', 30);
+
+                // We need this, because the Javascript populating the form is quite slow.
+                $spinner->assertBecomesTrue(function() use ($browser, $index, $value) {
+                    return $browser->getValue('tr:nth-last-child(2) td:nth-child('.$index.') input') == $value;
+                });*/
+                
+                // $browser->waitForUserInput();
 
                 $index += 1;
                 $inf = $upper_limit;
@@ -64,6 +78,8 @@ class CarrierManagement extends ShopCapability
 
         $oorb = isset($options['oorb']) ? ($options['oorb'] === 'highest' ? 0 : 1) : 0;
         $browser->select('#range_behavior', $oorb);
+
+        $browser->takeScreenshot('carrier_screenshot_'.posix_getpid().'_'.time().'.png');
 
         $browser->click('a.buttonNext');
 
