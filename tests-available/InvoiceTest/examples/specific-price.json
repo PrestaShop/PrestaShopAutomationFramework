@@ -21,7 +21,8 @@
   "expect": {
     "invoice": {
       "total": {
-        "to_pay_tax_included": 55.89
+        "to_pay_tax_included": 55.89,
+        "shipping_tax_excluded": 4.99
       },
       "tax": {
         "products": {
