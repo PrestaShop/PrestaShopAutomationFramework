@@ -16,7 +16,7 @@ class InstallationTest extends \PrestaShop\TestCase\TestCase
 			['de', 'de'], ['de', 'fr'],
 			['en', 'us'], ['en', 'de'],
 			['es', 'es'], ['es', 'it'],
-			['fr', 'fr'], ['fr', 'fr'],
+			['fr', 'fr'], ['fr', 'de'],
 			['id', 'id'], ['id', 'de'],
 			['it', 'it'], ['it', 'cz'],
 			['hu', 'hu'], ['hu', 'us'],
