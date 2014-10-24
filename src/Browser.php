@@ -7,6 +7,8 @@ class Browser
     private $driver;
     private $quitted = false;
 
+    private $screenshots = false;
+
     public function __construct($seleniumSettings)
     {
         $caps = [
@@ -29,6 +31,26 @@ class Browser
         // This is to ensure we close the windows
         if (!$this->quitted)
             $this->quit();
+    }
+
+    public function recordScreenshots($dir)
+    {
+        if (!$dir) {
+            $this->screenshots = false;
+        } else {
+            $this->screenshots = $dir;
+            $this->screenshotNumber = 0;
+        }
+    }
+
+    public function autoScreenshot()
+    {
+        if ($this->screenshots) {
+            $this->screenshotNumber += 1;
+            $n = sprintf("%'06d) ", $this->screenshotNumber);
+            $filename = $this->screenshots.DIRECTORY_SEPARATOR.$n.strftime("%a %d %b %Y, %H;%M;%S").'.png';
+            $this->takeScreenshot($filename);
+        }
     }
 
     public function quit()
@@ -78,6 +100,8 @@ class Browser
             $url = preg_replace('/^(\w+:\/\/)/', '\1'.$basic_auth['user'].':'.$basic_auth['pass'].'@', $url);
         $this->driver->get($url);
 
+        $this->autoScreenshot();
+
         return $this;
     }
 
@@ -94,7 +118,11 @@ class Browser
      */
     public function getAttribute($selector, $attribute)
     {
-        return $this->find($selector)->getAttribute($attribute);
+        try {
+            return $this->find($selector)->getAttribute($attribute);
+        } finally {
+            $this->autoScreenshot();
+        }
     }
 
     /**
@@ -110,7 +138,11 @@ class Browser
      */
     public function getText($selector)
     {
-        return $this->find($selector)->getText();
+        try {
+            return $this->find($selector)->getText();
+        } finally {
+            $this->autoScreenshot();
+        }
     }
 
     /**
@@ -142,13 +174,22 @@ class Browser
 
         $method = $unique ? 'findElement' : 'findElements';
 
-        if (isset($options['wait']) && $options['wait'] === false)
-            return $this->driver->$method(\WebDriverBy::$tos($selector));
+        if (isset($options['wait']) && $options['wait'] === false) {
+            try {
+                return $this->driver->$method(\WebDriverBy::$tos($selector));
+            } finally {
+                $this->autoScreenshot();
+            }
+        }
 
         $spin = new \PrestaShop\Helper\Spinner('Could not find element.', 5);
 
         return $spin->assertNoException(function () use ($method, $tos, $selector) {
-            return $this->driver->$method(\WebDriverBy::$tos($selector));
+            try {
+                return $this->driver->$method(\WebDriverBy::$tos($selector));
+            } finally {
+                $this->autoScreenshot();
+            }
         });
     }
 
@@ -189,8 +230,12 @@ class Browser
      */
     public function click($selector)
     {
-        $element = $this->find($selector);
-        $element->click();
+        try {
+            $element = $this->find($selector);
+            $element->click();
+        } finally {
+            $this->autoScreenshot();
+        }
 
         return $this;
     }
@@ -202,7 +247,11 @@ class Browser
     {
         $element = $this->find($selector);
        
-        $this->driver->action()->moveToElement($element)->perform();
+        try {
+            $this->driver->action()->moveToElement($element)->perform();
+        } finally {
+            $this->autoScreenshot();
+        }
 
         return $this;
     }
@@ -212,15 +261,19 @@ class Browser
      */
     public function clickButtonNamed($name)
     {
-        $buttons = $this->find("button[name=$name]", ['unique' => false]);
-        foreach ($buttons as $button) {
-            if ($button->isDisplayed() && $button->isEnabled()) {
-                $button->click();
+        try {
+            $buttons = $this->find("button[name=$name]", ['unique' => false]);
+            foreach ($buttons as $button) {
+                if ($button->isDisplayed() && $button->isEnabled()) {
+                    $button->click();
 
-                return $this;
+                    return $this;
+                }
             }
+            throw new \Exception("Could not find any visible and enabled button named $name");
+        } finally {
+            $this->autoScreenshot();
         }
-        throw new \Exception("Could not find any visible and enabled button named $name");
     }
 
     /**
@@ -230,8 +283,12 @@ class Browser
      */
     public function clickLabelFor($for)
     {
-        $element = $this->find("label[for=$for]");
-        $element->click();
+        try {
+            $element = $this->find("label[for=$for]");
+            $element->click();
+        } finally {
+            $this->autoScreenshot();
+        }
 
         return $this;
     }
@@ -243,10 +300,14 @@ class Browser
      */
     public function fillIn($selector, $value)
     {
-        $element = $this->find($selector);
-        $element->click();
-        $element->clear();
-        $this->driver->getKeyboard()->sendKeys($value);
+        try {
+            $element = $this->find($selector);
+            $element->click();
+            $element->clear();
+            $this->driver->getKeyboard()->sendKeys($value);
+        } finally {
+            $this->autoScreenshot();
+        }
 
         return $this;
     }
@@ -257,9 +318,13 @@ class Browser
      */
     public function setElementValue($element, $value)
     {
-        $element->click();
-        $element->clear();
-        $element->sendKeys($value);
+        try {
+            $element->click();
+            $element->clear();
+            $element->sendKeys($value);
+        } finally {
+            $this->autoScreenshot();
+        }
 
         return $this;
     }
@@ -272,16 +337,20 @@ class Browser
      */
     public function setFile($selector, $path)
     {
-        $element = $this->find($selector);
-        if (!$element->isDisplayed()) {
-            $this->executeScript("
-				arguments[0].style.setProperty('display', 'inherit', 'important');
-				arguments[0].style.setProperty('visibility', 'visible', 'important');
-				arguments[0].style.setProperty('width', 'auto', 'important');
-				arguments[0].style.setProperty('height', 'auto', 'important');
-			", [$element]);
+        try {
+            $element = $this->find($selector);
+            if (!$element->isDisplayed()) {
+                $this->executeScript("
+    				arguments[0].style.setProperty('display', 'inherit', 'important');
+    				arguments[0].style.setProperty('visibility', 'visible', 'important');
+    				arguments[0].style.setProperty('width', 'auto', 'important');
+    				arguments[0].style.setProperty('height', 'auto', 'important');
+    			", [$element]);
+            }
+            $element->sendKeys($path);
+        } finally {
+            $this->autoScreenshot();
         }
-        $element->sendKeys($path);
 
         return $this;
     }
@@ -301,13 +370,17 @@ class Browser
 	*/
     public function select($selector, $value)
     {
-        if ($value === null)
-            return $this;
+        try {
+            if ($value === null)
+                return $this;
 
-        $elt = $this->find($selector);
+            $elt = $this->find($selector);
 
-        $select = new \WebDriverSelect($elt);
-        $select->selectByValue($value);
+            $select = new \WebDriverSelect($elt);
+            $select->selectByValue($value);
+        } finally {
+            $this->autoScreenshot();
+        }
 
         return $this;
     }
@@ -318,33 +391,37 @@ class Browser
 	 */
     public function multiSelect($selector, $options)
     {
-        $elem = $this->find($selector);
-        $elem->click();
-        sleep(1);    // strangely, this is needed,
-                     // otherwise Selenium throws a StaleElementException
-                     // I don't have the faintest idea why
+        try {
+            $elem = $this->find($selector);
+            $elem->click();
+            sleep(1);    // strangely, this is needed,
+                         // otherwise Selenium throws a StaleElementException
+                         // I don't have the faintest idea why
 
-        $option_elts = $elem->findElements(\WebDriverBy::cssSelector('option'));
+            $option_elts = $elem->findElements(\WebDriverBy::cssSelector('option'));
 
-        $this->driver->getKeyboard()->pressKey(\WebDriverKeys::CONTROL);
+            $this->driver->getKeyboard()->pressKey(\WebDriverKeys::CONTROL);
 
-        $matched = 0;
+            $matched = 0;
 
-        foreach ($option_elts as $opt) {
-            if (in_array($opt->getAttribute('value'), $options)) {
-                $matched += 1;
-                if (!$opt->isSelected()) {
+            foreach ($option_elts as $opt) {
+                if (in_array($opt->getAttribute('value'), $options)) {
+                    $matched += 1;
+                    if (!$opt->isSelected()) {
+                        $opt->click();
+                    }
+                } elseif ($opt->isSelected()) {
                     $opt->click();
                 }
-            } elseif ($opt->isSelected()) {
-                $opt->click();
             }
+
+            $this->driver->getKeyboard()->releaseKey(\WebDriverKeys::CONTROL);
+
+            if ($matched !== count($options))
+                throw new \Exception('Could not select all values.');
+        } finally {
+            $this->autoScreenshot();
         }
-
-        $this->driver->getKeyboard()->releaseKey(\WebDriverKeys::CONTROL);
-
-        if ($matched !== count($options))
-            throw new \Exception('Could not select all values.');
 
         return $this;
     }
@@ -374,16 +451,20 @@ class Browser
 	*/
     public function jqcSelect($selector, $value)
     {
-        /**
-		* Spin this test, because since JQuery is involved, the DOM is likely not to be ready.
-		*/
-        $spinner = new \PrestaShop\Helper\Spinner(null, 5, 1000);
+        try {
+            /**
+    		* Spin this test, because since JQuery is involved, the DOM is likely not to be ready.
+    		*/
+            $spinner = new \PrestaShop\Helper\Spinner(null, 5, 1000);
 
-        $spinner->assertBecomesTrue(function () use ($selector, $value) {
-            $this->_jqcSelect($selector, $value);
+            $spinner->assertBecomesTrue(function () use ($selector, $value) {
+                $this->_jqcSelect($selector, $value);
 
-            return true;
-        });
+                return true;
+            });
+        } finally {
+            $this->autoScreenshot();
+        }
 
         return $this;
     }
@@ -446,9 +527,13 @@ class Browser
 	*/
     public function checkbox($selector, $on_off)
     {
-        $cb = $this->find($selector);
-        if (($on_off && !$cb->isSelected()) || (!$on_off && $cb->isSelected()))
-            $cb->click();
+        try {
+            $cb = $this->find($selector);
+            if (($on_off && !$cb->isSelected()) || (!$on_off && $cb->isSelected()))
+                $cb->click();
+        } finally {
+            $this->autoScreenshot();
+        }
 
         return $this;
     }
@@ -458,18 +543,22 @@ class Browser
 	*/
     public function waitFor($selector, $timeout_in_second = null, $interval_in_millisecond = null)
     {
-        $wait = new \WebDriverWait($this->driver, $timeout_in_second, $interval_in_millisecond);
-        $wait->until(function ($driver) use ($selector) {
-            try {
-                $e = $this->find($selector);
+        try {
+            $wait = new \WebDriverWait($this->driver, $timeout_in_second, $interval_in_millisecond);
+            $wait->until(function ($driver) use ($selector) {
+                try {
+                    $e = $this->find($selector);
 
-                return $e->isDisplayed();
-            } catch (\Exception $e) {
-                return false;
-            }
+                    return $e->isDisplayed();
+                } catch (\Exception $e) {
+                    return false;
+                }
 
-            return true;
-        });
+                return true;
+            });
+        } finally {
+            $this->autoScreenshot();
+        }
 
         return $this;
     }
@@ -548,7 +637,11 @@ class Browser
      */
     public function executeScript($script, array $args = array())
     {
-        return $this->driver->executeScript($script, $args);
+        try {
+            return $this->driver->executeScript($script, $args);
+        } finally {
+            $this->autoScreenshot();
+        }
     }
 
     /**

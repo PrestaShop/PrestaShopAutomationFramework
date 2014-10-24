@@ -159,7 +159,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
         return $files;
     }
 
-    public function writeArtefact($name, $contents)
+    public function getOutputDir()
     {
         $class = explode('\\', get_called_class());
         $class = end($class);
@@ -170,10 +170,70 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
             mkdir($dir, 0777, true);
         }
 
+        return $dir;
+    }
+
+    public function writeArtefact($name, $contents)
+    {
+        $dir = $this->getOutputDir();        
+
         $path = $dir.'/'.$name;
 
         file_put_contents($path, $contents);
 
         return $this;
+    }
+
+    public function makeFileNameCompatibleRepresentation($value) {
+        
+        $clean = function($str) {
+            return str_replace(
+                ['<', '>', ':', '"', '/', '\\', '|', '?', '*'],
+                ['(lt)', '(gt)', '(colon)', "''", '(fs)', '(bs)', '(or)', '(qstnmrk)', '(x)'],
+                $str
+            );
+        };
+
+        if (is_scalar($value)) {
+            return $clean((string)$value);
+        } elseif (is_object($value)) {
+            return '{'.spl_object_hash($value).'}';
+        } elseif (is_array($value)) {
+            $parts = [];
+            foreach ($value as $k => $v) {
+                $part = '';
+                if (is_string($k)) {
+                    $part .= $clean($k).'=';
+                }
+                $part .= $this->makeFileNameCompatibleRepresentation($v);
+                $parts[] = $part;
+            }
+            return '['.implode(', ', $parts).']';
+        }
+    }
+
+    public function aboutToStart($methodName, array $arguments = null)
+    {
+        $shortName = $methodName;
+        if (!empty($arguments)) {
+            $shortName .= ' - '.implode(' ', array_map([$this, 'makeFileNameCompatibleRepresentation'], $arguments));
+        }
+
+        $dir = $this->getOutputDir().DIRECTORY_SEPARATOR.$shortName;
+        
+        $screenshotsDir = $dir.DIRECTORY_SEPARATOR.'screenshots';
+
+        if (is_dir($screenshotsDir)) {
+            foreach (scandir($screenshotsDir) as $entry) {
+                if ($entry[0] === '.') {
+                    continue;
+                }
+                unlink($screenshotsDir.DIRECTORY_SEPARATOR.$entry);
+            }
+        } else {
+            mkdir($screenshotsDir, 0777, true);
+        }
+
+        static::getShop()->getBrowser()->recordScreenshots($screenshotsDir);
     }
 }
