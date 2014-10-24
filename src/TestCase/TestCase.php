@@ -11,6 +11,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
     private static $shop_managers = [];
     private static $test_numbers = [];
     private static $browsers = [];
+    private $shortName;
 
     protected static $cache_initial_state = true;
 
@@ -175,9 +176,16 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 
     public function writeArtefact($name, $contents)
     {
-        $dir = $this->getOutputDir();        
+        $dir = $this->getOutputDir();
 
-        $path = $dir.'/'.$name;
+        if ($this->shortName) {
+            $dir .= DIRECTORY_SEPARATOR . $this->shortName;
+            if (!is_dir($dir)) {
+                mkdir($dir, 0777, true);
+            }
+        }        
+
+        $path = $dir.DIRECTORY_SEPARATOR.$name;
 
         file_put_contents($path, $contents);
 
@@ -218,6 +226,8 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
         if (!empty($arguments)) {
             $shortName .= ' - '.implode(' ', array_map([$this, 'makeFileNameCompatibleRepresentation'], $arguments));
         }
+
+        $this->shortName = $shortName;
 
         $dir = $this->getOutputDir().DIRECTORY_SEPARATOR.$shortName;
         
