@@ -131,7 +131,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/djfm/ptest",
-                "reference": "5ae9d0161487665c3a5b3b35d9cc8a5f5fe0396d"
+                "reference": "5c0862b441c9b43b8525e68164abbd851aaa3d8c"
             },
             "require": {
                 "symfony/console": "*"
@@ -145,7 +145,7 @@
                     "PrestaShop\\Ptest\\": "src/"
                 }
             },
-            "time": "2014-10-24 11:25:51"
+            "time": "2014-10-24 15:06:38"
         },
         {
             "name": "facebook/webdriver",
