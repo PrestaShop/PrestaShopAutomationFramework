@@ -19,7 +19,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
         $class = get_called_class();
 
         if (!isset(self::$browsers[$class])) {
-            $browser = new \PrestaShop\Browser([
+            $browser = new \PrestaShop\PSBrowser([
                 'host' => \PrestaShop\SeleniumManager::getHost()
             ]);
             self::$browsers[$class] = $browser;
