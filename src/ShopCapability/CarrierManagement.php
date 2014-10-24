@@ -79,8 +79,6 @@ class CarrierManagement extends ShopCapability
         $oorb = isset($options['oorb']) ? ($options['oorb'] === 'highest' ? 0 : 1) : 0;
         $browser->select('#range_behavior', $oorb);
 
-        $browser->takeScreenshot('carrier_screenshot_'.posix_getpid().'_'.time().'.png');
-
         $browser->click('a.buttonNext');
 
         $browser->sleep(1);
