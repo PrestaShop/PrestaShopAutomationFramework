@@ -26,6 +26,7 @@ class Browser
 
     public function __destruct()
     {
+        // This is to ensure we close the windows
         if (!$this->quitted)
             $this->quit();
     }
@@ -36,6 +37,14 @@ class Browser
         $this->driver->quit();
     }
 
+    /**
+     * Utility function: do something with the browser,
+     * and then reload the current URL.
+     * This is useful if you need to grab an info from another
+     * page while not wanting to interrupt your current browsing
+     * flow.
+     * The function will return the value of your callback.
+     */
     public function doThenComeBack(callable $callback)
     {
         $url = $this->getCurrentURL();
@@ -48,7 +57,7 @@ class Browser
     }
 
     /**
-	* Wait for user input - useful when debugging
+	* Wait for user input - useful when debugging.
 	*/
     public function waitForUserInput()
     {
@@ -59,9 +68,11 @@ class Browser
     }
 
     /**
-	* Visit a URL
+	* Visit a URL.
+    * The optional basic_auth array contains user and pass keys,
+    * they will be injected into the URL if the array is provided.
 	*/
-    public function visit($url, $basic_auth = null)
+    public function visit($url, array $basic_auth = null)
     {
         if ($basic_auth)
             $url = preg_replace('/^(\w+:\/\/)/', '\1'.$basic_auth['user'].':'.$basic_auth['pass'].'@', $url);
@@ -70,28 +81,53 @@ class Browser
         return $this;
     }
 
+    /**
+     * Gets the source code of the page.
+     */
     public function getPageSource()
     {
         return $this->driver->getPageSource();
     }
 
+    /**
+     * Gets the value of an attribute for a given selector.
+     */
     public function getAttribute($selector, $attribute)
     {
         return $this->find($selector)->getAttribute($attribute);
     }
 
+    /**
+     * Gets the value of an input for the given selector.
+     */
     public function getValue($selector)
     {
         return $this->getAttribute($selector, 'value');
     }
 
+    /**
+     * Gets the VISIBLE text for a given selector.
+     */
     public function getText($selector)
     {
         return $this->find($selector)->getText();
     }
 
     /**
-	* Find element(s)
+	* Find element(s).
+    *
+    * Selectors are interpreted as CSS by default,
+    * example: ".main ul li"
+    * 
+    * To use an xpath selector, prefix it with {xpath},
+    * for instance "{xpath}}//div".
+    *
+    * The options you can provide are:
+    * - unique: boolean, defaults to true - whether or not the element you're looking for is unique
+    * - wait: boolean, defaults to true - wait for the element to show up if it is not immediately there
+    *
+    * @return native \RemoteWebDriverElement or elements
+    * 
 	*/
     public function find($selector, $options = [])
     {
@@ -116,11 +152,18 @@ class Browser
         });
     }
 
+    /**
+     * Find all elements matching the selector.
+     * This is a shortcut for find($selector, ['unique' => false]);
+     */
     public function all($selector)
     {
         return $this->find($selector, ['unique' => false]);
     }
 
+    /**
+     * Count elements matching a selector.
+     */
     public function count($selector)
     {
         return count($this->find($selector, ['unique' => false]));
@@ -140,6 +183,10 @@ class Browser
         return $this;
     }
 
+    /**
+     * Clicks an element by selector.
+     * Waits a bit if it is not there.
+     */
     public function click($selector)
     {
         $element = $this->find($selector);
@@ -148,17 +195,21 @@ class Browser
         return $this;
     }
 
+    /**
+     * Emulates a mouseover action.
+     */
     public function hover($selector)
     {
         $element = $this->find($selector);
-        /*
-		$coords = $element->getCoordinates();
-		$this->driver->getMouse()->mouseMove($coords, 5, 5);*/
+       
         $this->driver->action()->moveToElement($element)->perform();
 
         return $this;
     }
 
+    /**
+     * Clicks the first enabled button with the given name.
+     */
     public function clickButtonNamed($name)
     {
         $buttons = $this->find("button[name=$name]", ['unique' => false]);
@@ -172,6 +223,11 @@ class Browser
         throw new \Exception("Could not find any visible and enabled button named $name");
     }
 
+    /**
+     * Clicks the label that has the given "for" attribute.
+     * It is often more robust to click labels instead of
+     * checkboxes, so this convenience method is provided.
+     */
     public function clickLabelFor($for)
     {
         $element = $this->find("label[for=$for]");
@@ -180,6 +236,11 @@ class Browser
         return $this;
     }
 
+    /**
+     * Fills in an input with the given value.
+     * Will wait a bit for the element to show up
+     * if it is not immediately available.
+     */
     public function fillIn($selector, $value)
     {
         $element = $this->find($selector);
@@ -190,6 +251,10 @@ class Browser
         return $this;
     }
 
+    /**
+     * Convenience method to fill in the value of an input
+     * if we got the element as a native remote element.
+     */
     public function setElementValue($element, $value)
     {
         $element->click();
@@ -199,6 +264,12 @@ class Browser
         return $this;
     }
 
+    /**
+     * Helper method to set the file for a file input.
+     * This takes care of making it visible if it is not.
+     * This strange behaviour is needed to allow file upload
+     * with widgets that mask the original input.
+     */
     public function setFile($selector, $path)
     {
         $element = $this->find($selector);
@@ -215,6 +286,9 @@ class Browser
         return $this;
     }
 
+    /**
+     * Simulates keypresses.
+     */
     public function sendKeys($keys)
     {
         $this->driver->getKeyboard()->sendKeys($keys);
@@ -247,8 +321,8 @@ class Browser
         $elem = $this->find($selector);
         $elem->click();
         sleep(1);    // strangely, this is needed,
-                    // otherwise Selenium throws a StaleElementException
-                    // I don't have the faintest idea why
+                     // otherwise Selenium throws a StaleElementException
+                     // I don't have the faintest idea why
 
         $option_elts = $elem->findElements(\WebDriverBy::cssSelector('option'));
 
@@ -447,6 +521,9 @@ class Browser
         return $this;
     }
 
+    /**
+     * Convenience method to wait a bit and keep chaining methods.
+     */
     public function sleep($seconds)
     {
         sleep($seconds);
@@ -454,6 +531,9 @@ class Browser
         return $this;
     }
 
+    /**
+     * Clears the browser's cookies.
+     */
     public function clearCookies()
     {
         $this->driver->manage()->deleteAllCookies();
@@ -461,11 +541,19 @@ class Browser
         return $this;
     }
 
+    /**
+     * Executes javascript code in the context of the current page.
+     * When executing a function, arguments can be provided as an associative
+     * array in the $args argument.
+     */
     public function executeScript($script, array $args = array())
     {
         return $this->driver->executeScript($script, $args);
     }
 
+    /**
+     * Takes a screenshot, saves it to the "save_as" path.
+     */
     public function takeScreenshot($save_as = null)
     {
         $this->driver->takeScreenshot($save_as);
@@ -473,6 +561,10 @@ class Browser
         return $this;
     }
 
+    /**
+     * Executes a curl request with the same cookies
+     * as the browser.
+     */
     public function curl($url = null, $options = array())
     {
         if ($url === null)
