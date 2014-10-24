@@ -173,7 +173,7 @@ class Shop
     public function getBrowser()
     {
         if (!$this->browser) {
-            $this->browser = new Browser($this->selenium_settings);
+            $this->browser = new PSBrowser($this->selenium_settings);
         }
 
         return $this->browser;
