@@ -112,11 +112,6 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
         // TODO: restore state of shop
     }
 
-    public function onException($e, $files_prefix)
-    {
-        static::getShop()->getBrowser()->takeScreenshot($files_prefix.'.png');
-    }
-
     public function getExamplesPath()
     {
         $class = explode('\\', get_called_class());

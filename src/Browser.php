@@ -7,7 +7,12 @@ class Browser
     private $driver;
     private $quitted = false;
 
-    private $screenshots = false;
+    private $screenshotsDir = false;
+
+    // If this is >= 0, auto screenshots are active, if this is < 0,
+    // they're disabled.
+    // This is used to prevent double screenshotting when functions call one another.
+    private $screenshots = 0;
 
     public function __construct($seleniumSettings)
     {
@@ -36,19 +41,31 @@ class Browser
     public function recordScreenshots($dir)
     {
         if (!$dir) {
-            $this->screenshots = false;
+            $this->screenshotsDir = false;
         } else {
-            $this->screenshots = $dir;
+            $this->screenshotsDir = $dir;
             $this->screenshotNumber = 0;
+            $this->screenshots = 0;
         }
     }
 
-    public function autoScreenshot()
+    /**
+     * Call with 'false' to disa le autoScreenshotting temporarily,
+     * with 'true' to reenable it, and with null or anything else
+     * to take a screenshot without enabling/disabling them
+     */
+    public function autoScreenshot($yes = true)
     {
-        if ($this->screenshots) {
+        if ($yes === true) {
+            $this->screenshots += 1;
+        } elseif ($yes === false) {
+            $this->screenshots -= 1;
+        }
+
+        if ($this->screenshotsDir && $this->screenshots >= 0) {
             $this->screenshotNumber += 1;
             $n = sprintf("%'06d) ", $this->screenshotNumber);
-            $filename = $this->screenshots.DIRECTORY_SEPARATOR.$n.strftime("%a %d %b %Y, %H;%M;%S").'.png';
+            $filename = $this->screenshotsDir.DIRECTORY_SEPARATOR.$n.strftime("%a %d %b %Y, %H;%M;%S").'.png';
             $this->takeScreenshot($filename);
         }
     }
@@ -96,11 +113,12 @@ class Browser
 	*/
     public function visit($url, array $basic_auth = null)
     {
-        if ($basic_auth)
+        if ($basic_auth) {
             $url = preg_replace('/^(\w+:\/\/)/', '\1'.$basic_auth['user'].':'.$basic_auth['pass'].'@', $url);
+        }
         $this->driver->get($url);
 
-        $this->autoScreenshot();
+        $this->autoScreenshot(null);
 
         return $this;
     }
@@ -119,9 +137,10 @@ class Browser
     public function getAttribute($selector, $attribute)
     {
         try {
+            $this->screenshots -= 1;
             return $this->find($selector)->getAttribute($attribute);
         } finally {
-            $this->autoScreenshot();
+            $this->screenshots += 1;
         }
     }
 
@@ -139,9 +158,10 @@ class Browser
     public function getText($selector)
     {
         try {
+            $this->screenshots -= 1;
             return $this->find($selector)->getText();
         } finally {
-            $this->autoScreenshot();
+            $this->screenshots += 1;
         }
     }
 
@@ -163,34 +183,32 @@ class Browser
 	*/
     public function find($selector, $options = [])
     {
-        $unique = !isset($options['unique']) || $options['unique'];
+        try {
+            $this->autoScreenshot(false);
 
-        $m = [];
-        if (preg_match('/^{xpath}(.*)$/', $selector, $m)) {
-            $selector = $m[1];
-            $tos = 'xpath';
-        } else
-            $tos = 'cssSelector';
+            $unique = !isset($options['unique']) || $options['unique'];
 
-        $method = $unique ? 'findElement' : 'findElements';
+            $m = [];
+            if (preg_match('/^{xpath}(.*)$/', $selector, $m)) {
+                $selector = $m[1];
+                $tos = 'xpath';
+            } else
+                $tos = 'cssSelector';
 
-        if (isset($options['wait']) && $options['wait'] === false) {
-            try {
+            $method = $unique ? 'findElement' : 'findElements';
+
+            if (isset($options['wait']) && $options['wait'] === false) {  
                 return $this->driver->$method(\WebDriverBy::$tos($selector));
-            } finally {
-                $this->autoScreenshot();
             }
+
+            $spin = new \PrestaShop\Helper\Spinner('Could not find element.', 5);
+
+            return $spin->assertNoException(function () use ($method, $tos, $selector) {
+                return $this->driver->$method(\WebDriverBy::$tos($selector));
+            });
+        } finally {
+            $this->autoScreenshot();
         }
-
-        $spin = new \PrestaShop\Helper\Spinner('Could not find element.', 5);
-
-        return $spin->assertNoException(function () use ($method, $tos, $selector) {
-            try {
-                return $this->driver->$method(\WebDriverBy::$tos($selector));
-            } finally {
-                $this->autoScreenshot();
-            }
-        });
     }
 
     /**
@@ -207,18 +225,26 @@ class Browser
      */
     public function count($selector)
     {
-        return count($this->find($selector, ['unique' => false]));
+        try {
+            $this->screenshots -= 1;
+            return count($this->find($selector, ['unique' => false]));
+        } finally {
+            $this->screenshots += 1;
+        }
     }
 
     public function ensureElementIsOnPage($selector, $exception=null)
     {
         try {
+            $this->autoScreenshot(false);
             $this->find($selector);
         } catch (\Exception $e) {
             if ($exception)
                 throw $exception;
             else
                 throw $e;
+        } finally {
+            $this->autoScreenshot();
         }
 
         return $this;
@@ -231,6 +257,7 @@ class Browser
     public function click($selector)
     {
         try {
+            $this->autoScreenshot(false);
             $element = $this->find($selector);
             $element->click();
         } finally {
@@ -245,6 +272,8 @@ class Browser
      */
     public function hover($selector)
     {
+        $this->autoScreenshot(false);
+
         $element = $this->find($selector);
        
         try {
@@ -262,6 +291,8 @@ class Browser
     public function clickButtonNamed($name)
     {
         try {
+            $this->autoScreenshot(false);
+
             $buttons = $this->find("button[name=$name]", ['unique' => false]);
             foreach ($buttons as $button) {
                 if ($button->isDisplayed() && $button->isEnabled()) {
@@ -284,6 +315,7 @@ class Browser
     public function clickLabelFor($for)
     {
         try {
+            $this->autoScreenshot(false);
             $element = $this->find("label[for=$for]");
             $element->click();
         } finally {
@@ -301,6 +333,7 @@ class Browser
     public function fillIn($selector, $value)
     {
         try {
+            $this->autoScreenshot(false);
             $element = $this->find($selector);
             $element->click();
             $element->clear();
@@ -319,6 +352,7 @@ class Browser
     public function setElementValue($element, $value)
     {
         try {
+            $this->autoScreenshot(false);
             $element->click();
             $element->clear();
             $element->sendKeys($value);
@@ -338,6 +372,7 @@ class Browser
     public function setFile($selector, $path)
     {
         try {
+            $this->autoScreenshot(false);
             $element = $this->find($selector);
             if (!$element->isDisplayed()) {
                 $this->executeScript("
@@ -371,6 +406,7 @@ class Browser
     public function select($selector, $value)
     {
         try {
+            $this->autoScreenshot(false);
             if ($value === null)
                 return $this;
 
@@ -392,6 +428,7 @@ class Browser
     public function multiSelect($selector, $options)
     {
         try {
+            $this->autoScreenshot(false);
             $elem = $this->find($selector);
             $elem->click();
             sleep(1);    // strangely, this is needed,
@@ -431,17 +468,22 @@ class Browser
 	*/
     public function getSelectOptions($selector)
     {
-        $options = [];
-        $elem = $this->find($selector);
-        $elem->click();
-        // Multiselects apparently need us to slow down
-        if ($elem->getAttribute('multiple'))
-            sleep(1);
-        $select = new \WebDriverSelect($elem);
-        foreach ($select->getOptions() as $opt) {
-            $options[$opt->getAttribute('value')] = $opt->getText();
+        try {
+            $this->screenshots -= 1;
+            $options = [];
+            $elem = $this->find($selector);
+            $elem->click();
+            // Multiselects apparently need us to slow down
+            if ($elem->getAttribute('multiple'))
+                sleep(1);
+            $select = new \WebDriverSelect($elem);
+            foreach ($select->getOptions() as $opt) {
+                $options[$opt->getAttribute('value')] = $opt->getText();
+            }
+            $this->sendKeys(\WebDriverKeys::ESCAPE);
+        } finally {
+            $this->screenshots += 1;
         }
-        $this->sendKeys(\WebDriverKeys::ESCAPE);
 
         return $options;
     }
@@ -452,6 +494,7 @@ class Browser
     public function jqcSelect($selector, $value)
     {
         try {
+            $this->autoScreenshot(false);
             /**
     		* Spin this test, because since JQuery is involved, the DOM is likely not to be ready.
     		*/
@@ -528,6 +571,7 @@ class Browser
     public function checkbox($selector, $on_off)
     {
         try {
+            $this->autoScreenshot(false);
             $cb = $this->find($selector);
             if (($on_off && !$cb->isSelected()) || (!$on_off && $cb->isSelected()))
                 $cb->click();
@@ -544,6 +588,7 @@ class Browser
     public function waitFor($selector, $timeout_in_second = null, $interval_in_millisecond = null)
     {
         try {
+            $this->autoScreenshot(false);
             $wait = new \WebDriverWait($this->driver, $timeout_in_second, $interval_in_millisecond);
             $wait->until(function ($driver) use ($selector) {
                 try {
@@ -640,7 +685,7 @@ class Browser
         try {
             return $this->driver->executeScript($script, $args);
         } finally {
-            $this->autoScreenshot();
+            $this->autoScreenshot(null);
         }
     }
 
