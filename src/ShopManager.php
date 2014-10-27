@@ -80,6 +80,11 @@ class ShopManager
         return $uid;
     }
 
+    public function getConfiguration()
+    {
+        return new ConfigurationFile($this->configuration_file_path);
+    }
+
     /**
 	 * getShop uses the configuration file and
 	 * provided options to build a Shop ready for use by selenium
@@ -114,7 +119,11 @@ class ShopManager
     {
         $inplace = getenv('PSTAF_INPLACE') === '1';
 
-        $conf = new ConfigurationFile($this->configuration_file_path);
+        $conf = $this->getConfiguration();
+
+        if (isset($options['conf'])) {
+            $conf->update($options['conf']);
+        }
 
         $options['temporary'] = !empty($options['temporary']) && !$inplace;
         $options['overwrite'] = !empty($options['overwrite']);

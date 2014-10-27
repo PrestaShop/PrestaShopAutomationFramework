@@ -6,9 +6,9 @@ use \PrestaShop\Helper\FileSystem as FS;
 
 class FileManagement extends ShopCapability
 {
-    public static function copyShopFiles($srcDir, $dstDir)
+    public static function listShopFiles($dir)
     {
-        $files = FS::lsRecursive($srcDir,[
+        return FS::lsRecursive($dir,[
             '#^/?cache/smarty/cache/index.php#',
             '#^/?cache/smarty/compile/index.php#',
             '#^/?cache/purifier/index.php#',
@@ -29,6 +29,11 @@ class FileManagement extends ShopCapability
             '#^/?selenium\.pid$#',
             '#^/?selenium\.log$#'
         ]);
+    }
+
+    public static function copyShopFiles($srcDir, $dstDir)
+    {
+        $files = static::listShopFiles($srcDir);
 
         mkdir($dstDir);
         if (!chmod($dstDir, 0777)) {
@@ -48,6 +53,40 @@ class FileManagement extends ShopCapability
                 }
             }
         }
+    }
+
+    public function webCopyShopFiles($srcDir, $dstDir)
+    {
+        $files = static::listShopFiles($srcDir);
+
+        $actions = [];
+
+        $actions[] = [
+            'type' => 'mkdir',
+            'target' => $dstDir,
+            'chmod' => 0777
+        ];
+
+        foreach ($files as $src) {
+            $dst = FS::join($dstDir, substr($src, strlen(realpath($srcDir))+1));
+
+            if (is_dir($src)) {
+                $actions[] = [
+                    'type' => 'mkdir',
+                    'target' => $dst,
+                    'chmod' => 0777
+                ];
+            } else {
+                $actions[] = [
+                    'type' => 'copy',
+                    'source' => $src,
+                    'target' => $dst,
+                    'chmod' => 0777
+                ];
+            }
+        }
+
+        FS::webActions($actions, $this->getShop()->getFilesystemPath(), $this->getShop()->getFrontOfficeURL());
     }
 
     public function copyShopFilesTo($dstDir, $srcDir = null)

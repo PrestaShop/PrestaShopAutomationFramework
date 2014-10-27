@@ -144,4 +144,31 @@ EOS;
             return !file_exists($directory);
         });
     }
+
+    public static function webActions(array $actions, $scriptRoot, $url)
+    {
+        $actor = <<<'EOS'
+        <?php
+
+        $actions = [@$actions@];
+
+        foreach ($actions as $action) {
+            if ($action['type'] === 'mkdir') {
+                mkdir($action['target'], $action['chmod']);
+            } elseif ($action['type'] === 'copy') {
+                copy($action['source'], $action['target']);
+                chmod($action['target'], $action['chmod']);
+            }
+        }
+EOS;
+        
+        $actor = str_replace('[@$actions@]', var_export($actions, true), $actor);
+
+        $actorName = 'webActionsActor_tmp.php';
+
+        $actorPath = static::join($scriptRoot, $actorName);
+        file_put_contents($actorPath, $actor);
+        file_get_contents($url.'/'.$actorName);
+        unlink($actorPath);
+    }
 }

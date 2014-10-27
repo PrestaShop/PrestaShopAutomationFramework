@@ -136,4 +136,12 @@ class BackOfficeNavigation extends ShopCapability
 
         return $browser->visit($url);
     }
+
+    public function installModule($module_name)
+    {
+        $browser = $this->getShop()->getBrowser();
+        $url = $this->getCRUDLink('AdminModules', null, null).'&install='.$module_name;
+
+        return $browser->visit($url);
+    }
 }

@@ -689,6 +689,18 @@ class Browser
         }
     }
 
+    public function acceptAlert()
+    {
+        $spinner = new \PrestaShop\Helper\Spinner();
+
+        $spinner->assertNoException(function() {
+            $alert = $this->driver->switchTo()->alert();
+            $alert->accept();
+        });
+
+        return $this;
+    }
+
     /**
      * Takes a screenshot, saves it to the "save_as" path.
      */

@@ -13,7 +13,13 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
     private static $browsers = [];
     private $shortName;
 
+    // Whether or not to cache the initial shop state
     protected static $cache_initial_state = true;
+
+    protected static function shopManagerOptions()
+    {
+        return [];
+    }
 
     private static function newShop()
     {
@@ -26,12 +32,16 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
             self::$browsers[$class] = $browser;
         }
 
-        self::$shops[$class] = self::getShopManager()->getShop([
+        $shopManagerOptions = [
             'initial_state' => static::initialState(),
             'temporary' => true,
-            'use_cache' => true,
+            'use_cache' => static::$cache_initial_state,
             'browser' => self::$browsers[$class]
-        ]);
+        ];
+
+        $shopManagerOptions = array_merge($shopManagerOptions, static::shopManagerOptions());
+
+        self::$shops[$class] = self::getShopManager()->getShop($shopManagerOptions);
 
         self::$shops[$class]->getBrowser()->clearCookies();
     }
@@ -81,7 +91,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
         return self::$shops[$class];
     }
 
-    private static function getShopManager()
+    public static function getShopManager()
     {
         $class = get_called_class();
 

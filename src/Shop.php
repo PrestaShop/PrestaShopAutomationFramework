@@ -202,6 +202,11 @@ class Shop
         return rtrim($this->front_office_url, '/').'/'.trim($this->back_office_folder_name, '/').'/';
     }
 
+    public function getBackOfficeFolderPath()
+    {
+        return \PrestaShop\Helper\FileSystem::join($this->filesystem_path, $this->back_office_folder_name);
+    }
+
     public function getFrontOfficeURL()
     {
         return $this->front_office_url;
