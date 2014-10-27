@@ -92,18 +92,11 @@ class InvoiceTest extends \PrestaShop\TestCase\TestCase
             throw new \PrestaShop\Exception\InvoiceIncorrectException(implode("\n", $errors));
     }
 
-    /**
-	 * @dataProvider jsonExampleFiles
-	 * @parallelize 4
-	 */
-    public function testInvoice($exampleFile)
+    public static function runScenario($shop, array $scenario)
     {
-        $shop = static::getShop();
-        $browser = $shop->getBrowser();
+        $output = ['pdf' => null, 'json' => null, 'jsonString' => null];
 
         $shop->getBackOfficeNavigator()->login();
-
-        $scenario = $this->getJSONExample($exampleFile);
 
         if (isset($scenario['meta']['rounding_mode']))
             $shop->getPreferencesManager()->setRoundingMode($scenario['meta']['rounding_mode']);
@@ -176,17 +169,41 @@ class InvoiceTest extends \PrestaShop\TestCase\TestCase
             'payment' => 'bankwire'
         ]);
 
-        $cart_total = $data['cart_total'];
-        $id_order = $data['id_order'];
+        $output['cart_total'] = $data['cart_total'];
+        $output['id_order'] = $data['id_order'];
 
-        $orderPage = $shop->getOrderManager()->visit($id_order)->validate();
-        $this->writeArtefact(basename($exampleFile, '.json').'.pdf', $orderPage->getInvoicePDFData());
+        $orderPage = $shop->getOrderManager()->visit($output['id_order'])->validate();
+        $output['pdf'] = $orderPage->getInvoicePDFData();
         $json = $orderPage->getInvoiceFromJSON();
-        $this->writeArtefact(basename($exampleFile, '.json').'.invoice.json', json_encode($json, JSON_PRETTY_PRINT));
+        $output['json'] = $json;
+        $output['jsonString'] = json_encode($json, JSON_PRETTY_PRINT);
 
-        self::checkInvoiceJson($scenario['expect']['invoice'], $json);
+        return $output;
+    }
 
-        if ($cart_total != $json['order']['total_paid_tax_incl']) {
+    /**
+	 * @dataProvider jsonExampleFiles
+	 * @parallelize 4
+	 */
+    public function testInvoice($exampleFile)
+    {
+        $shop = $this->shop;
+
+        $scenario = $this->getJSONExample($exampleFile);
+
+        $output = static::runScenario($shop, $scenario);
+
+        if ($output['pdf']) {
+            $this->writeArtefact(basename($exampleFile, '.json').'.pdf', $output['pdf']);
+        }
+
+        if ($output['jsonString']) {
+            $this->writeArtefact(basename($exampleFile, '.json').'.invoice.json', $output['jsonString']);
+        }
+
+        self::checkInvoiceJson($scenario['expect']['invoice'], $output['json']);
+
+        if ($output['cart_total'] != $output['json']['order']['total_paid_tax_incl']) {
             throw new \Exception(
                 "Cart total `$cart_total` differs from invoice total of `{$actual['order']['total_paid_tax_incl']}`."
             );
@@ -205,7 +222,7 @@ class InvoiceTest extends \PrestaShop\TestCase\TestCase
             foreach ($types as $type => $unused) {
                 $shop->getPreferencesManager()->setRoundingType($type);
                 $new_json = $shop->getOrderManager()
-                ->visit($id_order)
+                ->visit($output['id_order'])
                 ->getInvoiceFromJSON();
 
                 try {

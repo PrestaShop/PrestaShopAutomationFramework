@@ -10,9 +10,26 @@ class UpgradeTest extends \PrestaShop\TestCase\TestCase
     {
         return [
             'conf' => [
-                'shop.filesystem_path' => __DIR__.'/UpgradeTest/prestashop'
+                'shop.filesystem_path' => __DIR__.'/UpgradeTest/prestashop',
+                'shop.prestashop_version' => '1.6.0.9'
             ]
         ];
+    }
+
+    public function beforeUpgrade()
+    {
+        $scenario = $this->getJSONExample('invoice/simple-order.json');
+        $output = InvoiceTest::runScenario($this->shop, $scenario);
+
+        $this->writeArtefact('simple-order-before-upgrade.pdf', $output['pdf']);
+
+        return $output;
+    }
+
+    public function afterUpgrade($before)
+    {
+        $om = $this->shop->getOrderManager()->visit($before['id_order']);
+        $this->writeArtefact('simple-order-after-upgrade.pdf', $om->getInvoicePDFData());
     }
 
     /**
@@ -20,10 +37,12 @@ class UpgradeTest extends \PrestaShop\TestCase\TestCase
      */
     public function testUpgrade()
     {
+        $before = $this->beforeUpgrade();
+
         // Install autoupgrade
         $this->shop
         ->getBackOfficeNavigator()
-        ->login()
+        // ->login() // already logged in from beforeUpgrade
         ->installModule('autoupgrade');
 
         // Copy files from the target version
@@ -50,5 +69,7 @@ class UpgradeTest extends \PrestaShop\TestCase\TestCase
         ->acceptAlert()
         ->click('#upgradeNow')
         ->waitFor("{xpath}//h3[contains(., 'Upgrade Complete!')]", 120);
+
+        $this->afterUpgrade($before);
     }
 }

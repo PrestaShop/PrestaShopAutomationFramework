@@ -19,9 +19,13 @@ class CarrierManagement extends ShopCapability
 	 */
     public function createCarrier($options)
     {
+        $newCarrierButtonSelector = $this->shopVersionBefore('1.6.0.10')
+            ? '#configuration_form a'
+            : 'a[data-selenium-id=create_custom_carrier]';
+
         $browser = $this->getShop()->getBackOfficeNavigator()->visit('AdminCarriers')
         ->click('#page-header-desc-carrier-new_carrier')
-        ->click('a[data-selenium-id=create_custom_carrier]')
+        ->click($newCarrierButtonSelector)
         ->waitFor('#name')
         ->fillIn('#name', $options['name'])
         ->fillIn($this->i18nFieldName('#delay'), $options['delay'])

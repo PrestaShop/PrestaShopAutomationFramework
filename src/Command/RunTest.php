@@ -68,7 +68,7 @@ class RunTest extends Command
             return;
         }
 
-        $tests_directory = realpath(FS::join(__DIR__, '..', '..', 'tests-available'));
+        $tests_directory = realpath(FS::join(__DIR__, '..', '..', 'FunctionalTest'));
         if (!$tests_directory) {
             $output->writeln('<error>Couldn\'t find directory containing tests.</error>');
 

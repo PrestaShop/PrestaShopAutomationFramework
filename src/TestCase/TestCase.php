@@ -127,7 +127,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
         $class = explode('\\', get_called_class());
         $class = end($class);
 
-        $path = realpath(__DIR__.'/../../tests-available/'.$class.'/examples/');
+        $path = realpath(__DIR__.'/../../FunctionalTest/'.$class.'/examples/');
 
         if (!$path)
             throw new \PrestaShop\Exception\FailedTestException("No example files found for $class.\nThey should have been in tests-available/$class/examples/.");

@@ -24,19 +24,29 @@ class OrderManagement extends ShopCapability
         return $this;
     }
 
+    public function getInvoiceLink()
+    {
+        if ($this->shopVersionBefore('1.6.0.10')) {
+            $selector = "a.btn[href*=generateInvoice]";
+        } else {
+            $selector = '[data-selenium-id="view_invoice"]';
+        }
+
+        return $this->getBrowser()->getAttribute($selector, 'href');
+    }
+
     public function getInvoicePDFData()
     {
-        $browser = $this->getBrowser();
-        $invoice_link = $browser->getAttribute('[data-selenium-id="view_invoice"]', 'href');
+        $invoice_link = $this->getInvoiceLink();
 
-        return $browser->curl($invoice_link);
+        return $this->getBrowser()->curl($invoice_link);
     }
 
     public function getInvoiceFromJSON()
     {
         $browser = $this->getBrowser();
 
-        $invoice_json_link = $browser->getAttribute('[data-selenium-id="view_invoice"]', 'href').'&debug=1';
+        $invoice_json_link = $this->getInvoiceLink().'&debug=1';
         $browser->visit($invoice_json_link);
         $json = json_decode($browser->find('body')->getText(), true);
 

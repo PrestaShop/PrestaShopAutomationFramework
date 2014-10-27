@@ -6,7 +6,7 @@ external-tests
 selenium.log
 selenium.pid
 misc
-tests-available/tmp*
+FunctionalTest/tmp*
 fup.js
-tests-available/WIPTest.php
+FunctionalTest/WIPTest.php
 bamboo*
