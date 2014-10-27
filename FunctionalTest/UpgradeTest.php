@@ -28,6 +28,8 @@ class UpgradeTest extends \PrestaShop\TestCase\TestCase
 
     public function afterUpgrade($before)
     {
+        $this->shop->getBackOfficeNavigator()->login();
+
         $om = $this->shop->getOrderManager()->visit($before['id_order']);
         $this->writeArtefact('simple-order-after-upgrade.pdf', $om->getInvoicePDFData());
     }
