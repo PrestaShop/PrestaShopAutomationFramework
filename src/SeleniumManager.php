@@ -34,59 +34,8 @@ class SeleniumManager
         return $path;
     }
 
-    public static function getPIDFile()
+    public static function start($directory = null)
     {
-        $base = realpath('.');
-        $filename = 'selenium.pid';
-
-        for (;;) {
-            $candidate = \PrestaShop\Helper\FileSystem::join($base, $filename);
-            if (file_exists($candidate)) {
-                return $candidate;
-            } elseif (dirname($base) !== $base) {
-                // This condition checks we're not at the filesystem root
-                $base = dirname($base);
-            } else {
-                throw new \PrestaShop\Exception\SeleniumPIDFileNotFoundException();
-            }
-        }
-    }
-
-    public static function isSeleniumStarted()
-    {
-        if (getenv('SELENIUM_HOST')) {
-            return true;
-        }
-
-        try {
-            $pid = json_decode(file_get_contents(static::getPIDFile()), true)['pid'];
-
-            return \djfm\Process\Process::runningByUPID($pid) ? $pid : false;
-        } catch (\PrestaShop\Exception\SeleniumPIDFileNotFoundException $e) {
-            return false;
-        }
-
-    }
-
-    public static function getMyPort()
-    {
-        return (int) json_decode(file_get_contents(static::getPIDFile()), true)['port'];
-    }
-
-    public static function getHost()
-    {
-        if (($sh = getenv('SELENIUM_HOST'))) {
-            return $sh;
-        }
-
-        return 'http://127.0.0.1:'.SeleniumManager::getMyPort().'/wd/hub';
-    }
-
-    public static function startSelenium()
-    {
-        if (static::isSeleniumStarted() !== false)
-            return;
-
         $sjp = static::getSeleniumJARPath();
 
         $port = static::findOpenPort();
@@ -98,21 +47,91 @@ class SeleniumManager
 
         $upid = $process->run(STDIN, 'selenium.log', 'selenium.log');
 
-        file_put_contents('selenium.pid', json_encode(['pid' => $upid, 'port' => $port]));
+        $pidFile = 'selenium.pid';
+        if ($directory) {
+            $pidFile = \PrestaShop\Helper\FileSystem::join($directory, $pidFile);
+        }
+
+        file_put_contents($pidFile, json_encode([
+            'pid' => $upid,
+            'port' => $port,
+            'host' => 'http://127.0.0.1:'.$port.'/wd/hub'
+        ]));
     }
 
-    public static function stopSelenium()
+    public static function stop($walkDirectoryTreeUp = false)
     {
-        $pid = static::isSeleniumStarted();
-        if (false !== $pid) {
-            \djfm\Process\Process::killByUPID($pid);
-            unlink('selenium.pid');
+        if (($data = static::started($walkDirectoryTreeUp))) {
+            \djfm\Process\Process::killByUPID($data['pid']);
+            unlink($data['pidFile']);
         }
+    }
+
+    public static function startedInHigherDirectory()
+    {
+        return static::started(true);
+    }
+
+    public static function startedInCWD()
+    {
+        return static::started(false);
+    }
+
+    public static function started($walkDirectoryTreeUp = false)
+    {
+        $base = realpath('.');
+        $filename = 'selenium.pid';
+
+        for (;;) {
+            $candidate = \PrestaShop\Helper\FileSystem::join($base, $filename);
+            if (file_exists($candidate)) {
+
+                 $data = json_decode(file_get_contents($candidate), true);
+                 $data['pidDirectory'] = $base;
+                 $data['pidFile'] = $candidate;
+
+                 if (\djfm\Process\Process::runningByUPID($data['pid'])) {
+                    return $data;
+                 } else {
+                    unlink($candidate);
+                 }
+
+            } elseif (dirname($base) !== $base) {
+                // This condition checks we're not at the filesystem root
+                $base = dirname($base);
+            } else {
+                break;
+            }
+
+            if (!$walkDirectoryTreeUp) {
+                break;
+            }
+        }
+
+        return false;
+    }
+
+    public static function isSeleniumStarted()
+    {
+        if (getenv('SELENIUM_HOST')) {
+            return true;
+        }
+
+       return static::started(true) ? true : false;
+    }
+
+    public static function getHost()
+    {
+        if (($sh = getenv('SELENIUM_HOST'))) {
+            return $sh;
+        }
+
+        return static::started(true)['host'];
     }
 
     public static function ensureSeleniumIsRunning()
     {
-        if (static::isSeleniumStarted() === false) {
+        if (!static::started(true)) {
             throw new \PrestaShop\Exception\SeleniumIsNotRunningException();
         }
     }
