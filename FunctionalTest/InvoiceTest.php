@@ -86,10 +86,10 @@ class InvoiceTest extends \PrestaShop\TestCase\TestCase
             }
         }
 
-        self::checkInvoiceCoherence($actual);
-
         if (!empty($errors))
             throw new \PrestaShop\Exception\InvoiceIncorrectException(implode("\n", $errors));
+
+        self::checkInvoiceCoherence($actual);
     }
 
     public static function runScenario($shop, array $scenario)
@@ -98,14 +98,22 @@ class InvoiceTest extends \PrestaShop\TestCase\TestCase
 
         $shop->getBackOfficeNavigator()->login();
 
-        if (isset($scenario['meta']['rounding_mode']))
+        if (isset($scenario['meta']['rounding_mode'])) {
             $shop->getPreferencesManager()->setRoundingMode($scenario['meta']['rounding_mode']);
+        }
 
-        if (isset($scenario['meta']['rounding_type']))
+        if (isset($scenario['meta']['rounding_type'])) {
             $shop->getPreferencesManager()->setRoundingType($scenario['meta']['rounding_type']);
+        }
 
-        if (isset($scenario['meta']['tax_breakdown_on_invoices']))
+        if (isset($scenario['meta']['rounding_decimals'])) {
+            $shop->getPreferencesManager()->setRoundingDecimals($scenario['meta']['rounding_decimals']);
+        }
+
+
+        if (isset($scenario['meta']['tax_breakdown_on_invoices'])) {
             $shop->getTaxManager()->enableTaxBreakdownOnInvoices($scenario['meta']['tax_breakdown_on_invoices']);
+        }
 
         $carrier = $scenario['carrier'];
 

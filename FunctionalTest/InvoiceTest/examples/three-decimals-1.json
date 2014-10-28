@@ -1,0 +1,38 @@
+{
+	"meta": {
+		"rounding_type": "line",
+		"rounding_mode": "half_up",
+		"rounding_decimals": 3
+	},
+	"carrier": {
+		"name": "SeleniumShipping",
+		"delay": "28 days later",
+		"handling": false,
+		"free": true
+	},
+	"products": {
+		"Kindle": {
+			"price": 87.3275,
+			"vat": 14.5,
+			"quantity": 7
+		},
+		"TV": {
+			"price": 255.0005,
+			"vat": 10,
+			"quantity": 10
+		}
+	},
+	"expect": {
+		"invoice": {
+			"total": {
+				"to_pay_tax_included": 3504.936
+			},
+			"tax": {
+				"products": {
+					"14.5": 88.637,
+					"10": 255.001
+				}
+			}
+		}
+	}
+}
