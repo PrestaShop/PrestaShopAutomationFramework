@@ -58,4 +58,20 @@ class PreferencesManagement extends ShopCapability
 
         return $this;
     }
+
+    public function setRoundingDecimals($n)
+    {
+        $this->getShop()
+        ->getBackOfficeNavigator()
+        ->visit('AdminPreferences')
+        ->fillIn('[name="PS_PRICE_DISPLAY_PRECISION"]', $n)
+        ->clickButtonNamed('submitOptionsconfiguration')
+        ->ensureStandardSuccessMessageDisplayed();
+
+        if ((int)$this->getBrowser()->getValue('[name="PS_PRICE_DISPLAY_PRECISION"]') !== (int)$n) {
+            throw new \Exception("PrestaShop did not store the number of decimals correctly!");
+        }
+
+        return $this;
+    }
 }
