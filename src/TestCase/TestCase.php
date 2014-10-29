@@ -113,6 +113,11 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
         return self::get('shop');
     }
 
+    public static function getBrowser()
+    {
+        return self::get('browser');
+    }
+
     public static function getShopManager()
     {
         return self::get('shopManager');
@@ -129,12 +134,13 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
             self::newShop();
         }
 
-        $this->shop = self::getShop();
+        $this->shop = static::getShop();
+        $this->browser = static::getBrowser();
     }
 
     public function tearDown()
     {
-        
+
     }
 
     public function getExamplesPath()
@@ -264,6 +270,8 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
             mkdir($screenshotsDir, 0777, true);
         }
 
-        static::getShop()->getBrowser()->recordScreenshots($screenshotsDir);
+        if (!getenv('NO_SCREENSHOTS')) {
+            static::getShop()->getBrowser()->recordScreenshots($screenshotsDir);
+        }
     }
 }

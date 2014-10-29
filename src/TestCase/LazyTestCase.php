@@ -14,6 +14,7 @@ class LazyTestCase extends TestCase
     public function setUp()
     {
         $this->shop = static::getShop();
+        $this->browser = static::getBrowser();
     }
 
     public function tearDown()
