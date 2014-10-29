@@ -144,5 +144,6 @@ Warning, this will take a looong time, unless you use an [optimized testing setu
 # Going further
 
 - learn how to tune your Linux setup to [improve test execution speed](https://github.com/PrestaShop/PrestaShopAutomationFramework/blob/master/FASTER.md)
+- learn about [writing tests](https://github.com/PrestaShop/PrestaShopAutomationFramework/blob/master/WRITING TESTS.md)
 - read about our recommended workflows with pstaf [TODO]
 - write your own tests [TODO]
