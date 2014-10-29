@@ -1,6 +1,6 @@
 <?php
 
-namespace PrestaShop\Helper;
+namespace PrestaShop\PSTAF\Helper;
 
 class URL
 {

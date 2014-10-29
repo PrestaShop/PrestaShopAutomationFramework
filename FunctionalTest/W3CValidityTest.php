@@ -1,8 +1,10 @@
 <?php
 
-namespace PrestaShop\FunctionalTest;
+namespace PrestaShop\PSTAF\FunctionalTest;
 
-class W3CValidityTest extends \PrestaShop\TestCase\LazyTestCase
+use PrestaShop\PSTAF\TestCase\LazyTestCase;
+
+class W3CValidityTest extends LazyTestCase
 {
     public static function w3cValidateHTML($html, $options = array())
     {
@@ -145,7 +147,7 @@ class W3CValidityTest extends \PrestaShop\TestCase\LazyTestCase
         }
 
         if (count($messages > 0)) {
-            throw new \PrestaShop\Exception\FailedTestException(implode("\n", $messages));
+            throw new \PrestaShop\PSTAF\Exception\FailedTestException(implode("\n", $messages));
         }
     }
 

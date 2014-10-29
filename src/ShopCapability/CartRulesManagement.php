@@ -1,6 +1,6 @@
 <?php
 
-namespace PrestaShop\ShopCapability;
+namespace PrestaShop\PSTAF\ShopCapability;
 
 class CartRulesManagement extends ShopCapability
 {
@@ -64,7 +64,7 @@ class CartRulesManagement extends ShopCapability
         $id_cart_rule = (int) $browser->getURLParameter('id_cart_rule');
 
         if ($id_cart_rule <= 0)
-            throw new \PrestaShop\Exception\CartRuleCreationIncorrectException();
+            throw new \PrestaShop\PSTAF\Exception\CartRuleCreationIncorrectException();
 
         return $id_cart_rule;
     }

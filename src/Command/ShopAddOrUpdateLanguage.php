@@ -1,6 +1,6 @@
 <?php
 
-namespace PrestaShop\Command;
+namespace PrestaShop\PSTAF\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

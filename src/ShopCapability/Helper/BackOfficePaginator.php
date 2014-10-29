@@ -1,6 +1,8 @@
 <?php
 
-namespace PrestaShop\ShopCapability\Helper;
+namespace PrestaShop\PSTAF\ShopCapability\Helper;
+
+use PrestaShop\PSTAF\ShopCapability\BackOfficePagination;
 
 class BackOfficePaginator
 {
@@ -8,7 +10,7 @@ class BackOfficePaginator
     private $settings;
 
     public function __construct(
-        \PrestaShop\ShopCapability\BackOfficePagination $pagination,
+        BackOfficePagination $pagination,
         array $settings
     )
     {

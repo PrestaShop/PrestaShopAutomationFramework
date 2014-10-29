@@ -1,11 +1,11 @@
 <?php
 
-namespace PrestaShop\Command;
+namespace PrestaShop\PSTAF\Command;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use PrestaShop\OptionProvider;
+use PrestaShop\PSTAF\OptionProvider;
 
 class Install extends Command
 {

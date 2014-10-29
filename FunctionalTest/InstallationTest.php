@@ -1,8 +1,10 @@
 <?php
 
-namespace PrestaShop\FunctionalTest;
+namespace PrestaShop\PSTAF\FunctionalTest;
 
-class InstallationTest extends \PrestaShop\TestCase\TestCase
+use PrestaShop\PSTAF\TestCase\TestCase;
+
+class InstallationTest extends TestCase
 {
     public static function initialState()
     {

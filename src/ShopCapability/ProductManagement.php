@@ -1,6 +1,8 @@
 <?php
 
-namespace PrestaShop\ShopCapability;
+namespace PrestaShop\PSTAF\ShopCapability;
+
+use PrestaShop\PSTAF\Helper\Spinner;
 
 class ProductManagement extends ShopCapability
 {
@@ -9,7 +11,7 @@ class ProductManagement extends ShopCapability
     {
         $browser = $this->getBrowser();
 
-        $assert = new \PrestaShop\Helper\Spinner('Save button did not appear in time.', 10);
+        $assert = new Spinner('Save button did not appear in time.', 10);
         $assert->assertBecomesTrue(function () use ($browser) {
             $browser->clickButtonNamed('submitAddproductAndStay');
 
@@ -77,14 +79,14 @@ class ProductManagement extends ShopCapability
             ->click('#link-Quantities')
             ->waitFor('#qty_0');
 
-            $spinner = new \PrestaShop\Helper\Spinner();
+            $spinner = new Spinner();
 
             $spinner->assertNoException(function () use ($browser, $options) {
                 $a = (int) $this->i18nParse($browser->getValue('#qty_0 input'), 'float');
                 $e = (int) $options['quantity'];
 
                 if ($e !== $a)
-                    throw new \PrestaShop\Exception\ProductCreationIncorrectException('quantity', $e, $a);
+                    throw new \PrestaShop\PSTAF\Exception\ProductCreationIncorrectException('quantity', $e, $a);
             });
         }
 
@@ -95,12 +97,12 @@ class ProductManagement extends ShopCapability
         $expected_price = (float) $options['price'];
         $actual_price = $this->i18nParse($browser->getValue('#priceTE'));
         if ($actual_price !== $expected_price)
-            throw new \PrestaShop\Exception\ProductCreationIncorrectException('price', $expected_price, $actual_price);
+            throw new \PrestaShop\PSTAF\Exception\ProductCreationIncorrectException('price', $expected_price, $actual_price);
 
         $id_product = (int) $browser->getURLParameter('id_product');
 
         if ($id_product <= 0)
-            throw new \PrestaShop\Exception\ProductCreationIncorrectException();
+            throw new \PrestaShop\PSTAF\Exception\ProductCreationIncorrectException();
 
         return [
             'id' => $id_product,

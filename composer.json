@@ -22,8 +22,8 @@
     },
 	"autoload": {
 		"psr-4": {
-			"PrestaShop\\": "src/",
-			"PrestaShop\\FunctionalTest\\": "FunctionalTest/"
+			"PrestaShop\\PSTAF\\": "src/",
+			"PrestaShop\\PSTAF\\FunctionalTest\\": "FunctionalTest/"
 		}
 	}
 }

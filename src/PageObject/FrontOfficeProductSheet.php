@@ -1,6 +1,6 @@
 <?php
 
-namespace PrestaShop\PageObject;
+namespace PrestaShop\PSTAF\PageObject;
 
 class FrontOfficeProductSheet extends PageObject
 {

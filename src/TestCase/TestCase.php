@@ -1,10 +1,12 @@
 <?php
 
-namespace PrestaShop\TestCase;
+namespace PrestaShop\PSTAF\TestCase;
 
-use PrestaShop\ShopManager;
-use PrestaShop\Shop;
-use PrestaShop\Helper\FileSystem as FS;
+use PrestaShop\PSTAF\SeleniumManager;
+use PrestaShop\PSTAF\ShopManager;
+use PrestaShop\PSTAF\Shop;
+use PrestaShop\PSTAF\PSBrowser as Browser;
+use PrestaShop\PSTAF\Helper\FileSystem as FS;
 
 abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaShop\Ptest\TestClass\Basic
 {
@@ -66,8 +68,8 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
     private static function newShop()
     {
         if (!self::get('browser')) {
-            $browser = new \PrestaShop\PSBrowser([
-                'host' => \PrestaShop\SeleniumManager::getHost()
+            $browser = new Browser([
+                'host' => SeleniumManager::getHost()
             ]);
             self::set('browser', $browser);
         }
@@ -89,7 +91,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 
     public static function setUpBeforeClass()
     {
-        \PrestaShop\SeleniumManager::ensureSeleniumIsRunning();
+        SeleniumManager::ensureSeleniumIsRunning();
 
         self::set('shopManager', ShopManager::getInstance());
         self::newShop();
@@ -151,7 +153,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
         $path = realpath(__DIR__.'/../../FunctionalTest/'.$class.'/examples/');
 
         if (!$path)
-            throw new \PrestaShop\Exception\FailedTestException("No example files found for $class.\nThey should have been in tests-available/$class/examples/.");
+            throw new \PrestaShop\PSTAF\Exception\FailedTestException("No example files found for $class.\nThey should have been in tests-available/$class/examples/.");
 
         return $path;
     }

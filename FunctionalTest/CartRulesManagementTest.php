@@ -1,8 +1,10 @@
 <?php
 
-namespace PrestaShop\FunctionalTest;
+namespace PrestaShop\PSTAF\FunctionalTest;
 
-class CartRulesManagementTest extends \PrestaShop\TestCase\LazyTestCase
+use PrestaShop\PSTAF\TestCase\LazyTestCase;
+
+class CartRulesManagementTest extends LazyTestCase
 {
     public static function setupBeforeClass()
     {

@@ -1,6 +1,8 @@
 <?php
 
-namespace PrestaShop\FunctionalTest;
+namespace PrestaShop\PSTAF\FunctionalTest;
+
+use PrestaShop\PSTAF\TestCase\LazyTestCase;
 
 /**
  * This test does the following:
@@ -34,7 +36,7 @@ namespace PrestaShop\FunctionalTest;
  *
  */
 
-class TaxManagementTest extends \PrestaShop\TestCase\LazyTestCase
+class TaxManagementTest extends LazyTestCase
 {
     public static function setupBeforeClass()
     {

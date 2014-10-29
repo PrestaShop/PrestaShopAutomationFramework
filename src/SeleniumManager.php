@@ -1,6 +1,8 @@
 <?php
 
-namespace PrestaShop;
+namespace PrestaShop\PSTAF;
+
+use \PrestaShop\PSTAF\Helper\FileSystem as FS;
 
 class SeleniumManager
 {
@@ -25,7 +27,7 @@ class SeleniumManager
             $base = realpath(__DIR__.'/../');
             foreach (scandir($base) as $entry) {
                 if (preg_match('/selenium-server-standalone(?:-\d+(?:\.\d+)*)?\.jar$/', $entry)) {
-                    $path = \PrestaShop\Helper\FileSystem::join($base, $entry);
+                    $path = FS::join($base, $entry);
                     break;
                 }
             }
@@ -49,7 +51,7 @@ class SeleniumManager
 
         $pidFile = 'selenium.pid';
         if ($directory) {
-            $pidFile = \PrestaShop\Helper\FileSystem::join($directory, $pidFile);
+            $pidFile = FS::join($directory, $pidFile);
         }
 
         file_put_contents($pidFile, json_encode([
@@ -83,7 +85,7 @@ class SeleniumManager
         $filename = 'selenium.pid';
 
         for (;;) {
-            $candidate = \PrestaShop\Helper\FileSystem::join($base, $filename);
+            $candidate = FS::join($base, $filename);
             if (file_exists($candidate)) {
 
                  $data = json_decode(file_get_contents($candidate), true);
@@ -132,7 +134,7 @@ class SeleniumManager
     public static function ensureSeleniumIsRunning()
     {
         if (!static::started(true)) {
-            throw new \PrestaShop\Exception\SeleniumIsNotRunningException();
+            throw new \PrestaShop\PSTAF\Exception\SeleniumIsNotRunningException();
         }
     }
 }

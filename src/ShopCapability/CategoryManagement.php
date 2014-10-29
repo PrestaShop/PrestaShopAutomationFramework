@@ -1,6 +1,6 @@
 <?php
 
-namespace PrestaShop\ShopCapability;
+namespace PrestaShop\PSTAF\ShopCapability;
 
 class CategoryManagement extends ShopCapability
 {
@@ -45,6 +45,6 @@ class CategoryManagement extends ShopCapability
             if (trim($row['name']) === $options['name'] && (int) $row['id'] > 0)
                 return (int) $row['id'];
 
-        throw new \PrestaShop\Exception\FailedTestException('Could not find ID of created category.');
+        throw new \PrestaShop\PSTAF\Exception\FailedTestException('Could not find ID of created category.');
     }
 }

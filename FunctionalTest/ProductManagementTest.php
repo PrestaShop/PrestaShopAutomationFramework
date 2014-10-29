@@ -1,8 +1,10 @@
 <?php
 
-namespace PrestaShop\FunctionalTest;
+namespace PrestaShop\PSTAF\FunctionalTest;
 
-class ProductManagementTest extends \PrestaShop\TestCase\LazyTestCase
+use PrestaShop\PSTAF\TestCase\LazyTestCase;
+
+class ProductManagementTest extends LazyTestCase
 {
     public static function setupBeforeClass()
     {
@@ -50,7 +52,7 @@ class ProductManagementTest extends \PrestaShop\TestCase\LazyTestCase
         $pct2 = $summary->getPercentReduction($product['id']);
 
         if ($pct2 !== $pct) {
-            throw new \PrestaShop\Exception\FailedTestException(
+            throw new \PrestaShop\PSTAF\Exception\FailedTestException(
                 "Reduction percent is wrong after adding a product in the Shopping Cart Summary. Changed from $pct to $pct2!"
             );
         }

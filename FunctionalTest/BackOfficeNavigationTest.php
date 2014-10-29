@@ -1,8 +1,10 @@
 <?php
 
-namespace PrestaShop\FunctionalTest;
+namespace PrestaShop\PSTAF\FunctionalTest;
 
-class BackOfficeNavigationTest extends \PrestaShop\TestCase\LazyTestCase
+use PrestaShop\PSTAF\TestCase\LazyTestCase;
+
+class BackOfficeNavigationTest extends LazyTestCase
 {
     public function testLogin()
     {
@@ -26,7 +28,7 @@ class BackOfficeNavigationTest extends \PrestaShop\TestCase\LazyTestCase
     }
 
     /**
-	* @expectedException PrestaShop\Exception\AdminControllerNotFoundException
+	* @expectedException PrestaShop\PSTAF\Exception\AdminControllerNotFoundException
 	*/
     public function testNonExistingMenuLinkIsNotFound()
     {

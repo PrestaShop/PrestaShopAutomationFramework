@@ -1,6 +1,6 @@
 <?php
 
-namespace PrestaShop\Exception;
+namespace PrestaShop\PSTAF\Exception;
 
 class SpinAssertException extends \Exception
 {

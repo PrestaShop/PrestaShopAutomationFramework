@@ -1,8 +1,10 @@
 <?php
 
-namespace PrestaShop\FunctionalTest;
+namespace PrestaShop\PSTAF\FunctionalTest;
 
-class CarrierManagementTest extends \PrestaShop\TestCase\LazyTestCase
+use PrestaShop\PSTAF\TestCase\LazyTestCase;
+
+class CarrierManagementTest extends LazyTestCase
 {
     public static function setupBeforeClass()
     {

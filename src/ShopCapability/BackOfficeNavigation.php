@@ -1,8 +1,8 @@
 <?php
 
-namespace PrestaShop\ShopCapability;
+namespace PrestaShop\PSTAF\ShopCapability;
 
-use PrestaShop\OptionProvider;
+use PrestaShop\PSTAF\OptionProvider;
 
 class BackOfficeNavigation extends ShopCapability
 {
@@ -66,7 +66,7 @@ class BackOfficeNavigation extends ShopCapability
                 throw new \Exception('Missing id parameter for action other than `new`.');
 
             if (!isset($this->controller_links[$controller_name]))
-                throw new \PrestaShop\Exception\AdminControllerNotFoundException($controller_name);
+                throw new \PrestaShop\PSTAF\Exception\AdminControllerNotFoundException($controller_name);
 
             $base = $this->controller_links[$controller_name];
 

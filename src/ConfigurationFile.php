@@ -1,8 +1,8 @@
 <?php
 
-namespace PrestaShop;
+namespace PrestaShop\PSTAF;
 
-use PrestaShop\Helper\FileSystem as FS;
+use PrestaShop\PSTAF\Helper\FileSystem as FS;
 
 class ConfigurationFile implements Util\DataStoreInterface
 {

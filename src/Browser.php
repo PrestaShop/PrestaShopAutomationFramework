@@ -1,6 +1,9 @@
 <?php
 
-namespace PrestaShop;
+namespace PrestaShop\PSTAF;
+
+use PrestaShop\PSTAF\Helper\Spinner;
+use PrestaShop\PSTAF\Helper\URL;
 
 class Browser
 {
@@ -201,7 +204,7 @@ class Browser
                 return $this->driver->$method(\WebDriverBy::$tos($selector));
             }
 
-            $spin = new \PrestaShop\Helper\Spinner('Could not find element.', 5);
+            $spin = new Spinner('Could not find element.', 5);
 
             return $spin->assertNoException(function () use ($method, $tos, $selector) {
                 return $this->driver->$method(\WebDriverBy::$tos($selector));
@@ -498,7 +501,7 @@ class Browser
             /**
     		* Spin this test, because since JQuery is involved, the DOM is likely not to be ready.
     		*/
-            $spinner = new \PrestaShop\Helper\Spinner(null, 5, 1000);
+            $spinner = new Spinner(null, 5, 1000);
 
             $spinner->assertBecomesTrue(function () use ($selector, $value) {
                 $this->_jqcSelect($selector, $value);
@@ -562,7 +565,7 @@ class Browser
             }
         }
 
-        throw new \PrestaShop\Exception\SelectValueNotFoundException();
+        throw new \PrestaShop\PSTAF\Exception\SelectValueNotFoundException();
     }
 
     /**
@@ -630,7 +633,7 @@ class Browser
     {
         $url = $this->getCurrentURL();
 
-        return \PrestaShop\Helper\URL::getParameter($url, $param);
+        return URL::getParameter($url, $param);
     }
 
     /**

@@ -1,8 +1,8 @@
 <?php
 
-namespace PrestaShop\ShopCapability;
+namespace PrestaShop\PSTAF\ShopCapability;
 
-use \PrestaShop\Helper\FileSystem as FS;
+use PrestaShop\PSTAF\Helper\FileSystem as FS;
 
 class FileManagement extends ShopCapability
 {
@@ -108,7 +108,7 @@ class FileManagement extends ShopCapability
 	*/
     public function deleteAllFiles()
     {
-        \PrestaShop\Helper\FileSystem::webRmR($this->getShop()->getFilesystemPath(), $this->getShop()->getFrontOfficeURL());
+        FS::webRmR($this->getShop()->getFilesystemPath(), $this->getShop()->getFrontOfficeURL());
 
         return $this;
     }

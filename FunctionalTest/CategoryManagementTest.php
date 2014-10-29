@@ -1,6 +1,9 @@
 <?php
 
-namespace PrestaShop\FunctionalTest;
+namespace PrestaShop\PSTAF\FunctionalTest;
+
+use PrestaShop\PSTAF\TestCase\LazyTestCase;
+use PrestaShop\PSTAF\Helper\Spinner;
 
 /**
  * This test creates 3 categories, each a child of the previous one,
@@ -8,7 +11,7 @@ namespace PrestaShop\FunctionalTest;
  * goes to the Front-Office and checks the categories are in the menu.
  */
 
-class CategoryManagementTest extends \PrestaShop\TestCase\LazyTestCase
+class CategoryManagementTest extends LazyTestCase
 {
     public static function setupBeforeClass()
     {
@@ -48,7 +51,7 @@ class CategoryManagementTest extends \PrestaShop\TestCase\LazyTestCase
 
         $found = [];
 
-        $spinner = new \PrestaShop\Helper\Spinner();
+        $spinner = new Spinner();
 
         $spinner->assertBecomesTrue(function () use ($browser, $cats, &$found) {
             $browser->hover('#block_top_menu a[title="'.$cats[0].'"]');
@@ -65,6 +68,6 @@ class CategoryManagementTest extends \PrestaShop\TestCase\LazyTestCase
 
         foreach ($cats as $n => $cat)
             if ($n > 0 && !isset($found[strtolower(trim($cat))]))
-                throw new \PrestaShop\Exception\FailedTestException("Did not find this cat in the topmenu: $cat.");
+                throw new \PrestaShop\PSTAF\Exception\FailedTestException("Did not find this cat in the topmenu: $cat.");
     }
 }

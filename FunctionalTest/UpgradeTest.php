@@ -1,8 +1,10 @@
 <?php
 
-namespace PrestaShop\FunctionalTest;
+namespace PrestaShop\PSTAF\FunctionalTest;
 
-class UpgradeTest extends \PrestaShop\TestCase\TestCase
+use PrestaShop\PSTAF\TestCase\TestCase;
+
+class UpgradeTest extends TestCase
 {
     protected static $cache_initial_state = false;
 

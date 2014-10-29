@@ -1,8 +1,8 @@
 <?php
 
-namespace PrestaShop\ShopCapability;
+namespace PrestaShop\PSTAF\ShopCapability;
 
-use PrestaShop\OptionProvider;
+use PrestaShop\PSTAF\OptionProvider;
 
 class FrontOfficeNavigation extends ShopCapability
 {

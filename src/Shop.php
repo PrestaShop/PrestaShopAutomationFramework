@@ -1,6 +1,6 @@
 <?php
 
-namespace PrestaShop;
+namespace PrestaShop\PSTAF;
 
 class Shop
 {
@@ -105,22 +105,22 @@ class Shop
                 $this->$prop = $shop_settings[$prop];
         }
 
-        $this->addShopCapability('\PrestaShop\ShopCapability\InformationRetrieval', 'getInformationRetriever');
-        $this->addShopCapability('\PrestaShop\ShopCapability\ShopInstallation', 'getInstaller');
-        $this->addShopCapability('\PrestaShop\ShopCapability\DatabaseManagement', 'getDatabaseManager');
-        $this->addShopCapability('\PrestaShop\ShopCapability\FileManagement', 'getFileManager');
-        $this->addShopCapability('\PrestaShop\ShopCapability\BackOfficeNavigation', 'getBackOfficeNavigator');
-        $this->addShopCapability('\PrestaShop\ShopCapability\FrontOfficeNavigation', 'getFrontOfficeNavigator');
-        $this->addShopCapability('\PrestaShop\ShopCapability\BackOfficePagination', 'getBackOfficePaginator');
-        $this->addShopCapability('\PrestaShop\ShopCapability\TaxManagement', 'getTaxManager');
-        $this->addShopCapability('\PrestaShop\ShopCapability\FixtureManagement', 'getFixtureManager');
-        $this->addShopCapability('\PrestaShop\ShopCapability\ProductManagement', 'getProductManager');
-        $this->addShopCapability('\PrestaShop\ShopCapability\CarrierManagement', 'getCarrierManager');
-        $this->addShopCapability('\PrestaShop\ShopCapability\CartRulesManagement', 'getCartRulesManager');
-        $this->addShopCapability('\PrestaShop\ShopCapability\PreferencesManagement', 'getPreferencesManager');
-        $this->addShopCapability('\PrestaShop\ShopCapability\CheckoutManagement', 'getCheckoutManager');
-        $this->addShopCapability('\PrestaShop\ShopCapability\OrderManagement', 'getOrderManager');
-        $this->addShopCapability('\PrestaShop\ShopCapability\CategoryManagement', 'getCategoryManager');
+        $this->addShopCapability('\PrestaShop\PSTAF\ShopCapability\InformationRetrieval'    , 'getInformationRetriever' );
+        $this->addShopCapability('\PrestaShop\PSTAF\ShopCapability\ShopInstallation'        , 'getInstaller'            );
+        $this->addShopCapability('\PrestaShop\PSTAF\ShopCapability\DatabaseManagement'      , 'getDatabaseManager'      );
+        $this->addShopCapability('\PrestaShop\PSTAF\ShopCapability\FileManagement'          , 'getFileManager'          );
+        $this->addShopCapability('\PrestaShop\PSTAF\ShopCapability\BackOfficeNavigation'    , 'getBackOfficeNavigator'  );
+        $this->addShopCapability('\PrestaShop\PSTAF\ShopCapability\FrontOfficeNavigation'   , 'getFrontOfficeNavigator' );
+        $this->addShopCapability('\PrestaShop\PSTAF\ShopCapability\BackOfficePagination'    , 'getBackOfficePaginator'  );
+        $this->addShopCapability('\PrestaShop\PSTAF\ShopCapability\TaxManagement'           , 'getTaxManager'           );
+        $this->addShopCapability('\PrestaShop\PSTAF\ShopCapability\FixtureManagement'       , 'getFixtureManager'       );
+        $this->addShopCapability('\PrestaShop\PSTAF\ShopCapability\ProductManagement'       , 'getProductManager'       );
+        $this->addShopCapability('\PrestaShop\PSTAF\ShopCapability\CarrierManagement'       , 'getCarrierManager'       );
+        $this->addShopCapability('\PrestaShop\PSTAF\ShopCapability\CartRulesManagement'     , 'getCartRulesManager'     );
+        $this->addShopCapability('\PrestaShop\PSTAF\ShopCapability\PreferencesManagement'   , 'getPreferencesManager'   );
+        $this->addShopCapability('\PrestaShop\PSTAF\ShopCapability\CheckoutManagement'      , 'getCheckoutManager'      );
+        $this->addShopCapability('\PrestaShop\PSTAF\ShopCapability\OrderManagement'         , 'getOrderManager'         );
+        $this->addShopCapability('\PrestaShop\PSTAF\ShopCapability\CategoryManagement'      , 'getCategoryManager'      );
     }
 
     /**
@@ -154,7 +154,7 @@ class Shop
     public function getPageObject($name)
     {
         if (!isset($this->page_objects[$name])) {
-            $class = "\PrestaShop\PageObject\\$name";
+            $class = "\PrestaShop\PSTAF\PageObject\\$name";
             $this->page_objects[$name] = new $class($this);
             $this->page_objects[$name]->setup();
         }

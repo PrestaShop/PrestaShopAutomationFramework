@@ -1,6 +1,6 @@
 <?php
 
-namespace PrestaShop;
+namespace PrestaShop\PSTAF;
 
 class PSBrowser extends Browser
 {
@@ -10,13 +10,13 @@ class PSBrowser extends Browser
 	    	$this->autoScreenshot(false);
 	        $element = $this->find('div.alert.alert-success');
 	    } catch (\Exception $e) {
-	        throw new \PrestaShop\Exception\StandardSuccessMessageNotDisplayedException($error_explanation);
+	        throw new \PrestaShop\PSTAF\Exception\StandardSuccessMessageNotDisplayedException($error_explanation);
 	    } finally {
 	    	$this->autoScreenshot();
 	    }
 
 	    if (!$element->isDisplayed())
-	        throw new \PrestaShop\Exception\StandardSuccessMessageNotDisplayedException($error_explanation);
+	        throw new \PrestaShop\PSTAF\Exception\StandardSuccessMessageNotDisplayedException($error_explanation);
 
 	    return $this;
 	}
@@ -26,7 +26,7 @@ class PSBrowser extends Browser
 	    try {
 	    	$this->autoScreenshot(false);
 	        $this->find('div.alert.alert-error', ['wait' => false]);
-	        throw new \PrestaShop\Exception\StandardErrorMessageDisplayedException($error_explanation);
+	        throw new \PrestaShop\PSTAF\Exception\StandardErrorMessageDisplayedException($error_explanation);
 	    } catch (\Exception $e) {
 	        // That's expected :)
 	    } finally {

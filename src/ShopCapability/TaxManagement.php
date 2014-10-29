@@ -1,6 +1,8 @@
 <?php
 
-namespace PrestaShop\ShopCapability;
+namespace PrestaShop\PSTAF\ShopCapability;
+
+use PrestaShop\PSTAF\Helper\URL;
 
 class TaxManagement extends ShopCapability
 {
@@ -163,9 +165,9 @@ class TaxManagement extends ShopCapability
         $id_tax = $browser->getURLParameter('id_tax');
 
         if ((int) $id_tax < 1)
-            throw new \PrestaShop\Exception\TaxRuleCreationIncorrectException("id_tax not a positive integer");
+            throw new \PrestaShop\PSTAF\Exception\TaxRuleCreationIncorrectException("id_tax not a positive integer");
 
-        $check_url = \PrestaShop\Helper\URL::filterParameters(
+        $check_url = URL::filterParameters(
             $browser->getCurrentURL(),
             ['controller', 'id_tax', 'token'],
             ['updatetax' => 1]
@@ -178,7 +180,7 @@ class TaxManagement extends ShopCapability
         $actual_enabled = $browser->prestaShopSwitchValue('active');
 
         if ($actual_name !== $name || $actual_rate !== (float) $rate || $actual_enabled != $enabled)
-            throw new \PrestaShop\Exception\TaxRuleCreationIncorrectException("stored results differ from submitted data");
+            throw new \PrestaShop\PSTAF\Exception\TaxRuleCreationIncorrectException("stored results differ from submitted data");
 
         return (int) $id_tax;
     }
@@ -259,7 +261,7 @@ class TaxManagement extends ShopCapability
         $actual_enabled = $browser->prestaShopSwitchValue('active');
 
         if ($actual_name !== $name || $actual_enabled !== $enabled)
-            throw new \PrestaShop\Exception\TaxRulesGroupCreationIncorrectException();
+            throw new \PrestaShop\PSTAF\Exception\TaxRulesGroupCreationIncorrectException();
 
         $behavior_names = null;
         $country_names = null;
@@ -424,14 +426,14 @@ class TaxManagement extends ShopCapability
                 /*$differ = new \SebastianBergmann\Diff\Differ();
 				$diff = $differ->diff($expected, $actual);*/
                 echo "Results differ!\n\nExpected:\n$expected\n\nActual:\n$actual\n";
-                throw new \PrestaShop\Exception\TaxRulesGroupCreationIncorrectException();
+                throw new \PrestaShop\PSTAF\Exception\TaxRulesGroupCreationIncorrectException();
             }
         }
 
         $id_tax_rules_group = $browser->getURLParameter('id_tax_rules_group');
 
         if ((int) $id_tax_rules_group < 1)
-            throw new \PrestaShop\Exception\TaxRuleCreationIncorrectException("id_tax_rules_group not a positive integer");
+            throw new \PrestaShop\PSTAF\Exception\TaxRuleCreationIncorrectException("id_tax_rules_group not a positive integer");
 
         return $id_tax_rules_group;
     }

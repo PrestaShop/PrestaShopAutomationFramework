@@ -1,8 +1,8 @@
 <?php
 
-namespace PrestaShop\TestCase;
+namespace PrestaShop\PSTAF\TestCase;
 
-use \PrestaShop\Shop;
+use \PrestaShop\PSTAF\Shop;
 
 /**
 * A Lazy TestCase differs from a TestCase in that

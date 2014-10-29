@@ -1,8 +1,11 @@
 <?php
 
-namespace PrestaShop\FunctionalTest;
+namespace PrestaShop\PSTAF\FunctionalTest;
 
-class InvoiceTest extends \PrestaShop\TestCase\TestCase
+use PrestaShop\PSTAF\TestCase\TestCase;
+use PrestaShop\PSTAF\ShopCapability\PreferencesManagement;
+
+class InvoiceTest extends TestCase
 {
 
     public static function checkInvoiceCoherence($invoice)
@@ -21,7 +24,7 @@ class InvoiceTest extends \PrestaShop\TestCase\TestCase
         $actual_tax_amount = (float) $invoice['order']['total_paid_tax_incl'] - (float) $invoice['order']['total_paid_tax_excl'];
 
         if ("$tax_amount" != "$actual_tax_amount")
-            throw new \PrestaShop\Exception\InvoiceIncorrectException(
+            throw new \PrestaShop\PSTAF\Exception\InvoiceIncorrectException(
                 "Actual tax amount `$actual_tax_amount` differs from sum of VAT amount in the tax breakdown (`$tax_amount`)."
             );
     }
@@ -87,7 +90,7 @@ class InvoiceTest extends \PrestaShop\TestCase\TestCase
         }
 
         if (!empty($errors))
-            throw new \PrestaShop\Exception\InvoiceIncorrectException(implode("\n", $errors));
+            throw new \PrestaShop\PSTAF\Exception\InvoiceIncorrectException(implode("\n", $errors));
 
         self::checkInvoiceCoherence($actual);
     }
@@ -213,15 +216,15 @@ class InvoiceTest extends \PrestaShop\TestCase\TestCase
 
         /* Temporarily disabled - unsafe check
         if ($output['cart_total'] != $output['json']['order']['total_paid_tax_incl']) {
-            throw new \PrestaShop\Exception\FailedTestException(
+            throw new \PrestaShop\PSTAF\Exception\FailedTestException(
                 "Cart total `{$output['cart_total']}` differs from invoice total of `{$output['json']['order']['total_paid_tax_incl']}`."
             );
         }*/
 
         // Now check that the invoice doesn't change if the rounding settings change!
 
-        $modes = \PrestaShop\ShopCapability\PreferencesManagement::getRoundingModes();
-        $types = \PrestaShop\ShopCapability\PreferencesManagement::getRoundingTypes();
+        $modes = PreferencesManagement::getRoundingModes();
+        $types = PreferencesManagement::getRoundingTypes();
 
         unset($modes[$scenario['meta']['rounding_mode']]);
         unset($types[$scenario['meta']['rounding_type']]);
@@ -244,7 +247,7 @@ class InvoiceTest extends \PrestaShop\TestCase\TestCase
                         $scenario['meta']['rounding_type'],
                         $type
                     );
-                    throw new \PrestaShop\Exception\FailedTestException($message."\n".$e->getMessage());
+                    throw new \PrestaShop\PSTAF\Exception\FailedTestException($message."\n".$e->getMessage());
                 }
             }
         }

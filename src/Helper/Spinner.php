@@ -1,6 +1,6 @@
 <?php
 
-namespace PrestaShop\Helper;
+namespace PrestaShop\PSTAF\Helper;
 
 class Spinner
 {
@@ -35,7 +35,7 @@ class Spinner
             $elapsed += $this->interval_in_milliseconds / 1000;
         }
 
-        throw new \PrestaShop\Exception\SpinAssertException($this->error_message);
+        throw new \PrestaShop\PSTAF\Exception\SpinAssertException($this->error_message);
     }
 
     public function assertNoException(callable $cb)

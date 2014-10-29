@@ -1,6 +1,6 @@
 <?php
 
-namespace PrestaShop\Util;
+namespace PrestaShop\PSTAF\Util;
 
 interface DataStoreInterface
 {

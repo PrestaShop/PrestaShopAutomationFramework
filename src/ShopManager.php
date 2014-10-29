@@ -1,9 +1,10 @@
 <?php
 
-namespace PrestaShop;
+namespace PrestaShop\PSTAF;
 
-use \PrestaShop\Helper\FileSystem as FS;
-use \djfm\Process\Process as Process;
+use djfm\Process\Process as Process;
+use PrestaShop\PSTAF\Helper\FileSystem as FS;
+use PrestaShop\PSTAF\ShopCapability\FileManagement;
 
 class ShopManager
 {
@@ -91,7 +92,7 @@ class ShopManager
 	 * scripts
 	 *
 	 * @param  array  $options
-	 * @return a \PrestaShop\Shop instance
+	 * @return a Shop instance
 	 *
 	 * $options is an array with the following keys:
 	 * - initial_state: an array that will be passed to $shop->getFixtureManager()->setupInitialState(),
@@ -222,7 +223,7 @@ class ShopManager
 
         // Finally put the shop files in place!
         if (!$target_same_as_source && $new_install) {
-            \PrestaShop\ShopCapability\FileManagement::copyShopFiles(
+            FileManagement::copyShopFiles(
                 $source_files_path,
                 $target_files_path
             );
@@ -239,9 +240,9 @@ class ShopManager
             $seleniumSettings = ['host' => $seleniumHost];
 
             // Hoorah! Build our shop
-            $shop = new \PrestaShop\Shop($conf->get('shop'), $seleniumSettings);
+            $shop = new Shop($conf->get('shop'), $seleniumSettings);
         } else {
-            $shop = new \PrestaShop\Shop($conf->get('shop'), null);
+            $shop = new Shop($conf->get('shop'), null);
             $shop->setBrowser($options['browser']);
         }
 
@@ -285,7 +286,7 @@ class ShopManager
         return $shop;
     }
 
-    public function cleanUp(\PrestaShop\Shop $shop, $leaveBrowserRunning = false)
+    public function cleanUp(Shop $shop, $leaveBrowserRunning = false)
     {
         if ($shop->isTemporary()) {
             $shop->getDatabaseManager()->dropDatabaseIfExists();

@@ -1,6 +1,8 @@
 <?php
 
-namespace PrestaShop\FunctionalTest;
+namespace PrestaShop\PSTAF\FunctionalTest;
+
+use PrestaShop\PSTAF\TestCase\LazyTestCase;
 
 /**
  * This test does the following:
@@ -34,7 +36,7 @@ namespace PrestaShop\FunctionalTest;
  *
  */
 
-class GeneralPreferencesManagementTest extends \PrestaShop\TestCase\LazyTestCase
+class GeneralPreferencesManagementTest extends LazyTestCase
 {
     public static function setupBeforeClass()
     {

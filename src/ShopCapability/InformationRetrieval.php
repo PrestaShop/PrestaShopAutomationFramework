@@ -1,6 +1,6 @@
 <?php
 
-namespace PrestaShop\ShopCapability;
+namespace PrestaShop\PSTAF\ShopCapability;
 
 class InformationRetrieval extends ShopCapability
 {
