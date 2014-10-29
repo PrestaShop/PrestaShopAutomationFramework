@@ -1,3 +1,17 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Writing a Test](#writing-a-test)
+- [The test standard: PHPUnit_Framework_TestCase](#the-test-standard-phpunit_framework_testcase)
+- [General structure of a Test Case](#general-structure-of-a-test-case)
+- [The PrestaShop Test Cases](#the-prestashop-test-cases)
+- [Types of Test Cases](#types-of-test-cases)
+  - [PrestaShop\PSTAF\TestCase\TestCase](#PrestaShop\PSTAF\TestCase\testcase)
+  - [PrestaShop\PSTAF\TestCase\LazyTestCase](#PrestaShop\PSTAF\TestCase\lazytestcase)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 Writing a Test
 ==============
 # The test standard: PHPUnit_Framework_TestCase
@@ -20,7 +34,7 @@ Example of a basic test:
 ```php
     namespace PrestaShop\FunctionalTest;
 
-    class BasicTest extends \PrestaShop\TestCase\TestCase
+    class BasicTest extends \PrestaShop\PSTAF\TestCase\TestCase
     {
         /**
          * This test will fail.
@@ -55,22 +69,22 @@ Now that we're clear about the terminology, let's speak of real functional tests
 # The PrestaShop Test Cases
 Our testing framework builds up on the basic test definition and enhances it with a few things to make your life easier.
 
-Inside of a Test Case class that extends `PrestaShop\TestCase\TestCase` you get:
-- `$this->shop`, an object of type `PrestaShop\Shop` that you can use to manipulate a shop.
-- `$this->browser`, an object of type `PrestaShop\PSBrowser` that controls a browser.
+Inside of a Test Case class that extends `PrestaShop\PSTAF\TestCase\TestCase` you get:
+- `$this->shop`, an object of type `PrestaShop\PSTAF\Shop` that you can use to manipulate a shop.
+- `$this->browser`, an object of type `PrestaShop\PSTAF\PSBrowser` that controls a browser.
 
 The framework handles creating and destroying the actual shops for you according to the settings in your project's configuration file.
 
 # Types of Test Cases
 The framework provides two base test classes, located under `src/TestCase`, namely:
-- PrestaShop\TestCase\TestCase
-- PrestaShop\TestCase\LazyTestCase
+- PrestaShop\PSTAF\TestCase\TestCase
+- PrestaShop\PSTAF\TestCase\LazyTestCase
 
 Your tests should extend one of these classes. Which one?
 This would depends on your goals, read on!
 
-## PrestaShop\TestCase\TestCase
-Inside of a `PrestaShop\TestCase\TestCase` you get a new `Shop` instance before each test method. A new `Shop` instance means that behind the scenes, a new PrestaShop installation, with a new database, will be performed. 
+## PrestaShop\PSTAF\TestCase\TestCase
+Inside of a `PrestaShop\PSTAF\TestCase\TestCase` you get a new `Shop` instance before each test method. A new `Shop` instance means that behind the scenes, a new PrestaShop installation, with a new database, will be performed. 
 
 This is useful if your test methods alter the state of the shop in a significant and mutually incompatible manner.
 
@@ -78,8 +92,8 @@ It also helps make results consistent. Say in `testA` you create a Cart Rule and
 
 By using a `TestCase` as base class, you can be certain that at the time when testB is called, `$this->shop` will point to a brand new shop, with not created cart rules.
 
-##  PrestaShop\TestCase\LazyTestCase
-A `PrestaShop\TestCase\LazyTestCase` extends `PrestaShop\TestCase\TestCase`.
+##  PrestaShop\PSTAF\TestCase\LazyTestCase
+A `PrestaShop\PSTAF\TestCase\LazyTestCase` extends `PrestaShop\PSTAF\TestCase\TestCase`.
 
 The difference is that the state of the shop is not reset after each test method. This is obviously a lot faster, but should only be used when you are absolutely sure that your test methods don't step on each other's toes.
 

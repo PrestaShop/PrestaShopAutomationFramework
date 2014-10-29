@@ -109,11 +109,11 @@ Sit back and relax, if all goes well PrestaShop should install itself according 
 
 ## Running a test suite
 
-All test suites live under the [tests-available](https://github.com/PrestaShop/PrestaShopAutomationFramework/tree/master/tests-available) folder of PrestaShopAutomationFramework.
+All test suites live under the [FunctionalTest](https://github.com/PrestaShop/PrestaShopAutomationFramework/tree/master/FunctionalTest) folder of PrestaShopAutomationFramework.
 
 ### Running all tests from the suite
 
-To run all the tests contained in a test suite, type `pstaf test:run TestName` where test name is any filename from `tests-available`, without the 'Test' suffix nor the '.php' extension.
+To run all the tests contained in a test suite, type `pstaf test:run TestName` where test name is any filename from the `FunctionalTest` folder, without the 'Test' suffix nor the '.php' extension.
 
 To run one of the simplest test suites:
 ```bash
@@ -144,6 +144,5 @@ Warning, this will take a looong time, unless you use an [optimized testing setu
 # Going further
 
 - learn how to tune your Linux setup to [improve test execution speed](https://github.com/PrestaShop/PrestaShopAutomationFramework/blob/master/FASTER.md)
-- learn about [writing tests](https://github.com/PrestaShop/PrestaShopAutomationFramework/blob/master/WRITING TESTS.md)
+- learn about [writing tests](https://github.com/PrestaShop/PrestaShopAutomationFramework/blob/master/WRITING_TESTS.md)
 - read about our recommended workflows with pstaf [TODO]
-- write your own tests [TODO]
