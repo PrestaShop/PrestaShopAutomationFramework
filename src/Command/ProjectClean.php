@@ -5,6 +5,7 @@ namespace PrestaShop\PSTAF\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use PrestaShop\PSTAF\ShopManager;
 
 class ProjectClean extends Command
 {
@@ -17,7 +18,7 @@ class ProjectClean extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $manager = \PrestaShop\ShopManager::getInstance();
+        $manager = ShopManager::getInstance();
         $manager->cleanDirectory();
         if ($input->getOption('update'))
             $manager->updateRepo();

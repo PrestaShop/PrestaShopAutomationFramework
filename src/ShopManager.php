@@ -5,6 +5,7 @@ namespace PrestaShop\PSTAF;
 use djfm\Process\Process as Process;
 use PrestaShop\PSTAF\Helper\FileSystem as FS;
 use PrestaShop\PSTAF\ShopCapability\FileManagement;
+use PrestaShop\PSTAF\SeleniumManager;
 
 class ShopManager
 {
@@ -323,7 +324,7 @@ class ShopManager
             } elseif ($entry === 'test-results') {
                 echo "Removing test results folder $entry...\n";
                 FS::rmR($path);
-            } elseif ($entry === 'selenium.pid' && !\PrestaShop\SeleniumManager::isSeleniumStarted()) {
+            } elseif ($entry === 'selenium.pid' && !SeleniumManager::isSeleniumStarted()) {
                 echo "Removing stale pid file $entry...\n";
                 unlink($path);
             }
