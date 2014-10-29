@@ -2,6 +2,8 @@
 
 namespace PrestaShop\PSTAF;
 
+use PrestaShop\PSTAF\Helper\FileSystem as FS;
+
 class Shop
 {
     /**
@@ -204,7 +206,7 @@ class Shop
 
     public function getBackOfficeFolderPath()
     {
-        return \PrestaShop\Helper\FileSystem::join($this->filesystem_path, $this->back_office_folder_name);
+        return FS::join($this->filesystem_path, $this->back_office_folder_name);
     }
 
     public function getFrontOfficeURL()

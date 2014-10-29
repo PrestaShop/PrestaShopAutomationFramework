@@ -694,7 +694,7 @@ class Browser
 
     public function acceptAlert()
     {
-        $spinner = new \PrestaShop\Helper\Spinner();
+        $spinner = new Spinner();
 
         $spinner->assertNoException(function() {
             $alert = $this->driver->switchTo()->alert();
