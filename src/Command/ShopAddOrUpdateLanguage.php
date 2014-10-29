@@ -5,6 +5,8 @@ namespace PrestaShop\PSTAF\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use PrestaShop\PSTAF\SeleniumManager;
+use PrestaShop\PSTAF\ShopManager;
 
 class ShopAddOrUpdateLanguage extends Command
 {
@@ -17,9 +19,9 @@ class ShopAddOrUpdateLanguage extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        \PrestaShop\SeleniumManager::ensureSeleniumIsRunning();
+        SeleniumManager::ensureSeleniumIsRunning();
 
-        $shop = \PrestaShop\ShopManager::getInstance()->getShop(null, false);
+        $shop = ShopManager::getInstance()->getShop(null, false);
 
         $lc = $input->getArgument('TwoLettersLanguageCode');
 
