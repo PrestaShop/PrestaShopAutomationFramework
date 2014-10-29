@@ -6,6 +6,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use PrestaShop\PSTAF\OptionProvider;
+use PrestaShop\PSTAF\ShopManager;
 use PrestaShop\PSTAF\SeleniumManager;
 
 class Install extends Command
@@ -26,7 +27,7 @@ class Install extends Command
     {
         SeleniumManager::ensureSeleniumIsRunning();
 
-        $shop = \PrestaShop\ShopManager::getInstance()->getShop([
+        $shop = ShopManager::getInstance()->getShop([
             'temporary' => false,
             'use_cache' => false,
             'overwrite' => true
