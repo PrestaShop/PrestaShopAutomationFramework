@@ -3,6 +3,7 @@
 namespace PrestaShop\PSTAF\FunctionalTest;
 
 use PrestaShop\PSTAF\TestCase\TestCase;
+use PrestaShop\PSTAF\Helper\FileSystem as FS;
 
 class UpgradeTest extends TestCase
 {
@@ -50,7 +51,7 @@ class UpgradeTest extends TestCase
         ->installModule('autoupgrade');
 
         // Copy files from the target version
-        $targetFolder = \PrestaShop\Helper\FileSystem::join(
+        $targetFolder = FS::join(
             $this->shop->getBackOfficeFolderPath(),
             'autoupgrade',
             'latest',
