@@ -6,8 +6,7 @@ use \PrestaShop\Shop;
 
 /**
 * A Lazy TestCase differs from a TestCase in that
-* the state of the shop is not saved and restored after each test.
-* This is acceptable for simple tests or for tests that depend on the result of a previous test.
+* you don't get a new shop after each test.
 */
 
 class LazyTestCase extends TestCase

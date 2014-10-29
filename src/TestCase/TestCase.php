@@ -2,16 +2,48 @@
 
 namespace PrestaShop\TestCase;
 
-use \PrestaShop\ShopManager;
-use \PrestaShop\Shop;
+use PrestaShop\ShopManager;
+use PrestaShop\Shop;
+use PrestaShop\Helper\FileSystem as FS;
 
 abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaShop\Ptest\TestClass\Basic
 {
-    private static $shops = [];
-    private static $shop_managers = [];
-    private static $test_numbers = [];
-    private static $browsers = [];
+    // a static datastore using get_called_class() as keys
+    private static $staticData = [];
+
     private $shortName;
+
+    // Utility function to store static data safely even when called from inheriting class
+    private static function get($key, $defaultValue = null)
+    {
+        $className = get_called_class();
+
+        if (!array_key_exists($className, self::$staticData)) {
+            return $defaultValue;
+        }
+
+        if (array_key_exists($key, self::$staticData[$className])) {
+            return self::$staticData[$className][$key];
+        } else {
+            return $defaultValue;
+        }
+    }
+
+    // Utility function to store static data safely even when called from inheriting class
+    private static function set($key, $value)
+    {
+        $className = get_called_class();
+
+        if (!array_key_exists($className, self::$staticData)) {
+            self::$staticData[$className] = [];
+        }
+
+        if (!array_key_exists($className, self::$staticData)) {
+            self::$staticData[$className] = [];
+        }
+
+        self::$staticData[$className][$key] = $value;
+    }
 
     // Whether or not to cache the initial shop state
     protected static $cache_initial_state = true;
@@ -19,41 +51,6 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
     protected static function shopManagerOptions()
     {
         return [];
-    }
-
-    private static function newShop()
-    {
-        $class = get_called_class();
-
-        if (!isset(self::$browsers[$class])) {
-            $browser = new \PrestaShop\PSBrowser([
-                'host' => \PrestaShop\SeleniumManager::getHost()
-            ]);
-            self::$browsers[$class] = $browser;
-        }
-
-        $shopManagerOptions = [
-            'initial_state' => static::initialState(),
-            'temporary' => true,
-            'use_cache' => static::$cache_initial_state,
-            'browser' => self::$browsers[$class]
-        ];
-
-        $shopManagerOptions = array_merge($shopManagerOptions, static::shopManagerOptions());
-
-        self::$shops[$class] = self::getShopManager()->getShop($shopManagerOptions);
-
-        self::$shops[$class]->getBrowser()->clearCookies();
-    }
-
-    public static function setUpBeforeClass()
-    {
-        \PrestaShop\SeleniumManager::ensureSeleniumIsRunning();
-        $class = get_called_class();
-        $manager = ShopManager::getInstance();
-        self::$shop_managers[$class] = $manager;
-        self::newShop();
-        register_shutdown_function([$class, 'tearDownAfterClass']);
     }
 
     public static function initialState()
@@ -66,60 +63,78 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
         ];
     }
 
-    public static function beforeAll()
+    private static function newShop()
     {
+        if (!self::get('browser')) {
+            $browser = new \PrestaShop\PSBrowser([
+                'host' => \PrestaShop\SeleniumManager::getHost()
+            ]);
+            self::set('browser', $browser);
+        }
 
+        $shopManagerOptions = [
+            'initial_state' => static::initialState(),
+            'temporary' => true,
+            'use_cache' => static::$cache_initial_state,
+            'browser' => self::get('browser')
+        ];
+
+        $shopManagerOptions = array_merge($shopManagerOptions, static::shopManagerOptions());
+
+        $shop = self::getShopManager()->getShop($shopManagerOptions);
+        $shop->getBrowser()->clearCookies();
+
+        self::set('shop', $shop);
+    }
+
+    public static function setUpBeforeClass()
+    {
+        \PrestaShop\SeleniumManager::ensureSeleniumIsRunning();
+
+        self::set('shopManager', ShopManager::getInstance());
+        self::newShop();
+        register_shutdown_function([get_called_class(), 'tearDownAfterClass']);
     }
 
     public static function tearDownAfterClass()
     {
-        $class = get_called_class();
-        if (isset(self::$shops[$class])) {
-            static::getShopManager()->cleanUp(static::getShop());
-            unset(self::$shops[$class]);
+        if (($shop = self::getShop())) {
+            static::getShopManager()->cleanUp($shop);
+            self::set('shop', null);
         }
 
-        if (isset(self::$browsers[$class])) {
-            unset(self::$browsers[$class]);
+        if (self::get('browser')) {
+            self::set('browser', null);
         }
     }
 
     public static function getShop()
     {
-        $class = get_called_class();
-
-        return self::$shops[$class];
+        return self::get('shop');
     }
 
     public static function getShopManager()
     {
-        $class = get_called_class();
-
-        return self::$shop_managers[$class];
+        return self::get('shopManager');
     }
 
     public function setUp()
     {
-        $class = get_called_class();
+        self::set('testNumber', self::get('testNumber', 0) + 1);
 
-        if (!isset(self::$test_numbers[$class]))
-            self::$test_numbers[$class] = 0;
-        else
-            self::$test_numbers[$class]++;
-
-        if (self::$test_numbers[$class] > 0) {
+        if (self::get('testNumber') > 0) {
             // clean current shop
-            static::getShopManager()->cleanUp(static::getShop(), $leaveBrowserRunning = true);
+            static::getShopManager()->cleanUp(self::getShop(), $leaveBrowserRunning = true);
             // get a new one
             self::newShop();
         }
 
-        $this->shop = static::getShop();
+        $this->shop = self::getShop();
     }
 
     public function tearDown()
     {
-        // TODO: restore state of shop
+        
     }
 
     public function getExamplesPath()
@@ -137,7 +152,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 
     public function getExamplePath($name)
     {
-        return \PrestaShop\Helper\FileSystem::join($this->getExamplesPath(), $name);
+        return FS::join($this->getExamplesPath(), $name);
     }
 
     public function getJSONExample($example)
@@ -184,13 +199,13 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
         $dir = $this->getOutputDir();
 
         if ($this->shortName) {
-            $dir .= DIRECTORY_SEPARATOR . $this->shortName;
+            $dir = FS::join($dir, $this->shortName);
             if (!is_dir($dir)) {
                 mkdir($dir, 0777, true);
             }
         }        
 
-        $path = $dir.DIRECTORY_SEPARATOR.$name;
+        $path = FS::join($dir, $name);
 
         file_put_contents($path, $contents);
 
@@ -234,16 +249,16 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 
         $this->shortName = $shortName;
 
-        $dir = $this->getOutputDir().DIRECTORY_SEPARATOR.$shortName;
+        $dir = FS::join($this->getOutputDir(), $this->shortName);
         
-        $screenshotsDir = $dir.DIRECTORY_SEPARATOR.'screenshots';
+        $screenshotsDir = FS::join($dir, 'screenshots');
 
         if (is_dir($screenshotsDir)) {
             foreach (scandir($screenshotsDir) as $entry) {
                 if ($entry[0] === '.') {
                     continue;
                 }
-                unlink($screenshotsDir.DIRECTORY_SEPARATOR.$entry);
+                unlink(FS::join($screenshotsDir, $entry));
             }
         } else {
             mkdir($screenshotsDir, 0777, true);
