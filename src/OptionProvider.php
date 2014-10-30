@@ -52,8 +52,12 @@ class OptionProvider
             ]
         ],
         'BackOfficeLogin' => [
-            'admin_email'           => [],
-            'admin_password'        => [],
+            'admin_email'           => [
+                'default'       => 'pub@prestashop.com'
+            ],
+            'admin_password'        => [
+                'default'       => '123456789'
+            ],
             'stay_logged_in'        => [
                 'description'   => 'Stay logged in (Back-Office)',
                 'default'       => true
