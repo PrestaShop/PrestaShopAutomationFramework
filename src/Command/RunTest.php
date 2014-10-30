@@ -77,8 +77,10 @@ class RunTest extends Command
 
         if ($input->getOption('all')) {
             $tests_path = $tests_directory;
-        } elseif ($input->getArgument('test_name')) {
-            $tests_path = realpath(FS::join($tests_directory, $input->getArgument('test_name').'Test.php'));
+        } elseif (($test_name = $input->getArgument('test_name')) && !preg_match('/\.php$/', $test_name)) {
+            $tests_path = realpath(FS::join($tests_directory, $test_name.'Test.php'));
+        } elseif ($test_name) {
+            $tests_path = realpath($test_name);
         } else {
             $rdi = new \RecursiveDirectoryIterator(
                 $tests_directory,
