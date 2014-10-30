@@ -129,7 +129,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
     {
         self::set('testNumber', self::get('testNumber', 0) + 1);
 
-        if (self::get('testNumber') > 0) {
+        if (self::get('testNumber') > 1) {
             // clean current shop
             static::getShopManager()->cleanUp(self::getShop(), $leaveBrowserRunning = true);
             // get a new one
