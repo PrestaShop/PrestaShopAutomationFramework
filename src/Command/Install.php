@@ -4,6 +4,7 @@ namespace PrestaShop\PSTAF\Command;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputOption;
 
 use PrestaShop\PSTAF\OptionProvider;
 use PrestaShop\PSTAF\ShopManager;
@@ -16,10 +17,18 @@ class Install extends Command
         $this->setName('shop:install')
         ->setDescription('Install PrestaShop');
 
-        $optionDescriptions = OptionProvider::getDescriptions('ShopInstallation');
+        $options = ShopManager::getInstance()
+        ->getOptionProvider()
+        ->getDefaults('ShopInstallation');
 
-        foreach ($optionDescriptions as $name => $data) {
-            $this->addOption($name, $data['short'], $data['type'], $data['description'], $data['default']);
+        foreach ($options as $name => $data) {
+            $this->addOption(
+                $name,
+                $data['short'],
+                $data['type'],
+                $data['description'],
+                $data['type'] !== InputOption::VALUE_NONE ? $data['default'] : null
+            );
         }
     }
 
@@ -33,7 +42,9 @@ class Install extends Command
             'overwrite' => true
         ]);
 
-        $shop->getInstaller()->install(OptionProvider::fromInput('ShopInstallation', $input));
+        $shop->getInstaller()->install(
+            $shop->getOptionProvider()->getValues('ShopInstallation', $input)
+        );
         $shop->getBrowser()->quit();
     }
 }

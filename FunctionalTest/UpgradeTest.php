@@ -59,7 +59,7 @@ class UpgradeTest extends TestCase
         );
 
         $sourceFolder = static::getShopManager()
-                        ->getConfiguration()
+                        ->getNewConfiguration()
                         ->getAsAbsolutePath('shop.filesystem_path');
 
         // copy via a script executed by the browser to go around permissions issues

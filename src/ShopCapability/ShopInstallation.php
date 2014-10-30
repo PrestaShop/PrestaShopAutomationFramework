@@ -6,9 +6,9 @@ use PrestaShop\PSTAF\OptionProvider;
 
 class ShopInstallation extends ShopCapability
 {
-    public function install($options=[])
+    public function install($options = [])
     {
-        $options = OptionProvider::addDefaults('ShopInstallation', $options);
+        $options = $this->getOptionProvider()->getValues('ShopInstallation', $options);
 
         $this->getShop()->getDatabaseManager()->dropDatabaseIfExists();
 

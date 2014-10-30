@@ -65,6 +65,8 @@ class Shop
 
     protected $data_store;
 
+    protected $optionProvider;
+
     /**
 	* Capabilities
 	*
@@ -123,6 +125,17 @@ class Shop
         $this->addShopCapability('\PrestaShop\PSTAF\ShopCapability\CheckoutManagement'      , 'getCheckoutManager'      );
         $this->addShopCapability('\PrestaShop\PSTAF\ShopCapability\OrderManagement'         , 'getOrderManager'         );
         $this->addShopCapability('\PrestaShop\PSTAF\ShopCapability\CategoryManagement'      , 'getCategoryManager'      );
+    }
+
+    public function setOptionProvider(OptionProvider $optionProvider)
+    {
+        $this->optionProvider = $optionProvider;
+        return $this;
+    }
+
+    public function getOptionProvider()
+    {
+        return $this->optionProvider;
     }
 
     /**

@@ -13,7 +13,7 @@ class FrontOfficeNavigation extends ShopCapability
 
     public function login($options = [])
     {
-        $options = OptionProvider::addDefaults('FrontOfficeLogin', $options);
+        $options = $this->getOptionProvider()->getValues('FrontOfficeLogin', $options);
 
         $browser = $this->getShop()->getBrowser();
         $browser

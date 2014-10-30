@@ -6,29 +6,36 @@ use djfm\Process\Process as Process;
 use PrestaShop\PSTAF\Helper\FileSystem as FS;
 use PrestaShop\PSTAF\ShopCapability\FileManagement;
 use PrestaShop\PSTAF\SeleniumManager;
+use PrestaShop\PSTAF\OptionProvider;
 
 class ShopManager
 {
     private $configuration_file_path;
-    private $conf;
+    private $configuration;
+    private $optionProvider;
 
     private static $managers = [];
 
     public function __construct($configuration_file_path)
     {
         $this->configuration_file_path = $configuration_file_path;
+        $this->configuration = $this->getNewConfiguration();
+        $this->optionProvider = new OptionProvider();
     }
 
     public static function getInstance($configuration_file_path = null)
     {
-        if (!$configuration_file_path)
+        if (!$configuration_file_path) {
             $configuration_file_path = ConfigurationFile::getDefaultPath();
+        }
 
-        if (!file_exists($configuration_file_path))
+        if (!file_exists($configuration_file_path)) {
             throw new \Exception('Could not find configuration file pstaf.conf.json in current directory. Did you run pstaf project:init?');
+        }
 
-        if (!isset(self::$managers[$configuration_file_path]))
+        if (!isset(self::$managers[$configuration_file_path])) {
             self::$managers[$configuration_file_path] = new static($configuration_file_path);
+        }
 
         return self::$managers[$configuration_file_path];
     }
@@ -36,6 +43,11 @@ class ShopManager
     public function getWorkingDirectory()
     {
         return dirname($this->configuration_file_path);
+    }
+
+    public function getOptionProvider()
+    {
+        return $this->optionProvider;
     }
 
     private function rksort(array &$array)
@@ -82,9 +94,14 @@ class ShopManager
         return $uid;
     }
 
-    public function getConfiguration()
+    public function getNewConfiguration()
     {
         return new ConfigurationFile($this->configuration_file_path);
+    }
+
+    public function getConfiguration()
+    {
+        return $this->configuration;
     }
 
     /**
@@ -246,6 +263,8 @@ class ShopManager
             $shop = new Shop($conf->get('shop'), null);
             $shop->setBrowser($options['browser']);
         }
+
+        $shop->setOptionProvider($this->optionProvider);
 
         if ($inplace && !$new_install) {
             // nothing for now

@@ -26,6 +26,11 @@ abstract class ShopCapability
         return $this->getShop()->getBrowser();
     }
 
+    public function getOptionProvider()
+    {
+        return $this->getShop()->getOptionProvider();
+    }
+
     public function isAvailable()
     {
         return true;

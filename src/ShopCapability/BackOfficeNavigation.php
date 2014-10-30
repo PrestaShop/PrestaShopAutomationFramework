@@ -99,7 +99,7 @@ class BackOfficeNavigation extends ShopCapability
 	 */
     public function login($options = [])
     {
-        $options = OptionProvider::addDefaults('BackOfficeLogin', $options);
+        $options = $this->getOptionProvider()->getValues('BackOfficeLogin', $options);
 
         $browser = $this->getShop()->getBrowser();
         $browser
