@@ -17,9 +17,14 @@ class Install extends Command
         $this->setName('shop:install')
         ->setDescription('Install PrestaShop');
 
-        $options = ShopManager::getInstance()
-        ->getOptionProvider()
-        ->getDefaults('ShopInstallation');
+        try {
+            $options = ShopManager::getInstance()
+            ->getOptionProvider()
+            ->getDefaults('ShopInstallation');
+        } catch (\Exception $e) {
+            // We probably did not have a configuration file.
+            $options = (new OptionProvider())->getDefaults('ShopInstallation');
+        }
 
         foreach ($options as $name => $data) {
             $this->addOption(

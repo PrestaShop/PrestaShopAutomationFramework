@@ -5,8 +5,9 @@ namespace PrestaShop\PSTAF\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use PrestaShop\PSTAF\ConfigurationFile;
 
-use PrestaShop\Helper\FileSystem as FSHelper;
+use PrestaShop\PSTAF\Helper\FileSystem as FS;
 
 class ProjectInit extends Command
 {
@@ -35,7 +36,7 @@ class ProjectInit extends Command
     {
         $guessed = [];
 
-        if (is_readable($path = FSHelper::join($folder, 'config', 'settings.inc.php'))) {
+        if (is_readable($path = FS::join($folder, 'config', 'settings.inc.php'))) {
             $exp = '/\bdefine\s*\(\s*([\'"])(.*?)\1\s*,\s*([\'"])(.*?)\3\s*\)/';
             $m = [];
             $n = preg_match_all($exp, file_get_contents($path), $m);
@@ -68,10 +69,10 @@ class ProjectInit extends Command
         $install_folder_name = false;
 
         foreach (scandir($folder) as $entry) {
-            if ($entry[0] !== '.' && is_dir(FSHelper::join($folder, $entry))) {
-                if (FSHelper::exists($folder, $entry, 'index_cli.php'))
+            if ($entry[0] !== '.' && is_dir(FS::join($folder, $entry))) {
+                if (FS::exists($folder, $entry, 'index_cli.php'))
                     $install_folder_name = $entry;
-                elseif (FSHelper::exists($folder, $entry, 'ajax-tab.php'))
+                elseif (FS::exists($folder, $entry, 'ajax-tab.php'))
                     $back_office_folder_name = $entry;
             }
         }
@@ -89,7 +90,7 @@ class ProjectInit extends Command
     {
         $this->quoptparse($input, $output, $this->guessShopSettings('.'), $input->getOption('accept_defaults'));
 
-        $conf = new \PrestaShop\ConfigurationFile('pstaf.conf.json');
+        $conf = new ConfigurationFile('pstaf.conf.json');
         $conf->update(['shop' => $this->getOptions()])->save();
     }
 }

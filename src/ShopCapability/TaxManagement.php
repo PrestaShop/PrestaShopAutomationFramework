@@ -146,7 +146,7 @@ class TaxManagement extends ShopCapability
 	* - successfuly logged in to the back-office
 	* - on a back-office page
 	*
-	* @return the id of the created tax rule
+	* @return int the id of the created tax rule
 	*/
     public function createTaxRule($name, $rate, $enabled = true)
     {
