@@ -1,6 +1,5 @@
 *.log
 vendor
-output
 tmp.php
 external-tests
 selenium.log
@@ -10,3 +9,4 @@ FunctionalTest/tmp*
 fup.js
 FunctionalTest/WIPTest.php
 bamboo*
+doc/cache

@@ -19,6 +19,7 @@
 		"sebastian/diff": "*"
 	},
 	"require-dev": {
+		"sami/sami": "*"
     },
 	"autoload": {
 		"psr-4": {

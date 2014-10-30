@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="robots" content="index, follow, all" />
+        <title>PrestaShop\PSTAF\FunctionalTest\GeneralPreferencesManagementTest | PrestaShopAutomationFramework API</title>
+                    <link rel="stylesheet" type="text/css" href="../../../stylesheet.css">
+                            </head>
+        <body id="class">
+            <div class="header">
+        <ul>
+            <li><a href="../../../classes.html">Classes</a></li>
+                            <li><a href="../../../namespaces.html">Namespaces</a></li>
+                        <li><a href="../../../interfaces.html">Interfaces</a></li>
+            <li><a href="../../../traits.html">Traits</a></li>
+            <li><a href="../../../doc-index.html">Index</a></li>
+            
+        </ul>
+
+        <div id="title">PrestaShopAutomationFramework API</div>
+
+            <div class="type">Class</div>
+    <h1><a href="../../../PrestaShop/PSTAF/FunctionalTest.html">PrestaShop\PSTAF\FunctionalTest</a>\GeneralPreferencesManagementTest</h1>
+    </div>
+        <div class="content">
+                <p>    class
+    <strong>GeneralPreferencesManagementTest</strong>        extends <a href="../../../PrestaShop/PSTAF/TestCase/LazyTestCase.html"><abbr title="PrestaShop\PSTAF\TestCase\LazyTestCase">LazyTestCase</abbr></a></p>
+
+            <div class="description">
+            <p>This test does the following:</p>
+            <p><ul>
+<li>Check it can access AdminTaxes</li>
+<li>Check taxes can be disabled / enabled</li>
+<li>Check displaying taxes in the shopping cart can be enabled / disabled</li>
+<li>Check ecotax can be enabled / disabled</li>
+<li>Check ecotax can be set to use a specific tax group</li>
+<li><p>Check that the tax can be set to be based on delivery / invoice address</p></li>
+<li><p>Create and enable 2 tax rules, OldFrenchVat and NewFrenchVat</p></li>
+<li><p>Create a tax rules group with one tax, one country with zipcode range</p></li>
+<li>Create a tax rules group with one tax, applied to 2 USA states</li>
+<li>Create a tax rules group with one tax, applied to 1 USA state</li>
+<li>Create a tax rules group with one tax, applied to 2 countries</li>
+<li>Create a tax rules group with one tax, applied to 1 country</li>
+<li>Create a tax rules group with two taxes, applied combined to 1 country</li>
+<li>Create a tax rules group with one tax, applied to all countries</li>
+<li><p>Create a tax rules group with two taxes, applied to all countries in combine mode</p></li>
+<li><p>Delete created tax rule groups</p></li>
+<li>Delete created taxes</li>
+</ul>
+
+<p>THIS DOES NOT TEST THAT TAXES ARE ACTUALLY APPLIED CORRECTLY
+IT JUST TESTS THAT THE BACK-OFFICE MENUS WORK AS EXPECTED</p>
+
+<p>Other tests will check correct application of taxes.</p>
+        </div>
+    
+    
+    
+            <h2>Methods</h2>
+
+            <table>
+                    <tr>
+                <td class="type">
+                    static&nbsp;
+                </td>
+                <td class="last">
+                    <a href="#method_initialState">initialState</a>()
+                    <p>
+</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_initialState"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    static&nbsp;
+                </td>
+                <td class="last">
+                    <a href="#method_setUpBeforeClass">setUpBeforeClass</a>()
+                    <p>
+</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_setUpBeforeClass"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    static&nbsp;
+                </td>
+                <td class="last">
+                    <a href="#method_tearDownAfterClass">tearDownAfterClass</a>()
+                    <p>
+</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_tearDownAfterClass"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    static&nbsp;
+                </td>
+                <td class="last">
+                    <a href="#method_getShop">getShop</a>()
+                    <p>
+</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_getShop"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    static&nbsp;
+                </td>
+                <td class="last">
+                    <a href="#method_getBrowser">getBrowser</a>()
+                    <p>
+</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_getBrowser"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    static&nbsp;
+                </td>
+                <td class="last">
+                    <a href="#method_getShopManager">getShopManager</a>()
+                    <p>
+</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_getShopManager"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_setUp">setUp</a>()
+                    <p>
+</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../../PrestaShop/PSTAF/TestCase/LazyTestCase.html#method_setUp"><abbr title="PrestaShop\PSTAF\TestCase\LazyTestCase">LazyTestCase</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_tearDown">tearDown</a>()
+                    <p>
+</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../../PrestaShop/PSTAF/TestCase/LazyTestCase.html#method_tearDown"><abbr title="PrestaShop\PSTAF\TestCase\LazyTestCase">LazyTestCase</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_getExamplesPath">getExamplesPath</a>()
+                    <p>
+</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_getExamplesPath"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_getExamplePath">getExamplePath</a>($name)
+                    <p>
+</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_getExamplePath"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_getJSONExample">getJSONExample</a>($example)
+                    <p>
+</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_getJSONExample"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_jsonExampleFiles">jsonExampleFiles</a>()
+                    <p>
+</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_jsonExampleFiles"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_exampleFiles">exampleFiles</a>($ext)
+                    <p>
+</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_exampleFiles"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_getOutputDir">getOutputDir</a>()
+                    <p>
+</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_getOutputDir"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_writeArtefact">writeArtefact</a>($name, $contents)
+                    <p>
+</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_writeArtefact"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_makeFileNameCompatibleRepresentation">makeFileNameCompatibleRepresentation</a>($value)
+                    <p>
+</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_makeFileNameCompatibleRepresentation"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_aboutToStart">aboutToStart</a>($methodName, array $arguments = null)
+                    <p>
+</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_aboutToStart"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    static&nbsp;
+                </td>
+                <td class="last">
+                    <a href="#method_setupBeforeClass">setupBeforeClass</a>()
+                    <p>
+</p>
+                </td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_testNumberOfDecimalsCanBeSet">testNumberOfDecimalsCanBeSet</a>()
+                    <p>
+</p>
+                </td>
+                <td></td>
+            </tr>
+            </table>
+
+
+        <h2>Details</h2>
+
+                        <h3 id="method_initialState">
+        <div class="location">in <a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_initialState"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a> at line 58</div>
+        <code>        static    public            
+    <strong>initialState</strong>()</code>
+    </h3>
+    <div class="details">
+        <p>
+</p>
+        <p>
+</p>
+        <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_setUpBeforeClass">
+        <div class="location">in <a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_setUpBeforeClass"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a> at line 92</div>
+        <code>        static    public            
+    <strong>setUpBeforeClass</strong>()</code>
+    </h3>
+    <div class="details">
+        <p>
+</p>
+        <p>
+</p>
+        <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_tearDownAfterClass">
+        <div class="location">in <a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_tearDownAfterClass"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a> at line 101</div>
+        <code>        static    public            
+    <strong>tearDownAfterClass</strong>()</code>
+    </h3>
+    <div class="details">
+        <p>
+</p>
+        <p>
+</p>
+        <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_getShop">
+        <div class="location">in <a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_getShop"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a> at line 113</div>
+        <code>        static    public            
+    <strong>getShop</strong>()</code>
+    </h3>
+    <div class="details">
+        <p>
+</p>
+        <p>
+</p>
+        <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_getBrowser">
+        <div class="location">in <a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_getBrowser"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a> at line 118</div>
+        <code>        static    public            
+    <strong>getBrowser</strong>()</code>
+    </h3>
+    <div class="details">
+        <p>
+</p>
+        <p>
+</p>
+        <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_getShopManager">
+        <div class="location">in <a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_getShopManager"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a> at line 123</div>
+        <code>        static    public            
+    <strong>getShopManager</strong>()</code>
+    </h3>
+    <div class="details">
+        <p>
+</p>
+        <p>
+</p>
+        <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_setUp">
+        <div class="location">in <a href="../../../PrestaShop/PSTAF/TestCase/LazyTestCase.html#method_setUp"><abbr title="PrestaShop\PSTAF\TestCase\LazyTestCase">LazyTestCase</abbr></a> at line 14</div>
+        <code>            public            
+    <strong>setUp</strong>()</code>
+    </h3>
+    <div class="details">
+        <p>
+</p>
+        <p>
+</p>
+        <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_tearDown">
+        <div class="location">in <a href="../../../PrestaShop/PSTAF/TestCase/LazyTestCase.html#method_tearDown"><abbr title="PrestaShop\PSTAF\TestCase\LazyTestCase">LazyTestCase</abbr></a> at line 20</div>
+        <code>            public            
+    <strong>tearDown</strong>()</code>
+    </h3>
+    <div class="details">
+        <p>
+</p>
+        <p>
+</p>
+        <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_getExamplesPath">
+        <div class="location">in <a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_getExamplesPath"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a> at line 148</div>
+        <code>            public            
+    <strong>getExamplesPath</strong>()</code>
+    </h3>
+    <div class="details">
+        <p>
+</p>
+        <p>
+</p>
+        <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_getExamplePath">
+        <div class="location">in <a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_getExamplePath"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a> at line 161</div>
+        <code>            public            
+    <strong>getExamplePath</strong>($name)</code>
+    </h3>
+    <div class="details">
+        <p>
+</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$name</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_getJSONExample">
+        <div class="location">in <a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_getJSONExample"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a> at line 166</div>
+        <code>            public            
+    <strong>getJSONExample</strong>($example)</code>
+    </h3>
+    <div class="details">
+        <p>
+</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$example</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_jsonExampleFiles">
+        <div class="location">in <a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_jsonExampleFiles"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a> at line 171</div>
+        <code>            public            
+    <strong>jsonExampleFiles</strong>()</code>
+    </h3>
+    <div class="details">
+        <p>
+</p>
+        <p>
+</p>
+        <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_exampleFiles">
+        <div class="location">in <a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_exampleFiles"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a> at line 176</div>
+        <code>            public            
+    <strong>exampleFiles</strong>($ext)</code>
+    </h3>
+    <div class="details">
+        <p>
+</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$ext</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_getOutputDir">
+        <div class="location">in <a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_getOutputDir"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a> at line 191</div>
+        <code>            public            
+    <strong>getOutputDir</strong>()</code>
+    </h3>
+    <div class="details">
+        <p>
+</p>
+        <p>
+</p>
+        <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_writeArtefact">
+        <div class="location">in <a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_writeArtefact"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a> at line 205</div>
+        <code>            public            
+    <strong>writeArtefact</strong>($name, $contents)</code>
+    </h3>
+    <div class="details">
+        <p>
+</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$name</td>
+                <td>
+</td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$contents</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_makeFileNameCompatibleRepresentation">
+        <div class="location">in <a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_makeFileNameCompatibleRepresentation"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a> at line 223</div>
+        <code>            public            
+    <strong>makeFileNameCompatibleRepresentation</strong>($value)</code>
+    </h3>
+    <div class="details">
+        <p>
+</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$value</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_aboutToStart">
+        <div class="location">in <a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_aboutToStart"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a> at line 251</div>
+        <code>            public            
+    <strong>aboutToStart</strong>($methodName, array $arguments = null)</code>
+    </h3>
+    <div class="details">
+        <p>
+</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$methodName</td>
+                <td>
+</td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$arguments</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_setupBeforeClass">
+        <div class="location">at line 41</div>
+        <code>        static    public            
+    <strong>setupBeforeClass</strong>()</code>
+    </h3>
+    <div class="details">
+        <p>
+</p>
+        <p>
+</p>
+        <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_testNumberOfDecimalsCanBeSet">
+        <div class="location">at line 47</div>
+        <code>            public            
+    <strong>testNumberOfDecimalsCanBeSet</strong>()</code>
+    </h3>
+    <div class="details">
+        <p>
+</p>
+        <p>
+</p>
+        <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+    
+            </div>
+            <div id="footer">
+        Generated by <a href="http://sami.sensiolabs.org/" target="_top">Sami, the API Documentation Generator</a>.
+    </div>
+    </body>
+</html>

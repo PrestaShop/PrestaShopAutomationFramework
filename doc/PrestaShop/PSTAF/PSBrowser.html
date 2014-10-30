@@ -1,0 +1,1776 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="robots" content="index, follow, all" />
+        <title>PrestaShop\PSTAF\PSBrowser | PrestaShopAutomationFramework API</title>
+                    <link rel="stylesheet" type="text/css" href="../../stylesheet.css">
+                            </head>
+        <body id="class">
+            <div class="header">
+        <ul>
+            <li><a href="../../classes.html">Classes</a></li>
+                            <li><a href="../../namespaces.html">Namespaces</a></li>
+                        <li><a href="../../interfaces.html">Interfaces</a></li>
+            <li><a href="../../traits.html">Traits</a></li>
+            <li><a href="../../doc-index.html">Index</a></li>
+            
+        </ul>
+
+        <div id="title">PrestaShopAutomationFramework API</div>
+
+            <div class="type">Class</div>
+    <h1><a href="../../PrestaShop/PSTAF.html">PrestaShop\PSTAF</a>\PSBrowser</h1>
+    </div>
+        <div class="content">
+                <p>    class
+    <strong>PSBrowser</strong>        extends <a href="../../PrestaShop/PSTAF/Browser.html"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></p>
+
+    
+    
+    
+            <h2>Methods</h2>
+
+            <table>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method___construct">__construct</a>($seleniumSettings)
+                    <p>
+</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method___construct"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method___destruct">__destruct</a>()
+                    <p>
+</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method___destruct"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_recordScreenshots">recordScreenshots</a>($dir)
+                    <p>
+</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_recordScreenshots"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_autoScreenshot">autoScreenshot</a>($yes = true)
+                    <p>Call with 'false' to disa le autoScreenshotting temporarily, with 'true' to reenable it, and with null or anything else to take a screenshot without enabling/disabling them</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_autoScreenshot"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_quit">quit</a>()
+                    <p>
+</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_quit"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_doThenComeBack">doThenComeBack</a>(callable $callback)
+                    <p>Utility function: do something with the browser, and then reload the current URL.</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_doThenComeBack"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_waitForUserInput">waitForUserInput</a>()
+                    <p>Wait for user input - useful when debugging.</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_waitForUserInput"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_visit">visit</a>($url, array $basic_auth = null)
+                    <p>Visit a URL.</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_visit"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_getPageSource">getPageSource</a>()
+                    <p>Gets the source code of the page.</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_getPageSource"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_getAttribute">getAttribute</a>($selector, $attribute)
+                    <p>Gets the value of an attribute for a given selector.</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_getAttribute"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_getValue">getValue</a>($selector)
+                    <p>Gets the value of an input for the given selector.</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_getValue"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_getText">getText</a>($selector)
+                    <p>Gets the VISIBLE text for a given selector.</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_getText"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    <abbr title="PrestaShop\PSTAF\native">native</abbr>
+                </td>
+                <td class="last">
+                    <a href="#method_find">find</a>($selector, $options = array())
+                    <p>Find element(s).</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_find"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_all">all</a>($selector)
+                    <p>Find all elements matching the selector.</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_all"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_count">count</a>($selector)
+                    <p>Count elements matching a selector.</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_count"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_ensureElementIsOnPage">ensureElementIsOnPage</a>($selector, $exception = null)
+                    <p>
+</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_ensureElementIsOnPage"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_click">click</a>($selector)
+                    <p>Clicks an element by selector.</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_click"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_hover">hover</a>($selector)
+                    <p>Emulates a mouseover action.</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_hover"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_clickButtonNamed">clickButtonNamed</a>($name)
+                    <p>Clicks the first enabled button with the given name.</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_clickButtonNamed"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_clickLabelFor">clickLabelFor</a>($for)
+                    <p>Clicks the label that has the given "for" attribute.</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_clickLabelFor"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_fillIn">fillIn</a>($selector, $value)
+                    <p>Fills in an input with the given value.</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_fillIn"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_setElementValue">setElementValue</a>($element, $value)
+                    <p>Convenience method to fill in the value of an input if we got the element as a native remote element.</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_setElementValue"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_setFile">setFile</a>($selector, $path)
+                    <p>Helper method to set the file for a file input.</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_setFile"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_sendKeys">sendKeys</a>($keys)
+                    <p>Simulates keypresses.</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_sendKeys"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_select">select</a>($selector, $value)
+                    <p>Select by value in a select.</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_select"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_multiSelect">multiSelect</a>($selector, $options)
+                    <p>Select by value in a multiple select.</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_multiSelect"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_getSelectOptions">getSelectOptions</a>($selector)
+                    <p>Get Select Options as associative array</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_getSelectOptions"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_jqcSelect">jqcSelect</a>($selector, $value)
+                    <p>Select by value in a JQuery chosen select.</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_jqcSelect"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_checkbox">checkbox</a>($selector, $on_off)
+                    <p>Check or uncheck a checkbox</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_checkbox"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_waitFor">waitFor</a>($selector, $timeout_in_second = null, $interval_in_millisecond = null)
+                    <p>Wait for element to appear</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_waitFor"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_ensureElementShowsUpOnPage">ensureElementShowsUpOnPage</a>($selector, $timeout_in_second = null, $interval_in_millisecond = null)
+                    <p>
+</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_ensureElementShowsUpOnPage"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_getCurrentURL">getCurrentURL</a>()
+                    <p>Return the current URL</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_getCurrentURL"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_getURLParameter">getURLParameter</a>($param)
+                    <p>Return a parameter from the current URL</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_getURLParameter"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    <abbr title="PrestaShop\PSTAF\$this">$this</abbr>
+                </td>
+                <td class="last">
+                    <a href="#method_refresh">refresh</a>()
+                    <p>Refresh the page, using same HTTP verb</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_refresh"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    <abbr title="PrestaShop\PSTAF\$this">$this</abbr>
+                </td>
+                <td class="last">
+                    <a href="#method_reload">reload</a>()
+                    <p>Refresh the page, performing a GET</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_reload"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_sleep">sleep</a>($seconds)
+                    <p>Convenience method to wait a bit and keep chaining methods.</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_sleep"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_clearCookies">clearCookies</a>()
+                    <p>Clears the browser's cookies.</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_clearCookies"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_executeScript">executeScript</a>($script, array $args = array())
+                    <p>Executes javascript code in the context of the current page.</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_executeScript"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_acceptAlert">acceptAlert</a>()
+                    <p>
+</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_acceptAlert"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_takeScreenshot">takeScreenshot</a>($save_as = null)
+                    <p>Takes a screenshot, saves it to the "save_as" path.</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_takeScreenshot"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_curl">curl</a>($url = null, $options = array())
+                    <p>Executes a curl request with the same cookies as the browser.</p>
+                </td>
+                <td><small>from&nbsp;<a href="../../PrestaShop/PSTAF/Browser.html#method_curl"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_ensureStandardSuccessMessageDisplayed">ensureStandardSuccessMessageDisplayed</a>($error_explanation = null)
+                    <p>
+</p>
+                </td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_ensureStandardErrorMessageNotDisplayed">ensureStandardErrorMessageNotDisplayed</a>($error_explanation = null)
+                    <p>
+</p>
+                </td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_prestaShopSwitch">prestaShopSwitch</a>($idWithoutHash, $yesno)
+                    <p>Check or uncheck a PrestaShop classical switch</p>
+                </td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type">
+                    
+                </td>
+                <td class="last">
+                    <a href="#method_prestaShopSwitchValue">prestaShopSwitchValue</a>($idWithoutHash)
+                    <p>
+</p>
+                </td>
+                <td></td>
+            </tr>
+            </table>
+
+
+        <h2>Details</h2>
+
+                        <h3 id="method___construct">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method___construct"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 20</div>
+        <code>            public            
+    <strong>__construct</strong>($seleniumSettings)</code>
+    </h3>
+    <div class="details">
+        <p>
+</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$seleniumSettings</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method___destruct">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method___destruct"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 37</div>
+        <code>            public            
+    <strong>__destruct</strong>()</code>
+    </h3>
+    <div class="details">
+        <p>
+</p>
+        <p>
+</p>
+        <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_recordScreenshots">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_recordScreenshots"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 44</div>
+        <code>            public            
+    <strong>recordScreenshots</strong>($dir)</code>
+    </h3>
+    <div class="details">
+        <p>
+</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$dir</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_autoScreenshot">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_autoScreenshot"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 60</div>
+        <code>            public            
+    <strong>autoScreenshot</strong>($yes = true)</code>
+    </h3>
+    <div class="details">
+        <p>Call with 'false' to disa le autoScreenshotting temporarily, with 'true' to reenable it, and with null or anything else to take a screenshot without enabling/disabling them</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$yes</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_quit">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_quit"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 76</div>
+        <code>            public            
+    <strong>quit</strong>()</code>
+    </h3>
+    <div class="details">
+        <p>
+</p>
+        <p>
+</p>
+        <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_doThenComeBack">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_doThenComeBack"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 90</div>
+        <code>            public            
+    <strong>doThenComeBack</strong>(callable $callback)</code>
+    </h3>
+    <div class="details">
+        <p>Utility function: do something with the browser, and then reload the current URL.</p>
+        <p>This is useful if you need to grab an info from another
+page while not wanting to interrupt your current browsing
+flow.
+The function will return the value of your callback.</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td>callable</td>
+                <td>$callback</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_waitForUserInput">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_waitForUserInput"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 104</div>
+        <code>            public            
+    <strong>waitForUserInput</strong>()</code>
+    </h3>
+    <div class="details">
+        <p>Wait for user input - useful when debugging.</p>
+        <p>
+</p>
+        <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_visit">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_visit"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 117</div>
+        <code>            public            
+    <strong>visit</strong>($url, array $basic_auth = null)</code>
+    </h3>
+    <div class="details">
+        <p>Visit a URL.</p>
+        <p>The optional basic_auth array contains user and pass keys,
+they will be injected into the URL if the array is provided.</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$url</td>
+                <td>
+</td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$basic_auth</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_getPageSource">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_getPageSource"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 132</div>
+        <code>            public            
+    <strong>getPageSource</strong>()</code>
+    </h3>
+    <div class="details">
+        <p>Gets the source code of the page.</p>
+        <p>
+</p>
+        <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_getAttribute">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_getAttribute"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 140</div>
+        <code>            public            
+    <strong>getAttribute</strong>($selector, $attribute)</code>
+    </h3>
+    <div class="details">
+        <p>Gets the value of an attribute for a given selector.</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$selector</td>
+                <td>
+</td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$attribute</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_getValue">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_getValue"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 153</div>
+        <code>            public            
+    <strong>getValue</strong>($selector)</code>
+    </h3>
+    <div class="details">
+        <p>Gets the value of an input for the given selector.</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$selector</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_getText">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_getText"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 161</div>
+        <code>            public            
+    <strong>getText</strong>($selector)</code>
+    </h3>
+    <div class="details">
+        <p>Gets the VISIBLE text for a given selector.</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$selector</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_find">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_find"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 187</div>
+        <code>            public            <abbr title="PrestaShop\PSTAF\native">native</abbr>
+    <strong>find</strong>($selector, $options = array())</code>
+    </h3>
+    <div class="details">
+        <p>Find element(s).</p>
+        <p>Selectors are interpreted as CSS by default,
+example: ".main ul li"</p>
+
+<p>To use an xpath selector, prefix it with {xpath},
+for instance "{xpath}}//div".</p>
+
+<p>The options you can provide are:
+- unique: boolean, defaults to true - whether or not the element you're looking for is unique
+- wait: boolean, defaults to true - wait for the element to show up if it is not immediately there</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$selector</td>
+                <td>
+</td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$options</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table>
+        <tr>
+            <td><abbr title="PrestaShop\PSTAF\native">native</abbr></td>
+            <td>\RemoteWebDriverElement or elements</td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_all">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_all"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 221</div>
+        <code>            public            
+    <strong>all</strong>($selector)</code>
+    </h3>
+    <div class="details">
+        <p>Find all elements matching the selector.</p>
+        <p>This is a shortcut for find($selector, ['unique' => false]);</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$selector</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_count">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_count"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 229</div>
+        <code>            public            
+    <strong>count</strong>($selector)</code>
+    </h3>
+    <div class="details">
+        <p>Count elements matching a selector.</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$selector</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_ensureElementIsOnPage">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_ensureElementIsOnPage"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 239</div>
+        <code>            public            
+    <strong>ensureElementIsOnPage</strong>($selector, $exception = null)</code>
+    </h3>
+    <div class="details">
+        <p>
+</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$selector</td>
+                <td>
+</td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$exception</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_click">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_click"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 260</div>
+        <code>            public            
+    <strong>click</strong>($selector)</code>
+    </h3>
+    <div class="details">
+        <p>Clicks an element by selector.</p>
+        <p>Waits a bit if it is not there.</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$selector</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_hover">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_hover"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 276</div>
+        <code>            public            
+    <strong>hover</strong>($selector)</code>
+    </h3>
+    <div class="details">
+        <p>Emulates a mouseover action.</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$selector</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_clickButtonNamed">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_clickButtonNamed"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 294</div>
+        <code>            public            
+    <strong>clickButtonNamed</strong>($name)</code>
+    </h3>
+    <div class="details">
+        <p>Clicks the first enabled button with the given name.</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$name</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_clickLabelFor">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_clickLabelFor"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 318</div>
+        <code>            public            
+    <strong>clickLabelFor</strong>($for)</code>
+    </h3>
+    <div class="details">
+        <p>Clicks the label that has the given "for" attribute.</p>
+        <p>It is often more robust to click labels instead of
+checkboxes, so this convenience method is provided.</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$for</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_fillIn">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_fillIn"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 336</div>
+        <code>            public            
+    <strong>fillIn</strong>($selector, $value)</code>
+    </h3>
+    <div class="details">
+        <p>Fills in an input with the given value.</p>
+        <p>Will wait a bit for the element to show up
+if it is not immediately available.</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$selector</td>
+                <td>
+</td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$value</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_setElementValue">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_setElementValue"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 355</div>
+        <code>            public            
+    <strong>setElementValue</strong>($element, $value)</code>
+    </h3>
+    <div class="details">
+        <p>Convenience method to fill in the value of an input if we got the element as a native remote element.</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$element</td>
+                <td>
+</td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$value</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_setFile">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_setFile"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 375</div>
+        <code>            public            
+    <strong>setFile</strong>($selector, $path)</code>
+    </h3>
+    <div class="details">
+        <p>Helper method to set the file for a file input.</p>
+        <p>This takes care of making it visible if it is not.
+This strange behaviour is needed to allow file upload
+with widgets that mask the original input.</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$selector</td>
+                <td>
+</td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$path</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_sendKeys">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_sendKeys"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 399</div>
+        <code>            public            
+    <strong>sendKeys</strong>($keys)</code>
+    </h3>
+    <div class="details">
+        <p>Simulates keypresses.</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$keys</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_select">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_select"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 409</div>
+        <code>            public            
+    <strong>select</strong>($selector, $value)</code>
+    </h3>
+    <div class="details">
+        <p>Select by value in a select.</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$selector</td>
+                <td>
+</td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$value</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_multiSelect">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_multiSelect"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 431</div>
+        <code>            public            
+    <strong>multiSelect</strong>($selector, $options)</code>
+    </h3>
+    <div class="details">
+        <p>Select by value in a multiple select.</p>
+        <p>Options is an array of values.</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$selector</td>
+                <td>
+</td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$options</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_getSelectOptions">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_getSelectOptions"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 472</div>
+        <code>            public            
+    <strong>getSelectOptions</strong>($selector)</code>
+    </h3>
+    <div class="details">
+        <p>Get Select Options as associative array</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$selector</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_jqcSelect">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_jqcSelect"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 497</div>
+        <code>            public            
+    <strong>jqcSelect</strong>($selector, $value)</code>
+    </h3>
+    <div class="details">
+        <p>Select by value in a JQuery chosen select.</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$selector</td>
+                <td>
+</td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$value</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_checkbox">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_checkbox"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 574</div>
+        <code>            public            
+    <strong>checkbox</strong>($selector, $on_off)</code>
+    </h3>
+    <div class="details">
+        <p>Check or uncheck a checkbox</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$selector</td>
+                <td>
+</td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$on_off</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_waitFor">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_waitFor"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 591</div>
+        <code>            public            
+    <strong>waitFor</strong>($selector, $timeout_in_second = null, $interval_in_millisecond = null)</code>
+    </h3>
+    <div class="details">
+        <p>Wait for element to appear</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$selector</td>
+                <td>
+</td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$timeout_in_second</td>
+                <td>
+</td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$interval_in_millisecond</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_ensureElementShowsUpOnPage">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_ensureElementShowsUpOnPage"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 614</div>
+        <code>            public            
+    <strong>ensureElementShowsUpOnPage</strong>($selector, $timeout_in_second = null, $interval_in_millisecond = null)</code>
+    </h3>
+    <div class="details">
+        <p>
+</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$selector</td>
+                <td>
+</td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$timeout_in_second</td>
+                <td>
+</td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$interval_in_millisecond</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_getCurrentURL">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_getCurrentURL"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 624</div>
+        <code>            public            
+    <strong>getCurrentURL</strong>()</code>
+    </h3>
+    <div class="details">
+        <p>Return the current URL</p>
+        <p>
+</p>
+        <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_getURLParameter">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_getURLParameter"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 632</div>
+        <code>            public            
+    <strong>getURLParameter</strong>($param)</code>
+    </h3>
+    <div class="details">
+        <p>Return a parameter from the current URL</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$param</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_refresh">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_refresh"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 643</div>
+        <code>            public            <abbr title="PrestaShop\PSTAF\$this">$this</abbr>
+    <strong>refresh</strong>()</code>
+    </h3>
+    <div class="details">
+        <p>Refresh the page, using same HTTP verb</p>
+        <p>
+</p>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table>
+        <tr>
+            <td><abbr title="PrestaShop\PSTAF\$this">$this</abbr></td>
+            <td>
+</td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_reload">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_reload"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 654</div>
+        <code>            public            <abbr title="PrestaShop\PSTAF\$this">$this</abbr>
+    <strong>reload</strong>()</code>
+    </h3>
+    <div class="details">
+        <p>Refresh the page, performing a GET</p>
+        <p>
+</p>
+        <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table>
+        <tr>
+            <td><abbr title="PrestaShop\PSTAF\$this">$this</abbr></td>
+            <td>
+</td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_sleep">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_sleep"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 664</div>
+        <code>            public            
+    <strong>sleep</strong>($seconds)</code>
+    </h3>
+    <div class="details">
+        <p>Convenience method to wait a bit and keep chaining methods.</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$seconds</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_clearCookies">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_clearCookies"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 674</div>
+        <code>            public            
+    <strong>clearCookies</strong>()</code>
+    </h3>
+    <div class="details">
+        <p>Clears the browser's cookies.</p>
+        <p>
+</p>
+        <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_executeScript">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_executeScript"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 686</div>
+        <code>            public            
+    <strong>executeScript</strong>($script, array $args = array())</code>
+    </h3>
+    <div class="details">
+        <p>Executes javascript code in the context of the current page.</p>
+        <p>When executing a function, arguments can be provided as an associative
+array in the $args argument.</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$script</td>
+                <td>
+</td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$args</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_acceptAlert">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_acceptAlert"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 695</div>
+        <code>            public            
+    <strong>acceptAlert</strong>()</code>
+    </h3>
+    <div class="details">
+        <p>
+</p>
+        <p>
+</p>
+        <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_takeScreenshot">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_takeScreenshot"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 710</div>
+        <code>            public            
+    <strong>takeScreenshot</strong>($save_as = null)</code>
+    </h3>
+    <div class="details">
+        <p>Takes a screenshot, saves it to the "save_as" path.</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$save_as</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_curl">
+        <div class="location">in <a href="../../PrestaShop/PSTAF/Browser.html#method_curl"><abbr title="PrestaShop\PSTAF\Browser">Browser</abbr></a> at line 721</div>
+        <code>            public            
+    <strong>curl</strong>($url = null, $options = array())</code>
+    </h3>
+    <div class="details">
+        <p>Executes a curl request with the same cookies as the browser.</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$url</td>
+                <td>
+</td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$options</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_ensureStandardSuccessMessageDisplayed">
+        <div class="location">at line 7</div>
+        <code>            public            
+    <strong>ensureStandardSuccessMessageDisplayed</strong>($error_explanation = null)</code>
+    </h3>
+    <div class="details">
+        <p>
+</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$error_explanation</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_ensureStandardErrorMessageNotDisplayed">
+        <div class="location">at line 24</div>
+        <code>            public            
+    <strong>ensureStandardErrorMessageNotDisplayed</strong>($error_explanation = null)</code>
+    </h3>
+    <div class="details">
+        <p>
+</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$error_explanation</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_prestaShopSwitch">
+        <div class="location">at line 42</div>
+        <code>            public            
+    <strong>prestaShopSwitch</strong>($idWithoutHash, $yesno)</code>
+    </h3>
+    <div class="details">
+        <p>Check or uncheck a PrestaShop classical switch</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$idWithoutHash</td>
+                <td>
+</td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$yesno</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+                <h3 id="method_prestaShopSwitchValue">
+        <div class="location">at line 55</div>
+        <code>            public            
+    <strong>prestaShopSwitchValue</strong>($idWithoutHash)</code>
+    </h3>
+    <div class="details">
+        <p>
+</p>
+        <p>
+</p>
+        <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table>
+                    <tr>
+                <td></td>
+                <td>$idWithoutHash</td>
+                <td>
+</td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+    
+            </div>
+            <div id="footer">
+        Generated by <a href="http://sami.sensiolabs.org/" target="_top">Sami, the API Documentation Generator</a>.
+    </div>
+    </body>
+</html>
