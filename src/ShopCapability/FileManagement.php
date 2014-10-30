@@ -25,6 +25,7 @@ class FileManagement extends ShopCapability
             '#^/?cache/sandbox/.#',
             '#^/?cache/tcpdf/.#',
             '#^/?\.git/#',
+            '#^/?\.gitignore$#',
             '#^/?pstaf\.#',
             '#^/?selenium\.pid$#',
             '#^/?selenium\.log$#'
