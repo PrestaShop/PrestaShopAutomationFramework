@@ -84,13 +84,13 @@ Your tests should extend one of these classes. Which one?
 This would depends on your goals, read on!
 
 ## PrestaShop\PSTAF\TestCase\TestCase
-Inside of a `PrestaShop\PSTAF\TestCase\TestCase` you get a new `Shop` instance before each test method. A new `Shop` instance means that behind the scenes, a new PrestaShop installation, with a new database, will be performed. 
+Inside of a `PrestaShop\PSTAF\TestCase\TestCase` you get a new `Shop` instance before each test method. A new `Shop` instance means that behind the scenes a new PrestaShop installation with a new database will be performed. 
 
 This is useful if your test methods alter the state of the shop in a significant and mutually incompatible manner.
 
 It also helps make results consistent. Say in `testA` you create a Cart Rule and for some reason `testA` fails to remove it after its execution. Now imagine `testB` tries to check the price of a product in a shopping cart. If the Cart Rule is still there, `testB` may fail - but this is a false negative.
 
-By using a `TestCase` as base class, you can be certain that at the time when testB is called, `$this->shop` will point to a brand new shop, with not created cart rules.
+By using a `TestCase` as base class, you can be certain that at the time when testB is called, `$this->shop` will point to a brand new shop, with no created cart rules.
 
 ##  PrestaShop\PSTAF\TestCase\LazyTestCase
 A `PrestaShop\PSTAF\TestCase\LazyTestCase` extends `PrestaShop\PSTAF\TestCase\TestCase`.
