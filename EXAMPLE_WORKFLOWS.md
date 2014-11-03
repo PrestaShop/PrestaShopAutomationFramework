@@ -1,8 +1,5 @@
 Example Workflows
 =================
-
-**This documentation file is a work in progress, don't pay too much attention to it :)**
-
 We try our best to make PrestaShopAutomationFramework something that can help you in your day to day PrestaShop projects.
 
 This document describes a few ways to get productive with PrestaShopAutomationFramework.
