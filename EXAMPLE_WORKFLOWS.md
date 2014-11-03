@@ -10,7 +10,7 @@ This document describes a few ways to get productive with PrestaShopAutomationFr
 # Tests First Development
 
 Call it Behaviour Driven Development, Test Driven Development, Acceptance Driven Development... what matters is, when you write tests before writing code:
-- you reduce the chance of your code being broken (by yourself, someone else, or yourself in 3 months) by *A LOT*
+- you reduce the chances of your code being broken (by yourself, someone else, or yourself in 3 months) by *A LOT*
 - you are sure your code does what it was supposed to do
 - you are sure **you** know what your code is supposed to do
 
@@ -34,8 +34,10 @@ Path to web root (default = ..): # well this is just /var/www, which is right ab
 See if it works (this should connect to the Back-Office and make a few basic checks):
 ```bash
 pstaf selenium:start
-pstaf test:run BackOfficeNavigation #just a quick non-destructive test to see if all is working
+pstaf test:run BackOfficeNavigation -I #just a quick non-destructive test to see if all is working
 ```
+
+Note: the `-I` option above stands for "inplace", it means the shop will not be duplicated before running the test. This is generally OK if the tests are non-destructive.
 
 ## Write a Test Case Stub
 Now that we're ready to get to work, the first thing to do is to write the test. We're going to test a very simple module called `NoteToSelf`, so lets name the test file `NoteToSelfTest.php`.
@@ -58,7 +60,7 @@ Finished 1 tests in 0 minutes and 3 seconds.
 .
 ```
 
-Ok, looks good!
+Ok, looks good! But of course it should pass, since we're not testing anything yet.
 
 ## Develop Something Interesting and Test It
 In this example, we're going to create a very simple module that lets customers leave notes for themselves on product sheets.
