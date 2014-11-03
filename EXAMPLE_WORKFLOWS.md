@@ -119,7 +119,7 @@ Good, the module hook is configured properly!
 
 ### Third & fourth tests: are notes successfully stored?
 
-After the previous test, we're already on a page where we're supposed to be able to write notes. So this next test will not need to go to the product sheet and can directly try things out!
+After the previous test, we're already on a page where we're supposed to be able to write notes. So this next test will not need to navigate to the product sheet and can directly try things out!
 
 ```php
 public function testNotesAreSuccessfullyStored()
@@ -154,3 +154,112 @@ pstaf test:run NoteToSelfTest.php -I
 Finished 4 tests in 0 minutes and 27 seconds.
 ....
 ```
+
+### Fifth test: are my notes kept if I register after having written something?
+
+Up until now, we only handled the case of a visitor that doesn't have an account (a guest).
+
+If a guest has written notes and then registers, we'd like their notes to be kept!
+
+To test this, we're going to create a new customer account and then check that the note we just created is still here:
+
+```php
+public function testNotesSurviveAccountCreation()
+{
+    // Store the URL of the product sheet we're on
+    $url = $this->browser->getCurrentURL();
+    
+    // Create a new customer (you can of course pass options, but we're just
+    // gonna go with the defaults here)
+    $this->shop->getRegistrationManager()->registerCustomer();
+    
+    // Come back to the product sheet
+    $this->browser->visit($url);
+    
+    // Check that the notes are still here!
+    $this->assertEquals(
+        'Selenium thinks this product is nice.',
+        $this->browser->getValue('#notetoself-notes')
+    );
+}
+```
+
+**Important note:** this time, we're creating a test that is not repeatable because it changes the state of the shop too much: we can't run the same test twice because we cannot create the same customer twice on the same shop and `registerCustomer()`, called without options, will always register Mrs Carrie Murray.
+
+So, to be able to run the test several times (during development, it is often necessary to repeat the tests many times), we're just going to first save the database:
+
+```bash
+pstaf db:dump
+```
+
+Then load it before running the test:
+```bash
+pstaf db:load && pstaf test:run NoteToSelfTest.php -I
+#...
+Finished 5 tests in 0 minutes and 30 seconds.
+.....
+```
+
+With `db:dump` and `db:load` it is easy to save and restore the state of the database, which allows running destructive tests in place with little overhead.
+
+If you need to save different states of the shop, `db:dump` and `db:load` both accept an optional argument that tells it which filename to use for the SQL dump.
+
+Here is the full test case so far:
+```php
+class NoteToSelfTest extends \PrestaShop\PSTAF\TestCase\LazyTestCase
+{
+    public function testOurModuleIsFoundByPrestaShop()
+    {
+        $this->shop->getBackOfficeNavigator()
+        ->login()
+        ->visit('AdminModules');
+
+        $this->browser->fillIn('#moduleQuicksearch', 'notetoself');
+        $this->browser->waitFor('#anchorNotetoself', 5);
+    }
+
+    public function testProductSheetHookIsWorking()
+    {
+        $this->shop->getFrontOfficeNavigator()
+        ->visitHome();
+
+        // go to any product sheet, we don't care which one
+        $this->browser
+        ->click('a.product_img_link')
+        // check that our container show up
+        ->waitFor('#notetoself', 5);
+    }
+
+    public function testNotesAreSuccessfullyStored()
+    {
+        $this->browser
+        ->fillIn('#notetoself-notes', 'Selenium thinks this product is nice.')
+        ->waitFor('#notetoself-status .success');
+    }
+
+    public function testNotesSurvivePageRefresh()
+    {
+        $this->assertEquals(
+            'Selenium thinks this product is nice.',
+            $this->browser->reload()->getValue('#notetoself-notes')
+        );
+    }
+
+    public function testNotesSurviveAccountCreation()
+    {
+        $url = $this->browser->getCurrentURL();
+
+
+        $this->shop->getRegistrationManager()->registerCustomer();
+        
+        $this->browser->visit($url);
+        
+        $this->assertEquals(
+            'Selenium thinks this product is nice.',
+            $this->browser->getValue('#notetoself-notes')
+        );
+    }
+}
+```
+
+Next time, we'll see how to automate the installation of the module so that the test can be included in a standard test suite and ran as part of the PrestaShop QA process.
