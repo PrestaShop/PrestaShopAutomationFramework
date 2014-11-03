@@ -91,7 +91,7 @@ class OptionProvider
                 'default'       => [
                     'day' => 29,
                     'month' => 2,
-                    'year' => 1990
+                    'year' => 1988
                 ]
             ],
             'newsletter' => [
