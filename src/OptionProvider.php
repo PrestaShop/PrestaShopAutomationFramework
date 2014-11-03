@@ -10,7 +10,7 @@ class OptionProvider
     private static $optionClasses = [
         'ShopInstallation' => [
             'language'              => [
-                'description' => 'Installation language',
+                'description'   => 'Installation language',
                 'short'         => 'l',
                 'default'       => 'en'
             ],
@@ -69,6 +69,36 @@ class OptionProvider
             ],
             'customer_password'     => [
                 'default'       => '123456789'
+            ]
+        ],
+        'CustomerRegistration'  => [
+            'customer_email'        => [
+                'default'       =>  'carrie.m@example.com'
+            ],
+            'customer_password' => [
+                'default'       =>  'abcdef1234'
+            ],
+            'customer_firstname' => [
+                'default'       =>  'Carrie'
+            ],
+            'customer_lastname' => [
+                'default'       =>  'Murray'
+            ],
+            'customer_gender'   => [
+                'default'       => 'female'
+            ],
+            'customer_birthdate'   => [
+                'default'       => [
+                    'day' => 29,
+                    'month' => 2,
+                    'year' => 1990
+                ]
+            ],
+            'newsletter' => [
+                'default' => true
+            ],
+            'partners' => [
+                'default' => true
             ]
         ]
     ];

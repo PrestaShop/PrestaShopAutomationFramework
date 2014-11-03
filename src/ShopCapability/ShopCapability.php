@@ -14,7 +14,10 @@ abstract class ShopCapability
     /**
 	* Called immediately after construction, do your initializations here.
 	*/
-    public function setup() {}
+    public function setup()
+    {
+        
+    }
 
     public function getShop()
     {

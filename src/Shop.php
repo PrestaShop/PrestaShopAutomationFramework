@@ -125,6 +125,7 @@ class Shop
         $this->addShopCapability('\PrestaShop\PSTAF\ShopCapability\CheckoutManagement'      , 'getCheckoutManager'      );
         $this->addShopCapability('\PrestaShop\PSTAF\ShopCapability\OrderManagement'         , 'getOrderManager'         );
         $this->addShopCapability('\PrestaShop\PSTAF\ShopCapability\CategoryManagement'      , 'getCategoryManager'      );
+        $this->addShopCapability('\PrestaShop\PSTAF\ShopCapability\Registration'            , 'getRegistrationManager'  );
     }
 
     public function setOptionProvider(OptionProvider $optionProvider)
