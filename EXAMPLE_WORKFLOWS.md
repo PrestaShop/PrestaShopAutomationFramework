@@ -4,6 +4,22 @@ We try our best to make PrestaShopAutomationFramework something that can help yo
 
 This document describes a few ways to get productive with PrestaShopAutomationFramework.
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Example Workflows](#example-workflows)
+- [Tests First Development](#tests-first-development)
+  - [Setup PSTAF to work with your current project](#setup-pstaf-to-work-with-your-current-project)
+  - [Write a Test Case Stub](#write-a-test-case-stub)
+  - [Develop Something Interesting and Test It](#develop-something-interesting-and-test-it)
+    - [First test: is my module available in the BackOffice?](#first-test-is-my-module-available-in-the-backoffice)
+    - [Second test: does my module display something on the product sheets in Front-Office?](#second-test-does-my-module-display-something-on-the-product-sheets-in-front-office)
+    - [Third & fourth tests: are notes successfully stored?](#third-&-fourth-tests-are-notes-successfully-stored)
+    - [Fifth test: are my notes kept if I register after having written something?](#fifth-test-are-my-notes-kept-if-i-register-after-having-written-something)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Tests First Development
 
 Call it Behaviour Driven Development, Test Driven Development, Acceptance Driven Development... what matters is, when you write tests before writing code:
