@@ -8,7 +8,6 @@ This document describes a few ways to get productive with PrestaShopAutomationFr
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Example Workflows](#example-workflows)
 - [Tests First Development](#tests-first-development)
   - [Setup PSTAF to work with your current project](#setup-pstaf-to-work-with-your-current-project)
   - [Write a Test Case Stub](#write-a-test-case-stub)
