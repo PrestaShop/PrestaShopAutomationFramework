@@ -38,11 +38,11 @@ pstaf test:run BackOfficeNavigation #just a quick non-destructive test to see if
 ```
 
 ## Write a Test Case Stub
-Now that we're ready to get to work, the first thing to do is to write the test.
+Now that we're ready to get to work, the first thing to do is to write the test. We're going to test a very simple module called `NoteToSelf`, so lets name the test file `NoteToSelfTest.php`.
 
-Create a file `MyTest.php` in your `PrestaShop` folder, containing:
+Create a file `NoteToSelfTest.php` in your `PrestaShop` folder, containing:
 ```php
-class MyTest extends \PrestaShop\PSTAF\TestCase\LazyTestCase
+class NoteToSelfTest extends \PrestaShop\PSTAF\TestCase\LazyTestCase
 {
     public function testNothing()
     {
@@ -53,8 +53,7 @@ class MyTest extends \PrestaShop\PSTAF\TestCase\LazyTestCase
 
 Run your test to see if it works:
 ```bash
-pstaf test:run MyTest.php
-
+pstaf test:run NoteToSelfTest.php -I
 Finished 1 tests in 0 minutes and 3 seconds.
 .
 ```
@@ -68,7 +67,7 @@ The code for this simple demonstration module is [available on GitHub](https://g
 
 ### First test: is my module available in the BackOffice?
 To know this, well, easy, log in to the back office, write the name of the module in the search box, see if it shows up.
-Here is the code for this test (this is a method inside the `MyTest` class defined above):
+Here is the code for this test (this is a method inside the `NoteToSelfTest` class defined above):
 
 ```php
 public function testOurModuleIsFoundByPrestaShop()
@@ -83,7 +82,7 @@ public function testOurModuleIsFoundByPrestaShop()
 ```
 
 ```bash
-pstaf test:run MyTest.php
+pstaf test:run NoteToSelfTest.php -I
 Finished 1 tests in 0 minutes and 12 seconds.
 .
 ```
@@ -107,4 +106,49 @@ public function testProductSheetHookIsWorking()
 }
 ```
 
+Again, run the test:
+```bash
+pstaf test:run NoteToSelfTest.php -I
+Finished 2 tests in 0 minutes and 33 seconds.
+..
+```
 
+Good, the module hook is configured properly!
+
+### Third & fourth tests: are notes successfully stored?
+
+After the previous test, we're already on a page where we're supposed to be able to write notes. So this next test will not need to go to the product sheet and can directly try things out!
+
+```php
+public function testNotesAreSuccessfullyStored()
+{
+    $this->browser
+    ->fillIn('#notetoself-notes', 'Selenium thinks this product is nice.')
+    ->waitFor('#notetoself-status .success');
+}
+```
+
+Looks good:
+```bash
+pstaf test:run NoteToSelfTest.php -I
+Finished 3 tests in 0 minutes and 35 seconds.
+...
+```
+
+But do notes survive a page refresh?
+```php
+public function testNotesSurvivePageRefresh()
+{
+    $this->assertEquals(
+        'Selenium thinks this product is nice.',
+        $this->browser->reload()->getValue('#notetoself-notes')
+    );
+}
+```
+
+Seems they do!
+```bash
+pstaf test:run NoteToSelfTest.php -I
+Finished 4 tests in 0 minutes and 27 seconds.
+....
+```
