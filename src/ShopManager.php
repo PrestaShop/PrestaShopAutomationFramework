@@ -21,6 +21,9 @@ class ShopManager
         $this->configuration_file_path = $configuration_file_path;
         $this->configuration = $this->getNewConfiguration();
         $this->optionProvider = new OptionProvider();
+        $this->optionProvider->setDefaultValues(
+            $this->configuration->get('shop.default_options')
+        );
     }
 
     public static function getInstance($configuration_file_path = null)

@@ -103,6 +103,8 @@ class OptionProvider
         ]
     ];
 
+    private $defaultValues;
+
     public static function getOptions($type)
     {
         if (!isset(self::$optionClasses[$type])) {
@@ -129,9 +131,24 @@ class OptionProvider
         return $options;        
     }
 
+    public function setDefaultValues(array $values = null)
+    {
+        $this->defaultValues = $values;
+    }
+
     public function getDefaults($type)
     {
-        return static::getOptions($type);
+        $defaults = static::getOptions($type);
+
+        foreach ($defaults as $key => $data) {
+            if ($this->defaultValues && array_key_exists($type, $this->defaultValues)) {
+                if (array_key_exists($key, $this->defaultValues[$type])) {
+                    $defaults[$key]['default'] = $this->defaultValues[$type][$key];
+                }
+            }
+        }
+
+        return $defaults;
     }
 
     public function getValues($type, $input)
