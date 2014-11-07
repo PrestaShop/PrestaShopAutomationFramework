@@ -53,12 +53,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/brianium/paratest.git",
-                "reference": "ac2a093b54f89cd7f5848f27108e0c3986ca217a"
+                "reference": "069a61e7a72d62aa0ef9ef9263d3159cb68860d4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/brianium/paratest/zipball/ac2a093b54f89cd7f5848f27108e0c3986ca217a",
-                "reference": "ac2a093b54f89cd7f5848f27108e0c3986ca217a",
+                "url": "https://api.github.com/repos/brianium/paratest/zipball/069a61e7a72d62aa0ef9ef9263d3159cb68860d4",
+                "reference": "069a61e7a72d62aa0ef9ef9263d3159cb68860d4",
                 "shasum": ""
             },
             "require": {
@@ -107,7 +107,7 @@
                 "phpunit",
                 "testing"
             ],
-            "time": "2014-10-24 15:32:03"
+            "time": "2014-11-04 20:44:45"
         },
         {
             "name": "djfm/process",
@@ -131,7 +131,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/djfm/ptest",
-                "reference": "42f2fd0c83cf5c965a958e24c0b869a70032187a"
+                "reference": "930e80ad0d6fcd4f0897188c63b7108a3b5d4dbf"
             },
             "require": {
                 "symfony/console": "*"
@@ -145,7 +145,7 @@
                     "PrestaShop\\Ptest\\": "src/"
                 }
             },
-            "time": "2014-10-28 10:10:03"
+            "time": "2014-11-07 13:14:45"
         },
         {
             "name": "facebook/webdriver",
@@ -153,12 +153,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/facebook/php-webdriver.git",
-                "reference": "fab0b484142430f4f598baef45680f945a60eb4f"
+                "reference": "bbcb697efb394d17bd9ec3d467e7da847cde4509"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/facebook/php-webdriver/zipball/fab0b484142430f4f598baef45680f945a60eb4f",
-                "reference": "fab0b484142430f4f598baef45680f945a60eb4f",
+                "url": "https://api.github.com/repos/facebook/php-webdriver/zipball/bbcb697efb394d17bd9ec3d467e7da847cde4509",
+                "reference": "bbcb697efb394d17bd9ec3d467e7da847cde4509",
                 "shasum": ""
             },
             "require": {
@@ -186,7 +186,7 @@
                 "selenium",
                 "webdriver"
             ],
-            "time": "2014-10-28 20:04:04"
+            "time": "2014-11-05 20:53:09"
         },
         {
             "name": "phpunit/php-code-coverage",
