@@ -35,6 +35,15 @@ class UpgradeTest extends TestCase
 
         $om = $this->shop->getOrderManager()->visit($before['id_order']);
         $this->writeArtefact('simple-order-after-upgrade.pdf', $om->getInvoicePDFData());
+
+        $this->shop->getPreferencesManager()->setMaintenanceMode(false);
+
+        $this->browser->clearCookies();
+
+        $scenario = $this->getJSONExample('invoice/simple-order.json');
+        $output = InvoiceTest::runScenario($this->shop, $scenario);
+
+        $this->shop->getTaxManager()->getOrCreateTaxRulesGroupFromString("3.5 + 4.1 + 7");
     }
 
     /**

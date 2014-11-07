@@ -74,4 +74,16 @@ class PreferencesManagement extends ShopCapability
 
         return $this;
     }
+
+    public function setMaintenanceMode($on = true)
+    {
+        $this->getShop()
+        ->getBackOfficeNavigator()
+        ->visit('AdminMaintenance')
+        ->prestaShopSwitch('PS_SHOP_ENABLE', !$on)
+        ->clickButtonNamed('submitOptionsconfiguration')
+        ->ensureStandardSuccessMessageDisplayed();
+
+        return $this;
+    }
 }
