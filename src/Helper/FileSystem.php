@@ -109,6 +109,10 @@ class FileSystem
 
     public static function webRmR($directory, $url)
     {
+        if (!is_dir($directory)) {
+            return;
+        }
+
         $kill_script = <<<'EOS'
 				<?php
 
