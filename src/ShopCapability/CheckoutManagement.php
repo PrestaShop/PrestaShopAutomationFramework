@@ -12,6 +12,9 @@ class CheckoutManagement extends ShopCapability
 	 * options must contain:
 	 * - carrier
 	 * - payment (only bankwire for now)
+     *
+     * options may contain:
+     * - stop_at: 'carrier' => return before choosing a carrier. 
 	 *
 	 * @return array with at least order_id and total_cart set
 	 */
@@ -25,7 +28,13 @@ class CheckoutManagement extends ShopCapability
         ->click('div.shopping_cart a')
         ->click('a.standard-checkout')
         ->clickButtonNamed('processAddress')
-        ->clickLabelFor('cgv')
+        ->clickLabelFor('cgv');
+
+        if (isset($options['stop_at']) && $options['stop_at'] === 'carrier') {
+            return null;
+        }
+
+        $browser
         ->click('{xpath}//tr[contains(., "'.$options['carrier'].'")]//input[@type="radio"]')
         ->clickButtonNamed('processCarrier');
 
