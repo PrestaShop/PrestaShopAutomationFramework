@@ -90,6 +90,20 @@ class ProductManagement extends ShopCapability
             });
         }
 
+        $dimensions = ['width', 'height', 'depth', 'weight'];
+
+        $onShippingTab = false;
+        foreach ($dimensions as $dimension) {
+            if (!empty($options[$dimension])) {
+                if (!$onShippingTab) {
+                    $browser->click('#link-Shipping')->waitFor("#$dimension");
+                    $onShippingTab = true;
+                }
+
+                $browser->fillIn("#$dimension", $options[$dimension]);
+            }
+        }
+
         $browser
         ->click('#link-Prices')
         ->waitFor('#priceTE');
