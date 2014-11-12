@@ -103,6 +103,9 @@ class ProductManagement extends ShopCapability
                 $browser->fillIn("#$dimension", $options[$dimension]);
             }
         }
+        if ($onShippingTab) {
+            $this->saveProduct();
+        }
 
         $browser
         ->click('#link-Prices')
