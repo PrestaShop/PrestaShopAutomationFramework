@@ -18,7 +18,8 @@ class BackOfficeNavigation extends ShopCapability
             'AdminProducts' => ['object_name' => 'product'],
             'AdminCarriers' => ['object_name' => 'carrier'],
             'AdminOrders' => ['object_name' => 'order'],
-            'AdminCartRules' => ['object_name' => 'cart_rule']
+            'AdminCartRules' => ['object_name' => 'cart_rule'],
+            'AdminCarriers' => ['object_name' => 'carrier']
         ];
     }
 
@@ -44,6 +45,16 @@ class BackOfficeNavigation extends ShopCapability
         }
 
         return $links;
+    }
+
+    public function deleteEntityById($controller_name, $id)
+    {
+        $url = $this->getCRUDLink($controller_name, 'delete', $id);
+        $this->getBrowser()
+        ->visit($url)
+        ->ensureStandardSuccessMessageDisplayed();
+
+        return $this;
     }
 
     /**
