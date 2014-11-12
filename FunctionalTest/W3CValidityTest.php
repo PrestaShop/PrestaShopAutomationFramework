@@ -44,6 +44,9 @@ class W3CValidityTest extends LazyTestCase
             return false;
 
         $ns = $xml->getNamespaces(true);
+        if (!isset($ns['env']) || !isset($ns['m'])) {
+            return false;
+        }
         $soap = $xml->children($ns['env']);
         $body = $soap->Body;
         $validation = $body->children($ns['m'])->markupvalidationresponse;
