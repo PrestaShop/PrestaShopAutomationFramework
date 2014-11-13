@@ -53,6 +53,17 @@ class UpgradeTest extends TestCase
     {
         $before = $this->beforeUpgrade();
 
+        $sourceFolder = static::getShopManager()
+                        ->getNewConfiguration()
+                        ->getAsAbsolutePath('shop.filesystem_path');
+
+        // If we put an autoupgrade module in the source of the target version, use this one.
+        $autoupgradeSourceFolder = FS::join($sourceFolder, 'modules', 'autoupgrade'); 
+        if (FS::exists($autoupgradeSourceFolder)) {
+            $autoupgradeTargetFolder = FS::join($this->shop->getFilesystemPath(), 'modules', 'autoupgrade');
+            $this->shop->getFileManager()->webCopyShopFiles($autoupgradeSourceFolder,$autoupgradeTargetFolder);
+        }
+
         // Install autoupgrade
         $this->shop
         ->getBackOfficeNavigator()
@@ -66,10 +77,6 @@ class UpgradeTest extends TestCase
             'latest',
             'prestashop'
         );
-
-        $sourceFolder = static::getShopManager()
-                        ->getNewConfiguration()
-                        ->getAsAbsolutePath('shop.filesystem_path');
 
         // copy via a script executed by the browser to go around permissions issues
         $this->shop->getFileManager()->webCopyShopFiles($sourceFolder, $targetFolder);
