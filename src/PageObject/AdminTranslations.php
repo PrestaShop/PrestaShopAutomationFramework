@@ -20,4 +20,35 @@ class AdminTranslations extends PageObject
 
         return $this;
     }
+
+    public function modifyTranslations($type, $template, $language)
+    {
+        $b = $this->getBrowser();
+
+        $b->select('#type', $type);
+
+        if ($template) {
+            $b->select('#theme', $template);
+        } else {
+            $b->select('#theme', "");
+        }
+
+        $b
+        ->click('#language-button')
+        ->click("#translations-languages [data-type=\"$language\"] a")
+        ->click("#modify-translations");
+
+        return $this;
+    }
+
+    public function getModuleEmailSubject($module, $email)
+    {
+        $b = $this->getBrowser();
+
+        $b
+        ->click('a[onclick="$(\'#'.$module.'\').slideToggle();"]')
+        ->click("#$module .panel-title");
+
+        return $b->getValue("#email-$email .label-subject input");
+    }
 }
