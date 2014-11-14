@@ -25,6 +25,8 @@ This is a framework for writing functional tests for PrestaShop.
 
 The tests are written in PHP, and communicate with a browser using Selenium.
 
+Rudimentary API doc here is [on the gh-pages branch](http://prestashop.github.io/PrestaShopAutomationFramework/doc/html/).
+
 # Framework Setup
 
 The Framework should be working on any major platform where PHP runs.
