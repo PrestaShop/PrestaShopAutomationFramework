@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="robots" content="index, follow, all" />
-        <title>PrestaShop\PSTAF\FunctionalTest\UpgradeTest | PrestaShopAutomationFramework API</title>
+        <title>PrestaShop\PSTAF\FunctionalTest\MutExCarriersTest | PrestaShopAutomationFramework API</title>
                     <link rel="stylesheet" type="text/css" href="../../../stylesheet.css">
                             </head>
         <body id="class">
@@ -20,11 +20,11 @@
         <div id="title">PrestaShopAutomationFramework API</div>
 
             <div class="type">Class</div>
-    <h1><a href="../../../PrestaShop/PSTAF/FunctionalTest.html">PrestaShop\PSTAF\FunctionalTest</a>\UpgradeTest</h1>
+    <h1><a href="../../../PrestaShop/PSTAF/FunctionalTest.html">PrestaShop\PSTAF\FunctionalTest</a>\MutExCarriersTest</h1>
     </div>
         <div class="content">
                 <p>    class
-    <strong>UpgradeTest</strong>        extends <a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a></p>
+    <strong>MutExCarriersTest</strong>        extends <a href="../../../PrestaShop/PSTAF/TestCase/LazyTestCase.html"><abbr title="PrestaShop\PSTAF\TestCase\LazyTestCase">LazyTestCase</abbr></a></p>
 
     
     
@@ -107,7 +107,7 @@
                     <p>
 </p>
                 </td>
-                <td><small>from&nbsp;<a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_setUp"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a></small></td>
+                <td><small>from&nbsp;<a href="../../../PrestaShop/PSTAF/TestCase/LazyTestCase.html#method_setUp"><abbr title="PrestaShop\PSTAF\TestCase\LazyTestCase">LazyTestCase</abbr></a></small></td>
             </tr>
                     <tr>
                 <td class="type">
@@ -118,7 +118,7 @@
                     <p>
 </p>
                 </td>
-                <td><small>from&nbsp;<a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_tearDown"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a></small></td>
+                <td><small>from&nbsp;<a href="../../../PrestaShop/PSTAF/TestCase/LazyTestCase.html#method_tearDown"><abbr title="PrestaShop\PSTAF\TestCase\LazyTestCase">LazyTestCase</abbr></a></small></td>
             </tr>
                     <tr>
                 <td class="type">
@@ -221,10 +221,10 @@
             </tr>
                     <tr>
                 <td class="type">
-                    
+                    static&nbsp;
                 </td>
                 <td class="last">
-                    <a href="#method_beforeUpgrade">beforeUpgrade</a>()
+                    <a href="#method_setupBeforeClass">setupBeforeClass</a>()
                     <p>
 </p>
                 </td>
@@ -235,18 +235,7 @@
                     
                 </td>
                 <td class="last">
-                    <a href="#method_afterUpgrade">afterUpgrade</a>($before)
-                    <p>
-</p>
-                </td>
-                <td></td>
-            </tr>
-                    <tr>
-                <td class="type">
-                    
-                </td>
-                <td class="last">
-                    <a href="#method_testUpgrade">testUpgrade</a>()
+                    <a href="#method_testOrderIsSplitIntoPackages">testOrderIsSplitIntoPackages</a>()
                     <p>
 </p>
                 </td>
@@ -360,7 +349,7 @@
     </div>
 
                 <h3 id="method_setUp">
-        <div class="location">in <a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_setUp"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a> at line 128</div>
+        <div class="location">in <a href="../../../PrestaShop/PSTAF/TestCase/LazyTestCase.html#method_setUp"><abbr title="PrestaShop\PSTAF\TestCase\LazyTestCase">LazyTestCase</abbr></a> at line 14</div>
         <code>            public            
     <strong>setUp</strong>()</code>
     </h3>
@@ -377,7 +366,7 @@
     </div>
 
                 <h3 id="method_tearDown">
-        <div class="location">in <a href="../../../PrestaShop/PSTAF/TestCase/TestCase.html#method_tearDown"><abbr title="PrestaShop\PSTAF\TestCase\TestCase">TestCase</abbr></a> at line 143</div>
+        <div class="location">in <a href="../../../PrestaShop/PSTAF/TestCase/LazyTestCase.html#method_tearDown"><abbr title="PrestaShop\PSTAF\TestCase\LazyTestCase">LazyTestCase</abbr></a> at line 20</div>
         <code>            public            
     <strong>tearDown</strong>()</code>
     </h3>
@@ -624,10 +613,10 @@
                     </div>
     </div>
 
-                <h3 id="method_beforeUpgrade">
-        <div class="location">at line 22</div>
-        <code>            public            
-    <strong>beforeUpgrade</strong>()</code>
+                <h3 id="method_setupBeforeClass">
+        <div class="location">at line 9</div>
+        <code>        static    public            
+    <strong>setupBeforeClass</strong>()</code>
     </h3>
     <div class="details">
         <p>
@@ -641,38 +630,10 @@
                     </div>
     </div>
 
-                <h3 id="method_afterUpgrade">
-        <div class="location">at line 32</div>
+                <h3 id="method_testOrderIsSplitIntoPackages">
+        <div class="location">at line 15</div>
         <code>            public            
-    <strong>afterUpgrade</strong>($before)</code>
-    </h3>
-    <div class="details">
-        <p>
-</p>
-        <p>
-</p>
-        <div class="tags">
-                            <h4>Parameters</h4>
-
-                    <table>
-                    <tr>
-                <td></td>
-                <td>$before</td>
-                <td>
-</td>
-            </tr>
-            </table>
-
-            
-            
-            
-                    </div>
-    </div>
-
-                <h3 id="method_testUpgrade">
-        <div class="location">at line 52</div>
-        <code>            public            
-    <strong>testUpgrade</strong>()</code>
+    <strong>testOrderIsSplitIntoPackages</strong>()</code>
     </h3>
     <div class="details">
         <p>
