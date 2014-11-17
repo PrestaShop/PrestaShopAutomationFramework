@@ -102,12 +102,9 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
     {
         if (($shop = self::getShop())) {
             static::getShopManager()->cleanUp($shop);
-            self::set('shop', null);
         }
 
-        if (self::get('browser')) {
-            self::set('browser', null);
-        }
+        unset(self::$staticData[get_called_class()]);
     }
 
     public static function getShop()
