@@ -14,7 +14,7 @@ class ShoppingCartSummary extends PageObject
     {
         $this->getBrowser()
         ->visit($this->getShop()->getFrontOfficeURL())
-        ->click('div.shopping_cart a');
+        ->click('div.shopping_cart > a');
 
         return $this;
     }
