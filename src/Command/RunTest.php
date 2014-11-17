@@ -16,11 +16,11 @@ class RunTest extends Command
     {
         $this->setName('test:run')
         ->setDescription('Runs a test');
-
         $this->addArgument('test_name', InputArgument::OPTIONAL, 'Which test do you want to run?');
         $this->addOption('parallel', 'p', InputOption::VALUE_OPTIONAL, 'Parallelize tests: max number of parallel processes.');
         $this->addOption('runner', 'r', InputOption::VALUE_REQUIRED, 'Test runner to use: phpunit, paratest or ptest.', 'ptest');
         $this->addOption('all', 'a', InputOption::VALUE_NONE, 'Run all available tests.');
+        $this->addOption('domain', 'd', InputOption::VALUE_REQUIRED, 'Specify test domain.', 'FunctionalTest');
         $this->addOption('info', 'i', InputOption::VALUE_NONE, 'Make a dry run: display information but do not perform tests.');
         $this->addOption('filter', 'f', InputOption::VALUE_REQUIRED, 'Filter tests.');
         $this->addOption('data-provider-filter', 'z', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Filter datasets returned by the dataProviders');
@@ -68,7 +68,9 @@ class RunTest extends Command
             return;
         }
 
-        $tests_directory = realpath(FS::join(__DIR__, '..', '..', 'FunctionalTest'));
+        $domain = $input->getOption('domain');
+
+        $tests_directory = realpath(FS::join(__DIR__, '..', '..', $domain));
         if (!$tests_directory) {
             $output->writeln('<error>Couldn\'t find directory containing tests.</error>');
 
