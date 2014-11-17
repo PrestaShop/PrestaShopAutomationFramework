@@ -16,7 +16,9 @@
 		"brianium/paratest": "dev-master",
 		"djfm/ptest": "dev-master",
 		"djfm/process": "dev-master",
-		"sebastian/diff": "*"
+		"sebastian/diff": "*",
+		"symfony/dom-crawler": "3.0.*@dev",
+		"symfony/css-selector": "3.0.*@dev"
 	},
 	"require-dev": {
 		"sami/sami": "*"

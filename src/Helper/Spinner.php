@@ -20,7 +20,7 @@ class Spinner
         $this->error_message = $error_message;
     }
 
-    public function assertBecomesTrue(callable $truthy_returner)
+    public function assertBecomesTrue(callable $truthy_returner, $allowExceptions = true)
     {
         $elapsed = 0;
         while ($elapsed < $this->timeout_in_seconds) {
@@ -28,7 +28,7 @@ class Spinner
                 if (call_user_func($truthy_returner))
                     return true;
             } catch (\Exception $e) {
-                if ($elapsed >= $this->timeout_in_seconds)
+                if ($elapsed >= $this->timeout_in_seconds || !$allowExceptions)
                     throw $e;
             }
             usleep($this->interval_in_milliseconds * 1000);
