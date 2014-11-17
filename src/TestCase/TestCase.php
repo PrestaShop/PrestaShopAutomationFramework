@@ -67,18 +67,11 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 
     private static function newShop()
     {
-        if (!self::get('browser')) {
-            $browser = new Browser([
-                'host' => SeleniumManager::getHost()
-            ]);
-            self::set('browser', $browser);
-        }
-
         $shopManagerOptions = [
             'initial_state' => static::initialState(),
             'temporary' => true,
             'use_cache' => static::$cache_initial_state,
-            'browser' => self::get('browser')
+            'browser' => self::getBrowser()
         ];
 
         $shopManagerOptions = array_merge($shopManagerOptions, static::shopManagerOptions());
@@ -112,8 +105,20 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
         return self::get('shop');
     }
 
+    public static function setShop($shop)
+    {
+        self::set('shop', $shop);
+    }
+
     public static function getBrowser()
     {
+        if (!self::get('browser')) {
+            $browser = new Browser([
+                'host' => SeleniumManager::getHost()
+            ]);
+            self::set('browser', $browser);
+        }
+
         return self::get('browser');
     }
 
@@ -274,7 +279,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
         }
 
         if (!getenv('NO_SCREENSHOTS')) {
-            static::getShop()->getBrowser()->recordScreenshots($screenshotsDir);
+            static::getBrowser()->recordScreenshots($screenshotsDir);
         }
     }
 }
