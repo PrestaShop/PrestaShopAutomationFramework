@@ -147,7 +147,11 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
         $class = explode('\\', get_called_class());
         $class = end($class);
 
-        $path = realpath(__DIR__.'/../../FunctionalTest/'.$class.'/examples/');
+        $group = [];
+        preg_match('#PrestaShop\\\PSTAF\\\(\w+)\\\#', get_called_class(), $group);
+        $group = $group[1];
+
+        $path = realpath(__DIR__.'/../../'.$group.'/'.$class.'/examples/');
 
         if (!$path)
             throw new \PrestaShop\PSTAF\Exception\FailedTestException("No example files found for $class.\nThey should have been in tests-available/$class/examples/.");
@@ -187,10 +191,10 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 
     public function getOutputDir()
     {
-        $class = explode('\\', get_called_class());
-        $class = end($class);
+        $folder = str_replace('\\', '/', get_called_class());
+        $folder = preg_replace('#^PrestaShop/PSTAF/#', '', $folder);
 
-        $dir = 'test-results/'.$class;
+        $dir = FS::join('test-results', $folder);
 
         if (!is_dir($dir)) {
             mkdir($dir, 0777, true);
