@@ -30,8 +30,8 @@ class HomePage extends OnDemandPage
 		}
 
 		
-		$wantedLanguage = strtolower(trim(static::$twoLetterLanguageCodes[$twoLetterCode]));
-		$currentLanguage = strtolower(trim($this->getBrowser()->getText('#menu-language')));
+		$wantedLanguage = mb_strtolower(trim(static::$twoLetterLanguageCodes[$twoLetterCode]), 'UTF-8');
+		$currentLanguage = mb_strtolower(trim($this->getBrowser()->getText('#menu-language')), 'UTF-8');
 
 		// Can't set the language to the current one, so return if we're already OK.
 		if ($currentLanguage === $wantedLanguage) {
@@ -42,9 +42,11 @@ class HomePage extends OnDemandPage
 		->click('#menu-language a.dropdown-toggle')
 		->click('#menu-language [title="'.$twoLetterCode.'"]');
 
-		$currentLanguage = strtolower(trim($this->getBrowser()->getText('#menu-language')));
+		$this->getBrowser()->waitFor('#menu-language');
+
+		$currentLanguage = mb_strtolower(trim($this->getBrowser()->getText('#menu-language')), 'UTF-8');
 		if ($currentLanguage !== $wantedLanguage) {
-			throw new FailedTestException("Language did not change!");
+			throw new FailedTestException("Language did not change, got `$currentLanguage` instead of `$wantedLanguage`!");
 		}
 
 		return $this;

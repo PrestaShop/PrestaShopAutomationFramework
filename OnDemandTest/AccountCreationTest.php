@@ -8,7 +8,7 @@ class AccountCreationTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 {
 	public function newUid()
 	{
-		return time();
+		return microtime(true).'_'.getmypid();
 	}
 
 	public function languageAndCountryPairs()
