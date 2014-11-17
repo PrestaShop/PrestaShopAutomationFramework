@@ -11,3 +11,4 @@ FunctionalTest/WIPTest.php
 bamboo*
 doc/cache
 doc
+*.secrets.json
