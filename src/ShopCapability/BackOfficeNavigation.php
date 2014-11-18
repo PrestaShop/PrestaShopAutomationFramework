@@ -115,6 +115,7 @@ class BackOfficeNavigation extends ShopCapability
         $browser = $this->getShop()->getBrowser();
         $browser
         ->visit($this->getShop()->getBackOfficeURL())
+        ->waitFor('#email', 15) // yeah, takes time sometimes
         ->fillIn('#email', $options['admin_email'])
         ->fillIn('#passwd', $options['admin_password'])
         ->checkbox('#stay_logged_in', $options['stay_logged_in'])
