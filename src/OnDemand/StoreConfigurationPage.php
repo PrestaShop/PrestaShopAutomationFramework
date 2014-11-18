@@ -21,7 +21,7 @@ class StoreConfigurationPage extends OnDemandPage
 
 
 		if (!isset(static::$countryIds[$name])) {
-			throw new InvalidParameterException();
+			throw new InvalidParameterException("Unknown country `$name`.");
 		}
 
 		$this->getBrowser()

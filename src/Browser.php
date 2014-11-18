@@ -424,6 +424,20 @@ class Browser
         return $this;
     }
 
+    public function getSelectText($selector)
+    {
+        try {
+            $this->autoScreenshot(false);
+
+            $elt = $this->find($selector);
+
+            $select = new \WebDriverSelect($elt);
+            return $select->getFirstSelectedOption()->getText();
+        } finally {
+            $this->autoScreenshot();
+        }
+    }
+
     /**
 	 * Select by value in a multiple select.
 	 * Options is an array of values.

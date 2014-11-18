@@ -27,12 +27,12 @@ class AccountCreationTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 	public function languageAndCountryPairs()
 	{
 		return [
-			['en', 'United States'],
-			['fr', 'France'],
-			['es', 'Spain'],
-			['it', 'Italy'],
-			['nl', 'Netherlands'],
-			['pt', 'Brazil']
+			['en', 'United States'	, ['language' => 'English (English)']],
+			['fr', 'France'			, ['language' => 'Français (French)']],
+			['es', 'Spain'			, ['language' => 'Español (Spanish)']],
+			['it', 'Italy'			, ['language' => 'Italiano (Italian)']],
+			['nl', 'Netherlands'	, ['language' => 'Nederlands (Dutch)']],
+			['pt', 'Brazil'			, ['language' => 'Português BR (Portuguese)']]
 		];
 	}
 
@@ -41,7 +41,7 @@ class AccountCreationTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 	 * @dataProvider languageAndCountryPairs
 	 * @parallelize
 	 */
-	public function testCreateAccount($language, $country)
+	public function testCreateAccount($language, $country, array $expect)
 	{
 		$accountCreation = new AccountCreation($this->homePage);
 
@@ -64,6 +64,24 @@ class AccountCreationTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 
 		$shop->getBackOfficeNavigator()->login();
 
-		$this->browser->waitForUserInput();
+		$loc = $shop->getPageObject('AdminLocalization')->visit();
+
+		$actualLanguage = $loc->getDefaultLanguageName();
+		$actualCountry = $loc->getDefaultCountryName();
+
+		// Check that the shop is setup with the same country as defined during onboarding
+		$this->assertEquals(
+			$country,
+			$actualCountry,
+			"Shop doesn't have the expected default country, expected `$country` but got `$actualCountry`."
+		);
+
+		$this->assertEquals(
+			$expect['language'],
+			$actualLanguage,
+			"Shop doesn't have the expected default language, expected `{$expect['language']}` but got `$actualLanguage`."
+		);
+		
+		//$this->browser->waitForUserInput();
 	}
 }

@@ -18,7 +18,7 @@ class AccountCreation
 		'fr' => 'Activer mon compte',
 		'es' => 'Activar mi cuenta',
 		'it' => 'Attivare il mio account',
-		'pt' => '?',
+		'pt' => 'Activar a minha conta',
 		'nl' => 'Activeer mijn account'
 	];
 
