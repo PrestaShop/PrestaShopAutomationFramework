@@ -57,6 +57,7 @@ class HomePage extends OnDemandPage
 		$this->getBrowser()
 		->fillIn('#create-online-store-shop_name', $shop_name)
 		->fillIn('#create-online-store-email', $email)
+		->sleep(15)
 		->click('a.submit.btn.get-me-started')
 		;
 

@@ -27,8 +27,8 @@ class OnDemandTestCase extends TestCase
 
     public function setUp()
     {
-        $this->shop = static::getShop();
-        $this->browser = static::getBrowser();
+        $this->shop = self::getShop();
+        $this->browser = self::getBrowser();
         
         if (!$this->homePage) {
         	$this->homePage = new HomePage($this->browser, $this->getSecrets());
@@ -43,10 +43,10 @@ class OnDemandTestCase extends TestCase
     public static function setUpBeforeClass()
     {
         SeleniumManager::ensureSeleniumIsRunning();
+        self::getBrowser()->clearCookies();
     }
 
     public static function tearDownAfterClass()
     {
-       
     }
 }

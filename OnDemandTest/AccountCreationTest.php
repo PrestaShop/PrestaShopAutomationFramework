@@ -37,7 +37,7 @@ class AccountCreationTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 	}
 
 	/**
-	 * @maxattempts 1
+	 * @maxattempts 2
 	 * @dataProvider languageAndCountryPairs
 	 * @parallelize
 	 */

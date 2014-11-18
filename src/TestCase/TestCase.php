@@ -199,6 +199,9 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
         return $files;
     }
 
+    /**
+     * Base directory where a test may write stuff.
+     */
     public function getOutputDir()
     {
         $folder = str_replace('\\', '/', get_called_class());
@@ -213,7 +216,11 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
         return $dir;
     }
 
-    public function writeArtefact($name, $contents)
+    /**
+     * Depending on the test runner, a more specific output dir
+     * may be available, this function retrieves it.
+     */
+    public function getArtefactsDir()
     {
         $dir = $this->getOutputDir();
 
@@ -224,9 +231,12 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
             }
         }        
 
-        $path = FS::join($dir, $name);
+        return $dir;
+    }
 
-        file_put_contents($path, $contents);
+    public function writeArtefact($name, $contents)
+    {
+        file_put_contents($this->getArtefactsDir(), $contents);
 
         return $this;
     }
@@ -268,7 +278,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 
         $this->shortName = $shortName;
 
-        $dir = FS::join($this->getOutputDir(), $this->shortName);
+        $dir = $this->getArtefactsDir();
         
         $screenshotsDir = FS::join($dir, 'screenshots');
 
@@ -286,5 +296,10 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
         if (!getenv('NO_SCREENSHOTS')) {
             static::getBrowser()->recordScreenshots($screenshotsDir);
         }
+    }
+
+    public function getShortName()
+    {
+        return $this->shortName;
     }
 }

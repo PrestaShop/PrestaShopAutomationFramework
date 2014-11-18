@@ -2,11 +2,14 @@
 
 namespace PrestaShop\PSTAF\OnDemand;
 
+use Symfony\Component\DomCrawler\Crawler;
+
 use PrestaShop\PSTAF\EmailReader\GmailReader;
 use PrestaShop\PSTAF\Helper\Spinner;
 use PrestaShop\PSTAF\Shop;
-use Symfony\Component\DomCrawler\Crawler;
 use PrestaShop\PSTAF\OptionProvider;
+
+use PrestaShop\PSTAF\Exception\FailedTestException;
 
 class AccountCreation
 {
@@ -60,24 +63,28 @@ class AccountCreation
 		 * @todo : do we want to test the order in which the emails are received?
 		 */
 
-		$waitForEmail->assertBecomesTrue(function () use ($reader, $options, $expectedActivationEmailButtonTitle, &$activationLink) {
+		try {
+			$waitForEmail->assertBecomesTrue(function () use ($reader, $options, $expectedActivationEmailButtonTitle, &$activationLink) {
 
-			$emails = $reader->readEmails($options['email']);
+				$emails = $reader->readEmails($options['email']);
 
-			foreach ($emails as $email) {
-				$crawler = new Crawler('', 'http://www.example.com');
-				$crawler->addHtmlContent($email['body']);
+				foreach ($emails as $email) {
+					$crawler = new Crawler('', 'http://www.example.com');
+					$crawler->addHtmlContent($email['body']);
 
-				$crawler = $crawler->selectLink($expectedActivationEmailButtonTitle);
+					$crawler = $crawler->selectLink($expectedActivationEmailButtonTitle);
 
-				if ($crawler->count() > 0) {
-					$activationLink = $crawler->link()->getUri();
-					return true;
-				}				
-			}
+					if ($crawler->count() > 0) {
+						$activationLink = $crawler->link()->getUri();
+						return true;
+					}				
+				}
 
-			return false;
-		}, false);
+				return false;
+			}, false);
+		} catch (\Exception $e) {
+			throw new FailedTestException($e->getMessage());
+		}
 
 		$this->browser->visit($activationLink);
 
