@@ -44,7 +44,7 @@ class YourAccountPage extends OnDemandPage
 
 	public function submit()
 	{
-		sleep(15);
+		// sleep(15);
 		$this->getBrowser()->click('input[name="submitstep2"]');
 
 		return $this;

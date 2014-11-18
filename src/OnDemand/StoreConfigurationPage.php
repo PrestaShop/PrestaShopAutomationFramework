@@ -51,7 +51,7 @@ class StoreConfigurationPage extends OnDemandPage
 
 	public function submit()
 	{
-		sleep(15);
+		// sleep(15);
 		$this->getBrowser()->click('#submit-form');
 		return new YourAccountPage($this->getBrowser(), $this->getSecrets());
 	}
