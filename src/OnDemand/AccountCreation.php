@@ -54,6 +54,10 @@ class AccountCreation
 
 		$activationLink = null;
 
+		/**
+		 * @todo : do we want to test the order in which the emails are received?
+		 */
+
 		$waitForEmail->assertBecomesTrue(function () use ($reader, $options, $expectedActivationEmailButtonTitle, &$activationLink) {
 
 			$emails = $reader->readEmails($options['email']);
@@ -64,9 +68,7 @@ class AccountCreation
 
 				$crawler = $crawler->selectLink($expectedActivationEmailButtonTitle);
 
-				if ($crawler->count() === 0) {
-					return false;
-				} else {
+				if ($crawler->count() > 0) {
 					$activationLink = $crawler->link()->getUri();
 					return true;
 				}				

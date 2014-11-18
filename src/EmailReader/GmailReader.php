@@ -2,6 +2,8 @@
 
 namespace PrestaShop\PSTAF\EmailReader;
 
+use PrestaShop\PSTAF\Helper\Spinner;
+
 class GmailReader
 {
 	private $email;
@@ -17,7 +19,12 @@ class GmailReader
 	{
 		$host = '{imap.gmail.com:993/imap/ssl}INBOX';
 
-		$inbox = imap_open($host, $this->email, $this->password);
+		$spinner = new Spinner('Could not connect to Imap server.', 60, 10000);
+
+		$inbox = $spinner->assertBecomesTrue(function () use ($host) {
+			return @imap_open($host, $this->email, $this->password);
+		});
+
 		$emails = imap_search($inbox, 'TO '.($sentTo ? $sentTo : $this->email));
 
 		if ($emails) {
@@ -26,8 +33,10 @@ class GmailReader
 			{
 				$hinfo = imap_headerinfo($inbox, $n);
 
+				$subject = $hinfo->subject;
+
 				$message = [
-					'subject' => $hinfo->subject,
+					'subject' => $subject,
 					'body' => imap_fetchbody($inbox, $n, 2)
 				];
 

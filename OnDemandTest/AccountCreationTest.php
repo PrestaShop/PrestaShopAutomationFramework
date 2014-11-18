@@ -6,9 +6,19 @@ use PrestaShop\PSTAF\OnDemand\AccountCreation;
 
 class AccountCreationTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 {
+
+	public function randomAnimalName()
+	{
+		$data = json_decode(file_get_contents(__DIR__.'/data/animals.json'), true);
+		$item = $data[rand(0, count($data) - 1)];
+		$m = [];
+		$n = preg_match_all('/\w+/', $item, $m);
+		return implode('', array_map('ucfirst', $m[0]));
+	}
+
 	public function newUid()
 	{
-		return microtime(true).'_'.getmypid();
+		return $this->randomAnimalName().'_'.date("d.M.Y.h.i.s").'_'.getmypid();
 	}
 
 	public function languageAndCountryPairs()
@@ -34,10 +44,10 @@ class AccountCreationTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 
 		$secrets = $this->getSecrets();
 
-		$uid = $this->newUid();
+		$uid = $this->newUid().'_'.$language.'_'.preg_replace('/\s+/', '', $country);
 
 		$email =  implode("+$uid@", explode('@', $secrets['customer']['email']));
-		$shop_name = "Selenium{$uid}AutoShop";
+		$shop_name = $uid;
 
 		$accountCreation->createAccountAndShop([
 			'email' 	=> $email,
