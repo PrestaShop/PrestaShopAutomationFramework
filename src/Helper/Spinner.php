@@ -9,7 +9,7 @@ class Spinner
     private $error_message;
 
     public function __construct(
-        $error_message = 'Could not assert something.',
+        $error_message = 'Repeated assertion test failed after maximum waiting time was reached.',
         $timeout_in_seconds = 5,
         $interval_in_milliseconds = 500
     )
@@ -22,34 +22,41 @@ class Spinner
 
     public function assertBecomesTrue(callable $truthy_returner, $allowExceptions = true)
     {
-        $elapsed = 0;
-        while ($elapsed < $this->timeout_in_seconds) {
+        $maxTime = time() + $this->timeout_in_seconds;
+        do {
             try {
-                if (call_user_func($truthy_returner))
-                    return true;
+                if (($val = call_user_func($truthy_returner))) {
+                    return $val;
+                }
             } catch (\Exception $e) {
-                if ($elapsed >= $this->timeout_in_seconds || !$allowExceptions)
+                if (time() > $maxTime || !$allowExceptions) {
                     throw $e;
+                } else {
+                    $this->error_message = $e->getMessage();
+                }
             }
             usleep($this->interval_in_milliseconds * 1000);
-            $elapsed += $this->interval_in_milliseconds / 1000;
-        }
+        } while ( time() <= $maxTime );
 
         throw new \PrestaShop\PSTAF\Exception\SpinAssertException($this->error_message);
     }
 
     public function assertNoException(callable $cb)
     {
-        $elapsed = 0;
-        while (true) {
+        $maxTime = time() + $this->timeout_in_seconds;
+        do {
             try {
                 return call_user_func($cb);
             } catch (\Exception $e) {
-                if ($elapsed >= $this->timeout_in_seconds)
+                if (time() > $maxTime) {
                     throw $e;
+                } else {
+                    $this->error_message = $e->getMessage();
+                }
             }
             usleep($this->interval_in_milliseconds * 1000);
-            $elapsed += $this->interval_in_milliseconds / 1000;
-        }
+        } while ( time() <= $maxTime );
+
+        throw new \PrestaShop\PSTAF\Exception\SpinAssertException($this->error_message);
     }
 }
