@@ -47,6 +47,11 @@ class Shop
     protected $front_office_url;
 
     /**
+     * Back-Office URL
+     */
+    protected $back_office_url;
+
+    /**
 	* Name of the back-office folder (e.g. admin-dev)
 	*/
     protected $back_office_folder_name;
@@ -98,6 +103,7 @@ class Shop
             'mysql_database',
             'database_prefix',
             'front_office_url',
+            'back_office_url',
             'back_office_folder_name',
             'install_folder_name',
             'prestashop_version',
@@ -215,6 +221,10 @@ class Shop
 	*/
     public function getBackOfficeURL()
     {
+        if ($this->back_office_url) {
+            return $this->back_office_url;
+        }
+        
         return rtrim($this->front_office_url, '/').'/'.trim($this->back_office_folder_name, '/').'/';
     }
 

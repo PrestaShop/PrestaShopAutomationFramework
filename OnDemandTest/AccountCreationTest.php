@@ -6,11 +6,14 @@ use PrestaShop\PSTAF\OnDemand\AccountCreation;
 
 class AccountCreationTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 {
-
+	/**
+	 * This is used to make reasonably unique, human readable names.
+	 */
 	public function randomAnimalName()
 	{
 		$data = json_decode(file_get_contents(__DIR__.'/data/animals.json'), true);
 		$item = $data[rand(0, count($data) - 1)];
+		$item = implode('', array_reverse(explode(',', $item)));
 		$m = [];
 		$n = preg_match_all('/\w+/', $item, $m);
 		return implode('', array_map('ucfirst', $m[0]));
@@ -49,12 +52,18 @@ class AccountCreationTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 		$email =  implode("+$uid@", explode('@', $secrets['customer']['email']));
 		$shop_name = $uid;
 
-		$accountCreation->createAccountAndShop([
+		$data = $accountCreation->createAccountAndShop([
 			'email' 	=> $email,
 			'password'	=> $secrets['customer']['password'],
 			'shop_name' => $shop_name,
 			'country'	=> $country,
 			'language'	=> $language
 		]);
+
+		$shop = $data['shop'];
+
+		$shop->getBackOfficeNavigator()->login();
+
+		$this->browser->waitForUserInput();
 	}
 }

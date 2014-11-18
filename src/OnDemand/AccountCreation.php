@@ -4,7 +4,9 @@ namespace PrestaShop\PSTAF\OnDemand;
 
 use PrestaShop\PSTAF\EmailReader\GmailReader;
 use PrestaShop\PSTAF\Helper\Spinner;
+use PrestaShop\PSTAF\Shop;
 use Symfony\Component\DomCrawler\Crawler;
+use PrestaShop\PSTAF\OptionProvider;
 
 class AccountCreation
 {
@@ -78,7 +80,32 @@ class AccountCreation
 		}, false);
 
 		$this->browser->visit($activationLink);
-		
-		//$this->browser->waitForUserInput();
+
+		$backOfficeURL 	= $this->browser->getAttribute('a.btn-store:nth-child(1)', 'href');
+		$frontOfficeURL = $this->browser->getAttribute('a.btn-store:nth-child(2)', 'href');
+
+		$shopSettings = [
+			'front_office_url' => $frontOfficeURL,
+			'back_office_url' => $backOfficeURL,
+			'back_office_folder_name' => 'backoffice',
+			'prestashop_version' => '1.6.0.10'
+		];
+
+		$shop = new Shop($shopSettings, null);
+		$shop->setBrowser($this->browser);
+
+		$optionProvider = new OptionProvider();
+		$optionProvider->setDefaultValues([
+			'BackOfficeLogin' => [
+			    'admin_email'     => $options['email'],
+			    'admin_password'  => $options['password']
+			]	
+		]);
+
+		$shop->setOptionProvider($optionProvider);
+
+		return [
+			'shop' => $shop
+		];
 	}
 }
