@@ -86,6 +86,8 @@ class AccountCreation
 			throw new FailedTestException($e->getMessage());
 		}
 
+		sleep(30);
+
 		$this->browser->visit($activationLink);
 
 		$backOfficeURL 	= $this->browser->getAttribute('a.btn-store:nth-child(1)', 'href');

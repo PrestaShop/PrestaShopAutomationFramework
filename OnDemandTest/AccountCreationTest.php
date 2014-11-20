@@ -21,7 +21,14 @@ class AccountCreationTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 
 	public function newUid()
 	{
-		return $this->randomAnimalName().'_'.date("d.M.Y.h.i.s").'_'.getmypid();
+		$left  = $this->randomAnimalName();
+		$right = '_'.date("d.M.Y.h.i.s").'_'.getmypid();
+
+		if (strlen($left) + strlen($right) > 64) {
+			$left = substr($left, 0, 64 - strlen($right));
+		}
+
+		return $left.$right;
 	}
 
 	public function languageAndCountryPairs()
@@ -37,12 +44,14 @@ class AccountCreationTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 	}
 
 	/**
-	 * @maxattempts 2
+	 * @maxattempts 1
 	 * @dataProvider languageAndCountryPairs
 	 * @parallelize
 	 */
 	public function testCreateAccount($language, $country, array $expect)
 	{
+		$this->browser->clearCookies();
+		$this->homePage->getBrowser()->clearCookies();
 		$accountCreation = new AccountCreation($this->homePage);
 
 		$secrets = $this->getSecrets();
