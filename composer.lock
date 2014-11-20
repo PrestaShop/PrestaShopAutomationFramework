@@ -131,7 +131,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/djfm/ptest",
-                "reference": "e714ecee4306016f5cbf97c81eb034f8bcbbbe1d"
+                "reference": "39ce0eb35c6c3429a33cdfc144dd25e3f921a78f"
             },
             "require": {
                 "symfony/console": "*"
@@ -145,7 +145,7 @@
                     "PrestaShop\\Ptest\\": "src/"
                 }
             },
-            "time": "2014-11-18 17:00:46"
+            "time": "2014-11-20 15:41:35"
         },
         {
             "name": "facebook/webdriver",
@@ -945,12 +945,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/DomCrawler.git",
-                "reference": "c41774153f60c26a03aa40423db5776d9d3dff67"
+                "reference": "5d37cbac9f282807b829bc7921f9e48e2145745e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/DomCrawler/zipball/c41774153f60c26a03aa40423db5776d9d3dff67",
-                "reference": "c41774153f60c26a03aa40423db5776d9d3dff67",
+                "url": "https://api.github.com/repos/symfony/DomCrawler/zipball/5d37cbac9f282807b829bc7921f9e48e2145745e",
+                "reference": "5d37cbac9f282807b829bc7921f9e48e2145745e",
                 "shasum": ""
             },
             "require": {
@@ -989,7 +989,7 @@
             ],
             "description": "Symfony DomCrawler Component",
             "homepage": "http://symfony.com",
-            "time": "2014-11-11 08:37:22"
+            "time": "2014-11-20 13:24:36"
         },
         {
             "name": "symfony/process",
