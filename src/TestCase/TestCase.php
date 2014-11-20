@@ -236,7 +236,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
 
     public function writeArtefact($name, $contents)
     {
-        file_put_contents($this->getArtefactsDir(), $contents);
+        file_put_contents(FS::join($this->getArtefactsDir(), $name), $contents);
 
         return $this;
     }
