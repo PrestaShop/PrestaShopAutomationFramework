@@ -3,6 +3,7 @@
 namespace PrestaShop\PSTAF\OnDemandTest;
 
 use PrestaShop\PSTAF\OnDemand\AccountCreation;
+use PrestaShop\PSTAF\EmailReader\GmailReader;
 
 class AccountCreationTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 {
@@ -22,7 +23,7 @@ class AccountCreationTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 	public function newUid()
 	{
 		$left  = $this->randomAnimalName();
-		$right = '_'.date("d.M.Y.h.i.s").'_'.getmypid();
+		$right = '_'.date("dMYhis").getmypid();
 
 		if (strlen($left) + strlen($right) > 64) {
 			$left = substr($left, 0, 64 - strlen($right));
@@ -56,7 +57,7 @@ class AccountCreationTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 
 		$secrets = $this->getSecrets();
 
-		$uid = $this->newUid().'_'.$language.'_'.preg_replace('/\s+/', '', $country);
+		$uid = $this->newUid().'_'.$language.preg_replace('/\s+/', '', $country);
 
 		$email =  implode("+$uid@", explode('@', $secrets['customer']['email']));
 		$shop_name = $uid;
@@ -90,7 +91,17 @@ class AccountCreationTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 			$actualLanguage,
 			"Shop doesn't have the expected default language, expected `{$expect['language']}` but got `$actualLanguage`."
 		);
+
+		$address =  implode("+{$uid}_emailTest@", explode('@', $secrets['customer']['email']));
+		$emails = $shop->getPageObject('AdminEmails')->visit();
+		$emails->sendTestEmailTo($address);
 		
-		//$this->browser->waitForUserInput();
+		/*$reader = new GmailReader(
+			$this->getSecrets()['customer']['email'],
+			$this->getSecrets()['customer']['gmail_password']
+		);
+
+		$reader->readEmails()*/
+		// $this->browser->waitForUserInput();
 	}
 }
