@@ -16,9 +16,14 @@ class AdminLocalization extends PageObject
         return trim($this->getBrowser()->getSelectText('#PS_LANG_DEFAULT'));
     }
 
+    public function getDefaultLanguageId()
+    {
+        return $this->getBrowser()->getValue('#PS_LANG_DEFAULT > option[selected]');
+    }
+
     public function getDefaultCountryId()
     {
-        return trim($this->getBrowser()->getValue('#PS_COUNTRY_DEFAULT'));
+        return trim($this->getBrowser()->getValue('#PS_COUNTRY_DEFAULT  > option[selected]'));
     }
 
     public function getDefaultCountryName()

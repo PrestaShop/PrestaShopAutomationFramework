@@ -47,6 +47,16 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
         self::$staticData[$className][$key] = $value;
     }
 
+    public static function setValue($key, $value)
+    {
+        return self::set('USERDATA_'.$key, $value);
+    }
+
+    public static function getValue($key, $defaultValue = null)
+    {
+        return self::get('USERDATA_'.$key);
+    }
+
     // Whether or not to cache the initial shop state
     protected static $cache_initial_state = true;
 

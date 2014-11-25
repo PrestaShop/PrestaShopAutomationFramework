@@ -25,7 +25,7 @@ class StoreConfigurationPage extends OnDemandPage
 		}
 
 		$this->getBrowser()
-		->waitFor('#inputCountry')
+		->waitFor('#inputCountry', 60)
 		->select('#inputCountry', static::$countryIds[$name]);
 
 		return $this;

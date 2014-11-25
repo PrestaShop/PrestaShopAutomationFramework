@@ -214,6 +214,16 @@ class Browser
         }
     }
 
+    public function hasVisible($cssSelector)
+    {
+        try {
+            $e = $this->driver->findElement(\WebDriverBy::cssSelector($cssSelector));
+            return $e->isDisplayed();
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
     /**
      * Find all elements matching the selector.
      * This is a shortcut for find($selector, ['unique' => false]);

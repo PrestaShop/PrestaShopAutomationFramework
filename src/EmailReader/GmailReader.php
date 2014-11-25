@@ -47,4 +47,15 @@ class GmailReader
 			return [];
 		}
 	}
+
+	public function ensureAnEmailIsSentTo($address, $timeout_in_seconds = 300)
+	{
+		$spinner = new Spinner("Did not get an email on $address after {$timeout_in_seconds}s.", $timeout_in_seconds, 10000);
+
+		$spinner->assertBecomesTrue(function () use ($address) {
+			return count($this->readEmails($address)) > 0;
+		});
+
+		return $this;
+	}
 }

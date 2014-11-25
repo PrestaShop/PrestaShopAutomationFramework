@@ -31,12 +31,14 @@ class Spinner
             } catch (\Exception $e) {
                 if (time() > $maxTime || !$allowExceptions) {
                     throw $e;
-                } else {
+                }
+                
+                if (!$this->error_message) {
                     $this->error_message = $e->getMessage();
                 }
             }
             usleep($this->interval_in_milliseconds * 1000);
-        } while ( time() <= $maxTime );
+        } while (time() <= $maxTime);
 
         throw new \PrestaShop\PSTAF\Exception\SpinAssertException($this->error_message);
     }
@@ -44,19 +46,15 @@ class Spinner
     public function assertNoException(callable $cb)
     {
         $maxTime = time() + $this->timeout_in_seconds;
-        do {
+        for (;;) {
             try {
                 return call_user_func($cb);
             } catch (\Exception $e) {
                 if (time() > $maxTime) {
                     throw $e;
-                } else {
-                    $this->error_message = $e->getMessage();
                 }
             }
             usleep($this->interval_in_milliseconds * 1000);
-        } while ( time() <= $maxTime );
-
-        throw new \PrestaShop\PSTAF\Exception\SpinAssertException($this->error_message);
+        }
     }
 }

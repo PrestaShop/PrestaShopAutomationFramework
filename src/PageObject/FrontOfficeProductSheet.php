@@ -13,7 +13,9 @@ class FrontOfficeProductSheet extends PageObject
 
     public function setQuantity($q)
     {
-        $this->getBrowser()->fillIn('#quantity_wanted', $q);
+        $this->getBrowser()
+        ->waitFor('#quantity_wanted')
+        ->fillIn('#quantity_wanted', $q);
 
         return $this;
     }

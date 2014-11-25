@@ -8,6 +8,7 @@ class BackOfficeNavigation extends ShopCapability
 {
     public static $crud_url_settings;
     private $controller_links;
+    private $default_id_lang;
 
     public function setup()
     {
@@ -122,10 +123,19 @@ class BackOfficeNavigation extends ShopCapability
         ->click('button[name=submitLogin]')
         ->ensureElementShowsUpOnPage('#maintab-AdminDashboard', 15);
 
+        $this->default_id_lang = $this->getShop()->getPageObject('AdminLocalization')
+                                      ->visit()
+                                      ->getDefaultLanguageId();
+
         if (!$this->controller_links)
                 $this->controller_links = $this->getMenuLinks();
 
         return $this;
+    }
+
+    public function getDefaultIdLang()
+    {
+        return $this->default_id_lang;
     }
 
     /**

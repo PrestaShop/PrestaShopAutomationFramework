@@ -45,8 +45,8 @@ abstract class ShopCapability
 	*/
     public function i18nFieldName($name)
     {
-        // TODO: Implement
-        return $name.'_1';
+        $selector = $name.'_'.$this->getShop()->getBackOfficeNavigator()->getDefaultIdLang();
+        return $selector;
     }
 
     /**

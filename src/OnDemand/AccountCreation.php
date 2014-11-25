@@ -48,7 +48,7 @@ class AccountCreation
 		->submit()
 		;
 
-		$waitForEmail = new Spinner('Could not find activation email.', 60);
+		$waitForEmail = new Spinner('Could not find activation email.', 300);
 
 		$reader = new GmailReader(
 			$this->homePage->getSecrets()['customer']['email'],
