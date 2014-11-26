@@ -9,6 +9,7 @@ class Browser
 {
     private $driver;
     private $quitted = false;
+    private $logMessagesSeen = [];
 
     private $screenshotsDir = false;
 
@@ -20,7 +21,7 @@ class Browser
     public function __construct($seleniumSettings)
     {
         $caps = [
-            'browserName' => 'firefox',
+            'browserName' => 'firefox'
         ];
 
         $tunnel_identifier = getenv('TRAVIS_JOB_NUMBER');
@@ -68,8 +69,25 @@ class Browser
         if ($this->screenshotsDir && $this->screenshots >= 0) {
             $this->screenshotNumber += 1;
             $n = sprintf("%'06d) ", $this->screenshotNumber);
-            $filename = $this->screenshotsDir.DIRECTORY_SEPARATOR.$n.strftime("%a %d %b %Y, %H;%M;%S").'.png';
+            $base = $this->screenshotsDir.DIRECTORY_SEPARATOR.$n.strftime("%a %d %b %Y, %H;%M;%S");
+            $filename = $base.'.png';
             $this->takeScreenshot($filename);
+            $metaData = [];
+
+            $metaData['Current URL'] = $this->getCurrentURL();
+            $metaData['Browser Log'] = [];
+
+            $log = $this->driver->manage()->getLog('browser');
+            foreach ($log as $entry) {
+                $hash = md5(serialize($entry));
+                if (empty($this->logMessagesSeen[$hash])) {
+                    $this->logMessagesSeen[$hash] = true;
+                    $metaData['Browser Log'][] = $entry;
+                }
+            }
+
+            $metaDataFile = $base.'.json';
+            file_put_contents($metaDataFile, json_encode($metaData, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
         }
     }
 

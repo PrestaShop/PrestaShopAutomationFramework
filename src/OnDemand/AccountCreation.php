@@ -86,12 +86,14 @@ class AccountCreation
 			throw new FailedTestException($e->getMessage());
 		}
 
-		sleep(30);
-
 		$this->browser->visit($activationLink);
 
 		$backOfficeURL 	= $this->browser->getAttribute('a.btn-store:nth-child(1)', 'href');
-		$frontOfficeURL = $this->browser->getAttribute('a.btn-store:nth-child(2)', 'href');
+		$tmpFrontOfficeURL = $this->browser->getAttribute('a.btn-store:nth-child(2)', 'href');
+
+		$frontOfficeURL = preg_replace('/^(\w+:\/\/)([^.]+)/', "\${1}{$options['shop_name']}", $tmpFrontOfficeURL);
+
+		$this->waitFor200($frontOfficeURL);
 
 		$shopSettings = [
 			'front_office_url' => $frontOfficeURL,
@@ -116,5 +118,20 @@ class AccountCreation
 		return [
 			'shop' => $shop
 		];
+	}
+
+	public function waitFor200($url)
+	{
+		$spinner = new Spinner('Did not find final FO URL in 10 minutes.', 600, 1000);
+
+		$spinner->assertBecomesTrue(function () use ($url) {
+			$ch = curl_init($url);
+			curl_setopt($ch, CURLOPT_NOBODY, true);
+			curl_exec($ch);
+			$status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+			curl_close($ch);
+
+			return $status == 200;
+		});
 	}
 }

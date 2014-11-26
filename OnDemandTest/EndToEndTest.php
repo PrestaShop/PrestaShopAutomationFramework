@@ -206,6 +206,6 @@ class EndToEndTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 		$this->browser->clearCookies();
 		$scenario = $this->getJSONExample('invoice/simple-order.json');
         $output = InvoiceTest::runScenario($this->shop, $scenario);
-        self::checkInvoiceJson($scenario['expect']['invoice'], $output['json']);
+        InvoiceTest::checkInvoiceJson($scenario['expect']['invoice'], $output['json']);
 	}
 }
