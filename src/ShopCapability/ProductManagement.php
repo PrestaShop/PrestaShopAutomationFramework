@@ -48,9 +48,9 @@ class ProductManagement extends ShopCapability
             ->waitFor('#priceTE')
             ->fillIn('#priceTE', $options['price'])
             ->select('#id_tax_rules_group', empty($options['tax_rules_group']) ? 0 : $options['tax_rules_group']);
-        });
 
-        $this->saveProduct();
+            $this->saveProduct();
+        });
 
         if (isset($options['specific_price'])) {
             $browser
