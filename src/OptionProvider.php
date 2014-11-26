@@ -103,7 +103,7 @@ class OptionProvider
         ]
     ];
 
-    private $defaultValues;
+    private $defaultValues = [];
 
     public static function getOptions($type)
     {
@@ -133,7 +133,11 @@ class OptionProvider
 
     public function setDefaultValues(array $values = null)
     {
-        $this->defaultValues = $values;
+        if (!$values) {
+            $values = [];
+        }
+        
+        $this->defaultValues = array_merge_recursive($this->defaultValues, $values);
     }
 
     public function getDefaults($type)
