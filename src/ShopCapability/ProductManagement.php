@@ -42,8 +42,10 @@ class ProductManagement extends ShopCapability
         // very unstable.
         $saveSpinner->assertNoException(function () use ($browser, $options) {
             $browser
+            ->click('#link-Informations')
+            ->sleep(1)
             ->fillIn($this->i18nFieldName('#name'), $options['name'])
-            ->sleep(5)
+            ->sleep(1)
             ->click('#link-Prices')
             ->waitFor('#priceTE')
             ->fillIn('#priceTE', $options['price'])
