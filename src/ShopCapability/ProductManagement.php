@@ -11,7 +11,7 @@ class ProductManagement extends ShopCapability
     {
         $browser = $this->getBrowser();
 
-        $assert = new Spinner('Save button did not appear in time.', 10);
+        $assert = new Spinner('Save button did not appear in time.', 30);
         $assert->assertBecomesTrue(function () use ($browser) {
             $browser->clickButtonNamed('submitAddproductAndStay');
 
@@ -36,12 +36,19 @@ class ProductManagement extends ShopCapability
     {
         $browser = $this->getShop()->getBackOfficeNavigator()->visit('AdminProducts', 'new');
 
-        $browser
-        ->fillIn($this->i18nFieldName('#name'), $options['name'])
-        ->click('#link-Prices')
-        ->waitFor('#priceTE')
-        ->fillIn('#priceTE', $options['price'])
-        ->select('#id_tax_rules_group', empty($options['tax_rules_group']) ? 0 : $options['tax_rules_group']);
+        $saveSpinner = new Spinner('Could not save product.', 60, 2000);
+
+        // Try this in a loop, because the javascript that populates link rewrite is
+        // very unstable.
+        $saveSpinner->assertNoException(function () use ($browser, $options) {
+            $browser
+            ->fillIn($this->i18nFieldName('#name'), $options['name'])
+            ->sleep(5)
+            ->click('#link-Prices')
+            ->waitFor('#priceTE')
+            ->fillIn('#priceTE', $options['price'])
+            ->select('#id_tax_rules_group', empty($options['tax_rules_group']) ? 0 : $options['tax_rules_group']);
+        });
 
         $this->saveProduct();
 
