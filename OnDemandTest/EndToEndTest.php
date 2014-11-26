@@ -6,37 +6,8 @@ use PrestaShop\PSTAF\OnDemand\AccountCreation;
 use PrestaShop\PSTAF\EmailReader\GmailReader;
 use PrestaShop\PSTAF\FunctionalTest\InvoiceTest;
 use PrestaShop\PSTAF\Helper\Spinner;
-
-function shortenMd5($input)
-{	
-	static $decimal = [
-		'0' => 0, '1' => 1, '2' => 2, '3' => 3, '4' => 4, '5' => 5,
-		'6' => 6, '7' => 7, '8' => 8, '9' => 9, 'a' => 10, 'b' => 11,
-		'c' => 12, 'd' => 13, 'e' => 14, 'f' => 15
-	];
-
-	static $alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-	$input = strtolower($input);
-	$output = '';
-
-	for ($pos = 0; $pos < strlen($input) - 1; $pos += 2) {
-		$hex = substr($input, $pos, 2);
-		$dec = 16 * $decimal[$hex[0]] + $decimal[$hex[1]];
-
-		$out = '';
-		if ($dec < strlen($alphabet)) {
-			$out .= $alphabet[$dec];
-		} else {
-			$rem = $dec % strlen($alphabet);
-			$div = ($dec - $rem) / strlen($alphabet);
-			$out .= $alphabet[$div].$alphabet[$rem];
-		}
-
-		$output .= $out;
-	}
-	return $output;
-}
+use PrestaShop\PSTAF\Helper\HumanHash;
+use PrestaShop\PSTAF\Exception\FailedTestException;
 
 class EndToEndTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 {
@@ -126,7 +97,7 @@ class EndToEndTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 
 		$uid = $this->newUid().'_'.$this->getLanguageAndCountryIdentifier($language, $country);
 
-		$uid = shortenMd5(md5($uid));
+		$uid = HumanHash::humanMd5($uid);
 
 		self::setValue('uid', $uid);
 
@@ -169,27 +140,43 @@ class EndToEndTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 		$this->emailsAreSent();
 	}
 
-	
+	public function getEmailTestAddress()
+	{
+		$uid = self::getValue('uid');
+		return implode("+{$uid}_emailTest@", explode('@', $this->getSecrets()['customer']['email']));
+	}
+
+	public function getRegistrationAddress()
+	{
+		$uid = self::getValue('uid');
+		return implode("+{$uid}_registration@", explode('@', $this->getSecrets()['customer']['email']));
+	}
+
 	public function customersCanRegister()
 	{
 		$this->browser->clearCookies();
-		$uid = self::getValue('uid');
-		$registrationAddress =  implode("+{$uid}_registration@", explode('@', $this->getSecrets()['customer']['email']));
+		
+		$registrationAddress =  $this->getRegistrationAddress();
 		$this->shop->getRegistrationManager()->registerCustomer([
-			'customer_email' => $registrationAddress
+			'customer_email' => $registrationAddress,
+			'customer_password' => '123456789'
+		]);
+
+		$this->shop->getOptionProvider()->setDefaultValues([
+			'FrontOfficeLogin' => [
+				'customer_email' => $registrationAddress,
+				'customer_password' => '123456789'
+			]
 		]);
 	}
-
 	
 	public function emailsAreSent()
 	{
 		$this->browser->clearCookies();
-		$uid = self::getValue('uid');
 		$this->shop->getBackOfficeNavigator()->login();
 		$emails = $this->shop->getPageObject('AdminEmails')->visit();
 
-		$emailTestAddress =  implode("+{$uid}_emailTest@", explode('@', $this->getSecrets()['customer']['email']));
-
+		$emailTestAddress = $this->getEmailTestAddress();
 
 		$spinner = new Spinner('Could not send an email.', 300, 5000);
 
@@ -204,8 +191,18 @@ class EndToEndTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 	public function basicSellingFeatures()
 	{
 		$this->browser->clearCookies();
+
 		$scenario = $this->getJSONExample('invoice/simple-order.json');
         $output = InvoiceTest::runScenario($this->shop, $scenario);
         InvoiceTest::checkInvoiceJson($scenario['expect']['invoice'], $output['json']);
+
+        $reference = $output['json']['order']['reference'];
+
+        /*
+        try {
+        	$this->getEmailReader()->ensureAnEmailIsSentTo($emailTestAddress);
+        } catch (\Exception $e) {
+        	throw new FailedTestException("No email received by customer after placing an order.");
+        }*/
 	}
 }
