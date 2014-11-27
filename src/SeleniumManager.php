@@ -133,7 +133,7 @@ class SeleniumManager
 
     public static function ensureSeleniumIsRunning()
     {
-        if (!static::started(true)) {
+        if (!static::started(true) && !getenv('SELENIUM_HOST')) {
             throw new \PrestaShop\PSTAF\Exception\SeleniumIsNotRunningException();
         }
     }
