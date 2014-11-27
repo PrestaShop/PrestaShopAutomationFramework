@@ -173,6 +173,8 @@ class InvoiceTest extends TestCase
             ->visit($data['info']['fo_url'])
             ->setQuantity($data['quantity'])
             ->addToCart();
+
+            sleep(5);
         }
 
         $data = $shop->getCheckoutManager()->orderCurrentCartFiveSteps([
