@@ -321,10 +321,15 @@ class Browser
      */
     public function clickButtonNamed($name)
     {
+        return $this->clickFirstVisible("button[name=$name]");
+    }
+
+    public function clickFirstVisible($selector)
+    {
         try {
             $this->autoScreenshot(false);
 
-            $buttons = $this->find("button[name=$name]", ['unique' => false]);
+            $buttons = $this->find($selector, ['unique' => false]);
             foreach ($buttons as $button) {
                 if ($button->isDisplayed() && $button->isEnabled()) {
                     $button->click();
@@ -332,7 +337,7 @@ class Browser
                     return $this;
                 }
             }
-            throw new \Exception("Could not find any visible and enabled button named $name");
+            throw new \Exception("Could not find any visible thingy like: $selector");
         } finally {
             $this->autoScreenshot();
         }
