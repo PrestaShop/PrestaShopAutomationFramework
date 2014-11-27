@@ -122,7 +122,7 @@ class AccountCreation
 
 	public function waitFor200($url)
 	{
-		$spinner = new Spinner('Did not find final FO URL in 10 minutes.', 600, 1000);
+		$spinner = new Spinner('Did not find final FO URL in 1 hour.', 3600, 1000);
 
 		$spinner->assertBecomesTrue(function () use ($url) {
 			$ch = curl_init($url);
