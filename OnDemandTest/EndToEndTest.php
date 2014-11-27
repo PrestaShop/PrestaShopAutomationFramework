@@ -162,12 +162,12 @@ class EndToEndTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 			'customer_password' => '123456789'
 		]);
 
-		$this->shop->getOptionProvider()->setDefaultValues([
+		/*$this->shop->getOptionProvider()->setDefaultValues([
 			'FrontOfficeLogin' => [
 				'customer_email' => $registrationAddress,
 				'customer_password' => '123456789'
 			]
-		]);
+		]);*/
 	}
 	
 	public function emailsAreSent()
