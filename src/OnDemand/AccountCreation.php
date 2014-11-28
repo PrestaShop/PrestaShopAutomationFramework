@@ -88,10 +88,16 @@ class AccountCreation
 
 		$this->browser->visit($activationLink);
 
-		$backOfficeURL 	= $this->browser->getAttribute('a.btn-store:nth-child(1)', 'href');
-		$tmpFrontOfficeURL = $this->browser->getAttribute('a.btn-store:nth-child(2)', 'href');
-
-		$frontOfficeURL = preg_replace('/^(\w+:\/\/)([^.]+)/', "\${1}{$options['shop_name']}", $tmpFrontOfficeURL);
+		try {
+			// Proper markup, but not on all environments
+			$frontOfficeURL = $this->browser->getAttribute('a[data-sel="fo-link"]', 'href');
+			$backOfficeURL 	= $this->browser->getAttribute('a[data-sel="bo-link"]', 'href');
+		} catch (\Exception $e) {
+			// Fallback to horrible css selectors
+			$backOfficeURL 	= $this->browser->getAttribute('a.btn-store:nth-child(1)', 'href');
+			$tmpFrontOfficeURL = $this->browser->getAttribute('a.btn-store:nth-child(2)', 'href');
+			$frontOfficeURL = preg_replace('/^(\w+:\/\/)([^.]+)/', "\${1}{$options['shop_name']}", $tmpFrontOfficeURL);
+		}
 
 		$this->waitFor200($frontOfficeURL);
 
