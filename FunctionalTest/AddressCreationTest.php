@@ -21,7 +21,7 @@ class AddressCreationTest extends LazyTestCase
 		->setLastName('Murray')
 		->setAddress('5, main street')
 		->setCity('Neverland')
-		->setStateId(1)
+		->setStateId(15)
 		->setPostCode(12345)
 		->setPhone('12345655')
 		->setAdditionalInformation('bob')
@@ -43,11 +43,14 @@ class AddressCreationTest extends LazyTestCase
 	 */
 	public function testAddressCanBeEdited()
 	{
-		$ok = $this->shop
+		$edit = $this->shop
 		->getPageObject('MyAccount')->visit()
 		->goToMyAddresses()
-		->editAddress('My Cool Address')
-		->setAlias('This Alias is new')
+		->editAddress('My Cool Address');
+
+		$this->assertEquals(15, $edit->getStateId());
+
+		$edit->setAlias('This Alias is new')
 		->save();
 
 		$ok = $this->shop
