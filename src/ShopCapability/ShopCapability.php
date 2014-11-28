@@ -34,6 +34,11 @@ abstract class ShopCapability
         return $this->getShop()->getOptionProvider();
     }
 
+    public function getPageObject($name)
+    {
+        return $this->getShop()->getPageObject($name);
+    }
+
     public function isAvailable()
     {
         return true;

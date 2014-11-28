@@ -18,7 +18,8 @@ class HomePage extends OnDemandPage
 
 	public function visit()
 	{
-		$this->getBrowser()->visit("https://beta.prestashop.com/", $this->getSecrets()["htaccess"]);
+		$url = "https://v3staging.prestashop.com";
+		$this->getBrowser()->visit($url, $this->getSecrets()["htaccess"][$url]);
 
 		return $this;
 	}

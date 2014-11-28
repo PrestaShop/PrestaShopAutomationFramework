@@ -173,6 +173,26 @@ class Browser
         return $this->getAttribute($selector, 'value');
     }
 
+    public function getSelectedValue($selector)
+    {
+        $select = new \WebDriverSelect($this->find($selector));
+        $option = $select->getFirstSelectedOption();
+        if ($option) {
+            return $option->getAttribute('value');
+        } else {
+            return null;
+        }
+    }
+
+    public function getSelectedValues($selector)
+    {
+        $select = new \WebDriverSelect($this->find($selector));
+        $options = $select->getAllSelectedOptions();
+        return array_map(function ($option) {
+            return $option->getAttribute('value');
+        }, $options);
+    }
+
     /**
      * Gets the VISIBLE text for a given selector.
      */
@@ -285,14 +305,25 @@ class Browser
      * Clicks an element by selector.
      * Waits a bit if it is not there.
      */
-    public function click($selector)
+    public function click($selector, array $options = array())
     {
+        $options = array_merge(['screenshot' => true], $options);
+
         try {
-            $this->autoScreenshot(false);
+            if ($options['screenshot']) {
+                $this->autoScreenshot(false);
+            } else {
+                --$this->screenshots;
+            }
+
             $element = $this->find($selector);
             $element->click();
         } finally {
-            $this->autoScreenshot();
+            if ($options['screenshot']) {
+                $this->autoScreenshot();
+            } else {
+                ++$this->screenshots;
+            }
         }
 
         return $this;
@@ -741,7 +772,7 @@ class Browser
 
     public function acceptAlert()
     {
-        $spinner = new Spinner();
+        $spinner = new Spinner('Did not find alert.');
 
         $spinner->assertNoException(function() {
             $alert = $this->driver->switchTo()->alert();
