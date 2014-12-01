@@ -26,6 +26,7 @@ class InstallationTest extends TestCase
             ['no', 'no'], ['no', 'rs'],
             ['pl', 'pl'], ['pl', 'pt'],
             ['br', 'br'], ['br', 'sk'],
+            ['pt', 'pt'], ['pt', 'fr'],
             ['ro', 'ro'], ['ro', 'it'],
             ['sr', 'rs'], ['sr', 'fr'],
             ['tr', 'tr'], ['tr', 'gr'],
