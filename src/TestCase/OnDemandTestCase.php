@@ -5,6 +5,7 @@ namespace PrestaShop\PSTAF\TestCase;
 use PrestaShop\PSTAF\Shop;
 use PrestaShop\PSTAF\SeleniumManager;
 use PrestaShop\PSTAF\OnDemand\HomePage;
+use PrestaShop\PSTAF\EmailReader\GmailReader;
 use PrestaShop\PSTAF\Helper\FileSystem as FS;
 
 class OnDemandTestCase extends TestCase

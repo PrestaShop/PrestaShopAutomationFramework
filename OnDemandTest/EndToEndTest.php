@@ -3,7 +3,6 @@
 namespace PrestaShop\PSTAF\OnDemandTest;
 
 use PrestaShop\PSTAF\OnDemand\AccountCreation;
-use PrestaShop\PSTAF\EmailReader\GmailReader;
 use PrestaShop\PSTAF\FunctionalTest\InvoiceTest;
 use PrestaShop\PSTAF\Helper\Spinner;
 use PrestaShop\PSTAF\Helper\HumanHash;
