@@ -11,12 +11,15 @@ class OnDemandTestCase extends TestCase
 {
 	protected $homePage;
 
+    public function getSecretsName()
+    {
+        $class = explode('\\', get_called_class());
+        return end($class);
+    }
+
 	public function getSecrets()
 	{
-		$class = explode('\\', get_called_class());
-		$class = end($class);
-
-		$path = FS::join($this->getTestPath(), $class.'.secrets.json');
+		$path = FS::join($this->getTestPath(), $this->getSecretsName().'.secrets.json');
 
 		if (file_exists($path)) {
 			return json_decode(file_get_contents($path), true);
@@ -48,5 +51,15 @@ class OnDemandTestCase extends TestCase
 
     public static function tearDownAfterClass()
     {
+    }
+
+    public function getEmailReader()
+    {
+        $reader = new GmailReader(
+            $this->getSecrets()['customer']['email'],
+            $this->getSecrets()['customer']['gmail_password']
+        );
+
+        return $reader;
     }
 }
