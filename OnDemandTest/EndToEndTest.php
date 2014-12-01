@@ -134,16 +134,6 @@ class EndToEndTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 		return $l.$c;
 	}
 
-	public function getEmailReader()
-	{
-		$reader = new GmailReader(
-			$this->getSecrets()['customer']['email'],
-			$this->getSecrets()['customer']['gmail_password']
-		);
-
-		return $reader;
-	}
-
 	/**
 	 * @maxattempts 1
 	 * @dataProvider languageAndCountryPairs
@@ -203,8 +193,8 @@ class EndToEndTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 		);
 
 		$this->customersCanRegister();
-		$this->basicSellingFeatures();
 		$this->emailsAreSent();
+		$this->basicSellingFeatures();
 	}
 
 	public function getEmailTestAddress()
@@ -274,7 +264,7 @@ class EndToEndTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 
 		$emailTestAddress = $this->getEmailTestAddress();
 
-		$spinner = new Spinner('Could not send an email.', 300, 5000);
+		$spinner = new Spinner('Could not send an email (after 10 minutes).', 600, 5000);
 
 		$spinner->assertNoException(function () use ($emails, $emailTestAddress) {
 			$emails->sendTestEmailTo($emailTestAddress);
