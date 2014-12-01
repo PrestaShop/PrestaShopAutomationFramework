@@ -19,7 +19,8 @@ class EditAddress extends PageObject
 			'phone' => ['selector' => '#phone'],
 			'mobilephone' => ['selector' => '#phone_mobile'],
 			'additionalinformation' => ['selector' => '#other'],
-			'alias' => ['selector' => '#alias']
+			'alias' => ['selector' => '#alias'],
+			'dni' => ['selector' => '#dni']
 		];
 	}
 
