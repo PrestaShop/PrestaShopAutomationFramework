@@ -120,8 +120,13 @@ class BackOfficeNavigation extends ShopCapability
         ->fillIn('#email', $options['admin_email'])
         ->fillIn('#passwd', $options['admin_password'])
         ->checkbox('#stay_logged_in', $options['stay_logged_in'])
-        ->click('button[name=submitLogin]')
-        ->ensureElementShowsUpOnPage('#maintab-AdminDashboard', 15);
+        ->click('button[name=submitLogin]');
+
+        try {
+            $browser->ensureElementShowsUpOnPage('#maintab-AdminDashboard', 15);
+        } catch (\Exception $e) {
+            throw new \PrestaShop\PSTAF\Exception\CouldNotLoginToTheBackOfficeException();
+        }
 
         $this->default_id_lang = $this->getShop()->getPageObject('AdminLocalization')
                                       ->visit()
