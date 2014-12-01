@@ -18,7 +18,7 @@ class HomePage extends OnDemandPage
 
 	public function visit()
 	{
-		$url = "https://beta.prestashop.com";
+		$url = "https://v3staging.prestashop.com";
 		$this->getBrowser()->visit($url, $this->getSecrets()["htaccess"][$url]);
 
 		return $this;
@@ -63,5 +63,16 @@ class HomePage extends OnDemandPage
 		;
 
 		return new StoreConfigurationPage($this->getBrowser(), $this->getSecrets());
+	}
+
+	public function login($email, $password)
+	{
+		$this->getBrowser()
+		->click('#signin_menu a')
+		->fillIn('#header_ips_username', $email)
+		->fillIn('#header_ips_password', $password)
+		->click('#signin_menu button');
+
+		return new MyStoresPage($this->getBrowser(), $this->getSecrets());
 	}
 }

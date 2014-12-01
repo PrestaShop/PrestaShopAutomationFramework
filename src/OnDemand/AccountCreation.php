@@ -33,6 +33,8 @@ class AccountCreation
 
 	public function createAccountAndShop(array $options)
 	{
+		$options = array_merge(['waitForSubdomain' => true], $options);
+
 		$this->homePage
 		->visit()
 		->setLanguage($options['language'])
@@ -99,7 +101,9 @@ class AccountCreation
 			$frontOfficeURL = preg_replace('/^(\w+:\/\/)([^.]+)/', "\${1}{$options['shop_name']}", $tmpFrontOfficeURL);
 		}
 
-		$this->waitFor200($frontOfficeURL);
+		if ($options['waitForSubdomain']) {
+			$this->waitFor200($frontOfficeURL);
+		}
 
 		$shopSettings = [
 			'front_office_url' => $frontOfficeURL,
@@ -121,8 +125,11 @@ class AccountCreation
 
 		$shop->setOptionProvider($optionProvider);
 
+		$myStores = new MyStoresPage($this->browser, $this->homePage->getSecrets());
+
 		return [
-			'shop' => $shop
+			'shop' => $shop,
+			'myStoresPage' => $myStores
 		];
 	}
 

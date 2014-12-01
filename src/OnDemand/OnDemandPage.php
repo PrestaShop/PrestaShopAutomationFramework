@@ -7,10 +7,15 @@ class OnDemandPage
 	private $browser;
 	private $secrets;
 
-	public function __construct($browser, array $secrets = array())
+	public function __construct($browser_or_parent, array $secrets = array())
 	{
-		$this->browser = $browser;
-		$this->secrets = $secrets;
+		if ($browser_or_parent instanceof OnDemandPage) {
+			$this->browser = $browser_or_parent->getBrowser();
+			$this->secrets = $browser_or_parent->getSecrets();
+		} else {
+			$this->browser = $browser_or_parent;
+			$this->secrets = $secrets;
+		}
 	}
 
 	public function getBrowser()

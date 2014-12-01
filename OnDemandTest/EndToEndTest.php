@@ -57,68 +57,6 @@ class EndToEndTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 		];
 	}
 
-	public function extraData($key = null)
-	{
-		if ($key) {
-			return $this->extraData()[self::getValue('language') . ' ' . self::getValue('country')][$key];
-		}
-
-		return [
-			'en United States' => [
-				'AdminLocalizationExpectedLanguage' => 'English (English)',
-				'AdminLocalizationExpectedCountry' 	=> 'United States',
-				'addressData' => [
-					'countryId' => 21, 			// United States
-					'stateId'	=> 11,			// Hawaii
-					'postCode' 	=> '12345'
-				]
-			],
-			'fr France' => [
-				'AdminLocalizationExpectedLanguage' => 'Français (French)',
-				'AdminLocalizationExpectedCountry' 	=> 'France',
-				'addressData' => [
-					'countryId' => 8, 			// France
-					'postCode' 	=> '92300'
-				]
-			],
-			'es Spain' => [
-				'AdminLocalizationExpectedLanguage' => 'Español (Spanish)',
-				'AdminLocalizationExpectedCountry' 	=> 'Spain',
-				'addressData' => [
-					'countryId' => 6, 			// Spain
-					'stateId'	=> 322,			// Barcelona,
-					'dni'		=> '12345678',
-					'postCode' 	=> '12345'
-				]
-			],
-			'it Italy' => [
-				'AdminLocalizationExpectedLanguage' => 'Italiano (Italian)',
-				'AdminLocalizationExpectedCountry' 	=> 'Italy',
-				'addressData' => [
-					'countryId' => 10, 			// Italy
-					'stateId'	=> 135,			// Bergamo
-					'postCode' 	=> '33133'
-				]
-			],
-			'nl Netherlands' => [
-				'AdminLocalizationExpectedLanguage' => 'Nederlands (Dutch)',
-				'AdminLocalizationExpectedCountry' 	=> 'Netherlands',
-				'addressData' => [
-					'countryId' => 13, 			// Netherlands
-					'postCode' 	=> '1234 AB'
-				]
-			],
-			'pt Brazil' => [
-				'AdminLocalizationExpectedLanguage' => 'Português BR (Portuguese)',
-				'AdminLocalizationExpectedCountry' 	=> 'Brazil',
-				'addressData' => [
-					'countryId' => 58, 			// Brazil
-					'postCode' 	=> '12345-123'
-				]
-			]
-		];
-	}
-
 	public function getLanguageAndCountryIdentifier($language, $country)
 	{
 		$countryParts = preg_split('/\s+/', $country);
@@ -177,14 +115,14 @@ class EndToEndTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 		$actualCountry = $loc->getDefaultCountryName();
 
 		// Check that the shop is setup with the same country as defined during onboarding
-		$expectedCountry = $this->extraData('AdminLocalizationExpectedCountry');
+		$expectedCountry = $this->extraLocalizationData('AdminLocalizationExpectedCountry');
 		$this->assertEquals(
 			$expectedCountry,
 			$actualCountry,
 			"Shop doesn't have the expected default country, expected `$expectedCountry` but got `$actualCountry`."
 		);
 
-		$expectedLanguage = $this->extraData('AdminLocalizationExpectedLanguage');
+		$expectedLanguage = $this->extraLocalizationData('AdminLocalizationExpectedLanguage');
 		$this->assertEquals(
 			$expectedLanguage,
 			$actualLanguage,
@@ -218,7 +156,7 @@ class EndToEndTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 			'customer_password' => '123456789'
 		]);
 
-		$addressData = $this->extraData('addressData');
+		$addressData = $this->extraLocalizationData('addressData');
 
 		// Create an address
 		$addressForm = $this->shop

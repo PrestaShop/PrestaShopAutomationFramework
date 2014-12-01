@@ -782,6 +782,18 @@ class Browser
         return $this;
     }
 
+    public function switchToIFrame($name)
+    {
+        $this->driver->switchTo()->frame($name);
+        return $this;
+    }
+
+    public function switchToDefaultContent()
+    {
+        $this->driver->switchTo()->defaultContent();
+        return $this;
+    }
+
     /**
      * Takes a screenshot, saves it to the "save_as" path.
      */
