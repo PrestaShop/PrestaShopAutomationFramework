@@ -49,12 +49,74 @@ class EndToEndTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 	public function languageAndCountryPairs()
 	{
 		return [
-			['en', 'United States'	, ['language' => 'English (English)']],
-			['fr', 'France'			, ['language' => 'Français (French)']],
-			['es', 'Spain'			, ['language' => 'Español (Spanish)']],
-			['it', 'Italy'			, ['language' => 'Italiano (Italian)']],
-			['nl', 'Netherlands'	, ['language' => 'Nederlands (Dutch)']],
-			['pt', 'Brazil'			, ['language' => 'Português BR (Portuguese)']]
+			['en', 'United States'],
+			['fr', 'France'],
+			['es', 'Spain'],
+			['it', 'Italy'],
+			['nl', 'Netherlands'],
+			['pt', 'Brazil']
+		];
+	}
+
+	public function extraData($key = null)
+	{
+		if ($key) {
+			return $this->extraData()[self::getValue('language') . ' ' . self::getValue('country')][$key];
+		}
+
+		return [
+			'en United States' => [
+				'AdminLocalizationExpectedLanguage' => 'English (English)',
+				'AdminLocalizationExpectedCountry' 	=> 'United States',
+				'addressData' => [
+					'countryId' => 21, 			// United States
+					'stateId'	=> 11,			// Hawaii
+					'postCode' 	=> '12345'
+				]
+			],
+			'fr France' => [
+				'AdminLocalizationExpectedLanguage' => 'Français (French)',
+				'AdminLocalizationExpectedCountry' 	=> 'France',
+				'addressData' => [
+					'countryId' => 8, 			// France
+					'postCode' 	=> '92300'
+				]
+			],
+			'es Spain' => [
+				'AdminLocalizationExpectedLanguage' => 'Español (Spanish)',
+				'AdminLocalizationExpectedCountry' 	=> 'Spain',
+				'addressData' => [
+					'countryId' => 6, 			// Spain
+					'stateId'	=> 322,			// Barcelona,
+					'dni'		=> '12345678',
+					'postCode' 	=> '12345'
+				]
+			],
+			'it Italy' => [
+				'AdminLocalizationExpectedLanguage' => 'Italiano (Italian)',
+				'AdminLocalizationExpectedCountry' 	=> 'Italy',
+				'addressData' => [
+					'countryId' => 10, 			// Italy
+					'stateId'	=> 135,			// Bergamo
+					'postCode' 	=> '33133'
+				]
+			],
+			'nl Netherlands' => [
+				'AdminLocalizationExpectedLanguage' => 'Nederlands (Dutch)',
+				'AdminLocalizationExpectedCountry' 	=> 'Netherlands',
+				'addressData' => [
+					'countryId' => 13, 			// Netherlands
+					'postCode' 	=> '1234 AB'
+				]
+			],
+			'pt Brazil' => [
+				'AdminLocalizationExpectedLanguage' => 'Português BR (Portuguese)',
+				'AdminLocalizationExpectedCountry' 	=> 'Brazil',
+				'addressData' => [
+					'countryId' => 58, 			// Brazil
+					'postCode' 	=> '12345-123'
+				]
+			]
 		];
 	}
 
@@ -87,8 +149,11 @@ class EndToEndTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 	 * @dataProvider languageAndCountryPairs
 	 * @parallelize
 	 */
-	public function testFullProcess($language, $country, array $expect)
+	public function testFullProcess($language, $country)
 	{
+		self::setValue('language', $language);
+		self::setValue('country', $country);
+
 		$this->browser->clearCookies();
 		$this->homePage->getBrowser()->clearCookies();
 		$accountCreation = new AccountCreation($this->homePage);
@@ -123,16 +188,18 @@ class EndToEndTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 		$actualCountry = $loc->getDefaultCountryName();
 
 		// Check that the shop is setup with the same country as defined during onboarding
+		$expectedCountry = $this->extraData('AdminLocalizationExpectedCountry');
 		$this->assertEquals(
-			$country,
+			$expectedCountry,
 			$actualCountry,
-			"Shop doesn't have the expected default country, expected `$country` but got `$actualCountry`."
+			"Shop doesn't have the expected default country, expected `$expectedCountry` but got `$actualCountry`."
 		);
 
+		$expectedLanguage = $this->extraData('AdminLocalizationExpectedLanguage');
 		$this->assertEquals(
-			$expect['language'],
+			$expectedLanguage,
 			$actualLanguage,
-			"Shop doesn't have the expected default language, expected `{$expect['language']}` but got `$actualLanguage`."
+			"Shop doesn't have the expected default language, expected `$expectedLanguage` but got `$actualLanguage`."
 		);
 
 		$this->customersCanRegister();
@@ -162,12 +229,41 @@ class EndToEndTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 			'customer_password' => '123456789'
 		]);
 
-		/*$this->shop->getOptionProvider()->setDefaultValues([
+		$addressData = $this->extraData('addressData');
+
+		// Create an address
+		$addressForm = $this->shop
+							->getPageObject('MyAccount')
+							->goToMyAddresses()
+							->goToNewAddress();
+
+		$addressForm->setFirstName('Carrie')
+					->setLastName('Murray')
+					->setAddress('5, main street')
+					->setCity('Neverland')
+					->setCountryId($addressData['countryId']);
+
+		if (isset($addressData['stateId'])) {
+			sleep(5);
+			$addressForm->setStateId($addressData['stateId']);
+		}
+
+		if (isset($addressData['dni'])) {
+			$addressForm->setDni($addressData['dni']);
+		}
+
+		$addressForm->setPostCode($addressData['postCode'])
+					->setPhone('12345655')
+					->setAlias('My Cool Selenium Address');
+		
+		$addressForm->save();
+
+		$this->shop->getOptionProvider()->setDefaultValues([
 			'FrontOfficeLogin' => [
 				'customer_email' => $registrationAddress,
 				'customer_password' => '123456789'
 			]
-		]);*/
+		]);
 	}
 	
 	public function emailsAreSent()
@@ -198,11 +294,16 @@ class EndToEndTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 
         $reference = $output['json']['order']['reference'];
 
-        /*
         try {
-        	$this->getEmailReader()->ensureAnEmailIsSentTo($emailTestAddress);
+        	$this->getEmailReader()->ensureAnEmailIsSentTo(
+        		$this->getRegistrationAddress(),
+        		300,
+        		['body' => ['contains' => $reference]]
+        	);
         } catch (\Exception $e) {
-        	throw new FailedTestException("No email received by customer after placing an order.");
-        }*/
+        	throw new FailedTestException(
+        		"No valid order confirmation email received by customer in the 5 minutes after placing an order."
+        	);
+        }
 	}
 }
