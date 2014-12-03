@@ -134,7 +134,8 @@ class OnDemandTestCase extends TestCase
                 'AdminLocalizationExpectedLanguage' => 'Português BR (Portuguese)',
                 'AdminLocalizationExpectedCountry'  => 'Brazil',
                 'addressData' => [
-                    'countryId' => 58,          // Brazil
+                    'countryId' => 58,          // Brazil,
+                    'stateId'   => 316,         // Amazonas
                     'postCode'  => '12345-123'
                 ]
             ]
