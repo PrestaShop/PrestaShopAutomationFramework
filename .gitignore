@@ -12,3 +12,5 @@ bamboo*
 doc/cache
 doc
 *.secrets.json
+logcheck.php
+ondemandlog.csv
