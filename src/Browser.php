@@ -13,6 +13,8 @@ class Browser
 
     private $screenshotsDir = false;
 
+    private $browserMobProxy;
+
     // If this is >= 0, auto screenshots are active, if this is < 0,
     // they're disabled.
     // This is used to prevent double screenshotting when functions call one another.
@@ -28,6 +30,17 @@ class Browser
 
         if ($tunnel_identifier) {
             $caps['tunnel-identifier'] = $tunnel_identifier;
+        }
+
+        if (($bmp = getenv('BROWSERMOB_PROXY'))) {
+            $this->browserMobProxy = new BrowserMobProxy($bmp);
+
+            $caps['proxy'] = [
+                'proxyType' => 'manual',
+                'httpProxy' => $this->browserMobProxy->getURL()
+            ];
+
+            $this->browserMobProxy->startCapture();
         }
 
         $this->driver = \RemoteWebDriver::create($seleniumSettings['host'], $caps);
@@ -76,6 +89,13 @@ class Browser
 
             $metaData['Current URL'] = $this->getCurrentURL();
             $metaData['Browser Log'] = [];
+
+            if ($this->browserMobProxy) {
+                $har = $this->browserMobProxy->startCapture();
+                if (isset($har['log']['entries']) && count($har['log']['entries']) > 0) {
+                    $metaData['har'] = $har;
+                }
+            }
 
             $log = $this->driver->manage()->getLog('browser');
             foreach ($log as $entry) {
