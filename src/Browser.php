@@ -253,8 +253,9 @@ class Browser
             if (preg_match('/^{xpath}(.*)$/', $selector, $m)) {
                 $selector = $m[1];
                 $tos = 'xpath';
-            } else
+            } else {
                 $tos = 'cssSelector';
+            }
 
             $method = $unique ? 'findElement' : 'findElements';
 
@@ -272,10 +273,18 @@ class Browser
         }
     }
 
-    public function hasVisible($cssSelector)
+    public function hasVisible($selector)
     {
+        $m = [];
+        if (preg_match('/^{xpath}(.*)$/', $selector, $m)) {
+            $selector = $m[1];
+            $tos = 'xpath';
+        } else {
+            $tos = 'cssSelector';
+        }
+
         try {
-            $e = $this->driver->findElement(\WebDriverBy::cssSelector($cssSelector));
+            $e = $this->driver->findElement(\WebDriverBy::$tos($selector));
             return $e->isDisplayed();
         } catch (\Exception $e) {
             return false;
