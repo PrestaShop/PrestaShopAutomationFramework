@@ -16,9 +16,12 @@ class HomePage extends OnDemandPage
 		'nl' => 'Dutch'
 	];
 
-	public function visit()
+	public function visit($url = null)
 	{
-		$url = "https://v3staging.prestashop.com";
+		if (!$url) {
+			$url = $this->getSecrets()["homePageURL"];
+		}
+		
 		$this->getBrowser()->visit($url, $this->getSecrets()["htaccess"][$url]);
 
 		return $this;
