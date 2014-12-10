@@ -21,12 +21,21 @@ class OnDemandTestCase extends TestCase
 	public function getSecrets()
 	{
 		$path = FS::join($this->getTestPath(), $this->getSecretsName().'.secrets.json');
+        $override = $this->getSecretsName().'.secrets.json';
+
+        $secrets = [];
 
 		if (file_exists($path)) {
-			return json_decode(file_get_contents($path), true);
-		} else {
-			return [];
+			$secrets = json_decode(file_get_contents($path), true);
 		}
+
+        if (file_exists($override)) {
+            $suppl = json_decode(file_get_contents($override), true);
+            // TODO: do this recursively, but not with array_merge_recursive
+            $secrets = array_merge($secrets, $suppl);
+        }
+
+        return $secrets;
 	}
 
     public function setUp()
