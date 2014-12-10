@@ -47,8 +47,8 @@ class OrderManagement extends ShopCapability
         $browser = $this->getBrowser();
 
         $invoice_json_link = $this->getInvoiceLink().'&debug=1';
-        $browser->visit($invoice_json_link);
-        $json = json_decode($browser->find('body')->getText(), true);
+        $text = $browser->curl($invoice_json_link);
+        $json = json_decode($text, true);
 
         if (!$json)
             throw new \Exception('Invalid invoice JSON found');
