@@ -8,6 +8,13 @@ class MyStoresPage extends OnDemandPage
 	{
 		$this->getBrowser()->click('{xpath}//a[contains(@href, "init=select_domain")]');
 
-		return new DomainsPage($this->getBrowser(), $this->getSecrets());
+		return new DomainsPage($this);
+	}
+
+	public function gotoSettings()
+	{
+		$this->getBrowser()->click('{xpath}//a[contains(@href, "init=manage") and descendant::img]');
+
+		return new SettingsPage($this);
 	}
 }
