@@ -160,8 +160,11 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
     public function getTestPath()
     {
         $group = [];
-        preg_match('#PrestaShop\\\PSTAF\\\(\w+)\\\#', get_called_class(), $group);
-        $group = $group[1];
+        if (preg_match('#PrestaShop\\\PSTAF\\\(\w+)\\\#', get_called_class(), $group)) {
+            $group = $group[1];
+        } else {
+            return false;
+        }
 
         return realpath(__DIR__.'/../../'.$group.'/');
     }
@@ -171,10 +174,17 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
         $class = explode('\\', get_called_class());
         $class = end($class);
         
-        $path = FS::join($this->getTestPath(), $class, 'examples');
+        $testPath = $this->getTestPath();
 
-        if (!$path)
+        if ($testPath) {
+            $path = FS::join($testPath, $class, 'examples');
+        } else {
+            $path = null;
+        }
+
+        if (!$path) {
             throw new \PrestaShop\PSTAF\Exception\FailedTestException("No example files found for $class.\nThey should have been in tests-available/$class/examples/.");
+        }
 
         return $path;
     }
