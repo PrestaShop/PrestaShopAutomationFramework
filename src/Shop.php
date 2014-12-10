@@ -95,6 +95,8 @@ class Shop
         $this->data_store = new Util\DataStore();
         $this->selenium_settings = $selenium_settings;
 
+        $this->optionProvider = new OptionProvider();
+
         $import = [
             'mysql_host',
             'mysql_port',
