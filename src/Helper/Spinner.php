@@ -28,13 +28,12 @@ class Spinner
                 if (($val = call_user_func($truthy_returner))) {
                     return $val;
                 }
-            } catch (\Exception $e) {
-                if (time() > $maxTime || !$allowExceptions) {
-                    throw $e;
-                }
-                
+            } catch (\Exception $e) {                
                 if (!$this->error_message) {
                     $this->error_message = $e->getMessage();
+                }
+                if (!$allowExceptions) {
+                    break;
                 }
             }
             usleep($this->interval_in_milliseconds * 1000);
