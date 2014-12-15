@@ -1,6 +1,6 @@
 <?php
 
-namespace PrestaShop\PSTAF;
+namespace PrestaShop\PSTAF\Browser;
 
 class PSBrowser extends Browser
 {
