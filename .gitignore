@@ -14,3 +14,5 @@ doc
 *.secrets.json
 logcheck.php
 ondemandlog.csv
+src/Browser/Browser.old.php
+src/Browser/PSBrowser.old.php
