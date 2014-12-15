@@ -96,6 +96,17 @@ class BrowserTest extends PHPUnit_Framework_TestCase
 		$this->browser->waitFor('#eventually-visible');
 	}
 
+	public function testHasVisible()
+	{
+		$this->assertEquals(true, $this->browser->hasVisible('#ohai'));
+	}
+
+	public function testHasVisibleDoesntWait()
+	{
+		$this->browser->setDefaultRetryTimeout(15); // should not matter
+		$this->assertEquals(false, $this->browser->hasVisible('#eventually-visible'));
+	}
+
 	public function testFindExistingMultiple()
 	{
 		$elements = $this->browser->find('.three', ['unique' => false]);
@@ -189,5 +200,20 @@ class BrowserTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('', $this->browser->getValue('#input'));
 		$this->browser->click('#input')->sendKeys('yo');
 		$this->assertEquals('yo', $this->browser->getValue('#input'));
+	}
+
+	public function testClickFirstVisible()
+	{
+		$this->assertEquals('not clicked yet', $this->browser->getText('#first-visible'));
+		$this->browser->clickFirstVisible('.first-visible');
+		$this->assertEquals('clicked', $this->browser->getText('#first-visible'));
+	}
+
+	public function testClickButtonNamed()
+	{
+		$this->browser->setDefaultRetryTimeout(5);
+		$this->assertEquals('', $this->browser->getText('#clickButtonNamed'));
+		$this->browser->clickButtonNamed('button');
+		$this->assertEquals('clicked', $this->browser->getText('#clickButtonNamed'));
 	}
 }
