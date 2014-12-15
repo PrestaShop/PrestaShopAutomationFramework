@@ -1,6 +1,6 @@
 <?php
 
-namespace PrestaShop\PSTAF;
+namespace PrestaShop\PSTAF\Browser;
 
 use PrestaShop\PSTAF\Helper\Spinner;
 use PrestaShop\PSTAF\Helper\URL;

@@ -3,6 +3,8 @@
 namespace PrestaShop\PSTAF;
 
 use PrestaShop\PSTAF\Helper\FileSystem as FS;
+use PrestaShop\PSTAF\Browser\PSBrowser;
+use PrestaShop\PSTAF\Browser\Browser;
 
 class Shop
 {
