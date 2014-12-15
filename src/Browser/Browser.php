@@ -134,7 +134,8 @@ class Browser // implements BrowserInterface
             'baseElement' => null,
             'timeout' => $this->defaultTimeout,
             'interval' => $this->defaultInterval,
-            'displayed' => null
+            'displayed' => null,
+            'enabled' => null
         ];
 
         $options = array_merge($defaults, $options);
@@ -168,9 +169,20 @@ class Browser // implements BrowserInterface
                     return new Element($nativeElement, $this);
                 }, $found);
 
-                if ($options['displayed'] !== null) {
+                if ($options['displayed'] !== null || $options['enabled'] !== null) {
                     $elements = array_filter($elements, function ($element) use ($options) {
-                        return $element->isDisplayed() == $options['displayed'];
+
+                        $ok = true;
+
+                        if ($options['displayed'] !== null) {
+                            $ok = $ok && ($element->isDisplayed() == $options['displayed']);
+                        }
+
+                        if ($ok && $options['enabled'] !== null) {
+                            $ok = $ok && ($element->isEnabled() == $options['enabled']);
+                        }
+
+                        return $ok;
                     });
                 }
 
@@ -181,6 +193,9 @@ class Browser // implements BrowserInterface
                 if ($options['unique'] && count($elements) > 1) {
                     throw new TooManyElementsFoundException();
                 }
+
+                // reindex array starting at 0
+                $elements = array_values($elements);
 
                 if ($options['unique']) {
                     return $elements[0];
@@ -402,6 +417,47 @@ class Browser // implements BrowserInterface
         return $this->wrap(__FUNCTION__, func_get_args());
     }
 
+    private function _clickFirst($selector, array $options)
+    {
+        $options['unique'] = false;
+
+        $element = $this->find($selector, $options)[0];
+
+        $element->click();
+
+        return $this;
+    }
+
+    public function clickFirst($selector, array $options)
+    {
+        return $this->wrap(__FUNCTION__, func_get_args());
+    }
+
+    public function clickFirstVisible($selector)
+    {
+        return $this->clickFirst($selector, [
+            'displayed' => true
+        ]);
+    }
+
+    public function clickFirstVisibleAndEnabled($selector)
+    {
+        return $this->clickFirst($selector, [
+            'displayed' => true,
+            'enabled' => true
+        ]);
+    }
+
+    private function _clickButtonNamed($name)
+    {
+        return $this->clickFirstVisibleAndEnabled('button[name=' . $name . ']');
+    }
+
+    public function clickButtonNamed($name)
+    {
+        return $this->wrap(__FUNCTION__, func_get_args());
+    }
+
     private function _hover($selector)
     {
         $element = $this->find($selector)->getNativeElement();
@@ -425,5 +481,15 @@ class Browser // implements BrowserInterface
     public function sendKeys($keys)
     {
         return $this->wrap(__FUNCTION__, func_get_args());
+    }
+
+    public function hasVisible($selector)
+    {
+        try {
+            $this->find($selector, ['displayed' => true, 'timeout' => 0, 'unique' => false]);
+            return true;
+        } catch (ElementNotFoundException $e) {
+            return false;
+        }
     }
 }

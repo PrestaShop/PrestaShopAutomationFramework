@@ -18,6 +18,8 @@ interface ElementInterface
 
 	public function isDisplayed();
 
+	public function isEnabled();
+
 	public function isSelected();
 
 	public function click();

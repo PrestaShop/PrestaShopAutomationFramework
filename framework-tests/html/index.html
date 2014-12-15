@@ -37,4 +37,18 @@
 			document.getElementById('eventually-visible').style.visibility = 'visible';
 		}, 2000);
 	</script>
+
+	<div class="first-visible" style="display:none">don't click</div>
+	<div id="first-visible" class="first-visible" onclick="javascript:this.innerHTML='clicked'">not clicked yet</div>
+	<div class="first-visible" style="display:none">don't click either</div>
+
+	<button name="button" style="display:none">a</button>
+	<button name="button" style="visibility:hidden">b</button>
+	<button name="button" disabled>c</button>
+	<button id="clickButtonNamed" style="visibility:hidden" name="button" onclick="javascript:this.innerHTML='clicked'">not clicked yet</button>
+	<script>
+		window.setTimeout(function () {
+			document.getElementById('clickButtonNamed').style.visibility = 'visible';
+		}, 2000);
+	</script>
 </html>

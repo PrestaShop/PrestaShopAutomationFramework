@@ -54,6 +54,11 @@ class Element implements ElementInterface
 		return $this->nativeElement->isDisplayed();
 	}
 
+	public function isEnabled()
+	{
+		return $this->nativeElement->isEnabled();
+	}
+
 	public function isSelected()
 	{
 		return $this->nativeElement->isSelected();
