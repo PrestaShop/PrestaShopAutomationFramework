@@ -1,0 +1,40 @@
+<html>
+	<div id="ohai">Ohai!</div>
+	<span class="many"></span>
+	<span class="many"></span>
+	<span class="three"></span>
+	<span class="three"></span>
+	<span class="three"></span>
+	<span data-hello="world"></span>
+
+	<select id="select">
+		<option value="1"></option>
+		<option value="2"></option>
+		<option value="3" selected>  three  </option>
+		<option value="4"></option>
+	</select>
+
+	<select id="multiple" multiple>
+		<option value="1" selected>one</option>
+		<option value="2"></option>
+		<option value="3" selected>three</option>
+		<option value="4"></option>
+	</select>
+
+	<span id="click-me" onclick="javascript:this.innerHTML='clicked'">not clicked</span>
+	
+	<div id="hover-container" style="background-color:#ccc" onmouseover="javascript:document.getElementById('hover').style.visibility='visible'">
+		<div id="hover" style="visibility:hidden">hovered!</div>
+	</div>
+
+	<input id="input" type="text">
+
+	<div id="invisible" style="visibility:hidden">I'm the ghost in the shell.</div>
+
+	<div id="eventually-visible" style="visibility:hidden">I'm here now</div>
+	<script>
+		window.setTimeout(function () {
+			document.getElementById('eventually-visible').style.visibility = 'visible';
+		}, 2000);
+	</script>
+</html>
