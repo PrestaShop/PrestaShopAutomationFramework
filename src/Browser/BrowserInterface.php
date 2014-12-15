@@ -106,6 +106,17 @@ interface BrowserInterface
 	    public function clickFirstVisible($selector);
 
 	    /**
+	     * Click the first visible and enabled element matching selector.
+	     */
+	    public function clickFirstVisibleAndEnabled($selector);
+
+	    /**
+	     * Click the first element matching given options,
+	     * where options are any combination of: displayed, enabled
+	     */
+	    public function clickFirst($selector, array $options);
+
+	    /**
 	     * Click the first enabled button with the given name.
 	     */
 	    public function clickButtonNamed($name);
