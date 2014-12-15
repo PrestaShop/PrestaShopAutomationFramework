@@ -5,7 +5,7 @@ namespace PrestaShop\PSTAF\TestCase;
 use PrestaShop\PSTAF\SeleniumManager;
 use PrestaShop\PSTAF\ShopManager;
 use PrestaShop\PSTAF\Shop;
-use PrestaShop\PSTAF\PSBrowser as Browser;
+use PrestaShop\PSTAF\Browser\PSBrowser as Browser;
 use PrestaShop\PSTAF\Helper\FileSystem as FS;
 
 abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaShop\Ptest\TestClass\Basic
