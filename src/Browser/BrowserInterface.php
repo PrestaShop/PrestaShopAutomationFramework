@@ -169,8 +169,10 @@ interface BrowserInterface
 
         /**
 		* Check or uncheck a checkbox.
+		* If $on_off is === null, return whether the box is checked,
+		* otherwise checks it according to the truthiness of $on_off.
 		*/
-	    public function checkbox($selector, $on_off);
+	    public function checkbox($selector, $on_off = null);
 
         /**
     	* Wait for element to appear.
