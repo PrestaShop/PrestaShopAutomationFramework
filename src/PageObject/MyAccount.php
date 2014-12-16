@@ -7,7 +7,7 @@ class MyAccount extends PageObject
     public function visit($url = 'Argument Never Used')
     {
         $this->getShop()->getFrontOfficeNavigator()->visitHome();
-        $this->getBrowser()->click('.header_user_info a');
+        $this->getBrowser()->clickFirst('.header_user_info a');
 
         return $this;
     }
