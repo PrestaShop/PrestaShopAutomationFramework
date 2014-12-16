@@ -781,4 +781,40 @@ class Browser // implements BrowserInterface
     {
         return $this->wrap(__FUNCTION__, func_get_args());
     }
+
+    /**
+     * curl
+     */
+    
+    public function curl($url = null, $options = array())
+    {
+        if ($url === null)
+            $url = $this->getCurrentURL();
+
+        $ch = curl_init($url);
+
+        $defaults = [CURLOPT_RETURNTRANSFER => 1];
+
+        // Can't use array_merge here cuz keys are numeric
+        foreach ($options as $option => $value) {
+            $defaults[$option] = $value;
+        }
+        $options = $defaults;
+
+        foreach ($options as $option => $value) {
+            curl_setopt($ch, $option, $value);
+        }
+
+        $cookies = [];
+        foreach ($this->driver->manage()->getCookies() as $cookie) {
+            $cookies[] = $cookie['name'].'='.$cookie['value'];
+        }
+        $cookies = implode(';', $cookies);
+
+        curl_setopt($ch, CURLOPT_COOKIE, $cookies);
+        $ret = curl_exec($ch);
+        curl_close($ch);
+
+        return $ret;
+    }
 }
