@@ -269,4 +269,18 @@ class BrowserTest extends PHPUnit_Framework_TestCase
 
 		$this->assertEquals("42", $this->browser->executeScript('return 2*20 + 2'));
 	}
+
+	/**
+	 * @expectedException PrestaShop\PSTAF\Exception\NoAlertException
+	 */
+	public function testAcceptAlertNotFound()
+	{
+		$this->browser->acceptAlert();
+	}
+
+	public function testAcceptAlert()
+	{
+		$this->browser->visit('file://' . __DIR__ . '/html/alert.html');
+		$this->browser->acceptAlert();
+	}
 }
