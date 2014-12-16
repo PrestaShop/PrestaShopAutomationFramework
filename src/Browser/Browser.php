@@ -229,21 +229,34 @@ class Browser // implements BrowserInterface
      * waitFor
      */
 
-    private function _waitFor($selector, $timeout_in_second = 5, $interval_in_millisecond = 500)
+    private function _waitFor($selector, $timeout_in_second = null, $interval_in_millisecond = null)
     {
-        $this->find($selector, [
+        $options = [
             'unique' => false,
-            'timeout' => $timeout_in_second,
-            'interval' => $interval_in_millisecond,
             'displayed' => true
-        ]);
+        ];
+
+        if ($timeout_in_second) {
+            $options['timeout'] = $timeout_in_second;
+        }
+
+        if ($interval_in_millisecond) {
+            $options['interval'] = $interval_in_millisecond;
+        }
+
+        $this->find($selector, $options);
 
         return $this;
     }
 
-    public function waitFor($selector, $timeout_in_second = 5, $interval_in_millisecond = 500)
+    public function waitFor($selector, $timeout_in_second = null, $interval_in_millisecond = null)
     {
         return $this->wrap(__FUNCTION__, func_get_args());
+    }
+
+    public function ensureElementShowsUpOnPage($selector, $timeout_in_second = null, $interval_in_millisecond = null)
+    {
+        return $this->waitFor($selector, $timeout_in_second, $interval_in_millisecond);
     }
 
     /**
