@@ -20,10 +20,19 @@ class ShopInstallation extends ShopCapability
         ->click('#btNext')
         ->checkbox('#set_license', true)
         ->click('#btNext')
-        ->fillIn('#infosShop', $options['shop_name'])
-        ->jqcSelect('#infosActivity', $options['main_activity'])
-        ->jqcSelect('#infosCountry', $options['country'])
-        ->jqcSelect('#infosTimezone', $options['timezone'])
+        ->fillIn('#infosShop', $options['shop_name']);
+        
+        if (isset($options['main_activity'])) {
+            $browser->jqcSelect('#infosActivity', $options['main_activity']);
+        }
+        
+        $browser->jqcSelect('#infosCountry', $options['country']);
+
+        if (isset($options['timezone'])) {
+            $browser->jqcSelect('#infosTimezone', $options['timezone']);
+        }
+        
+        $browser
         ->fillIn('#infosFirstname', $options['admin_firstname'])
         ->fillIn('#infosName', $options['admin_lastname'])
         ->fillIn('#infosEmail', $options['admin_email'])
