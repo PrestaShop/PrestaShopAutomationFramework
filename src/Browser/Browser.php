@@ -538,47 +538,11 @@ class Browser implements BrowserInterface
      * jqcSelect
      */
     
-    private function _jqcSelect($selector, $value)
+    private function tryJqcSelect($selector, $value)
     {
-        $nativeSelect = $this->find($selector);
-        $chosenSelect = $nativeSelect->find(
-            "{xpath}./following-sibling::div[contains(concat(' ',normalize-space(@class),' '),' chosen-container ')][1]"
-        );
-        $chosenSelect->click();
+        $script = "$(arguments[0]).val(arguments[1]).trigger('chosen:updated').trigger('liszt:updated');";
 
-        $option_containers = [$nativeSelect];
-
-        $optgroups = $nativeSelect->all('optgroup');
-        if (!empty($optgroups)) {
-            $option_containers = $optgroups;
-        }
-
-        $n = 0;
-
-        $found = false;
-
-        foreach ($option_containers as $option_container) {
-            if ($option_container->getTagName() === 'optgroup') {
-                $n += 1;
-            }
-
-            $optionElements = $option_container->all('option');
-
-            foreach ($optionElements as $element) {
-                $v = $element->getValue();
-                if ($v == $value) {
-                    $chosenSelect->find('*[data-option-array-index="'.$n.'"]')->click();
-                    $found = true;
-                    break 2;
-                }
-
-                $n += 1;
-            }
-        }
-
-        if (!$found) {
-            throw new SelectValueNotFoundException("value: $value");
-        }
+        $this->executeScript($script, [$selector, $value]);
 
         $actual = $this->getSelectedValue($selector);
         if ($actual != $value) {
@@ -588,6 +552,15 @@ class Browser implements BrowserInterface
         }
 
         return $this;
+    }
+
+    private function _jqcSelect($selector, $value)
+    {
+        $spinner = new Spinner('Could not select value (JQuery Chosen Select)', $this->defaultTimeout, $this->defaultInterval);
+
+        return $spinner->assertNoException(function() use ($selector, $value) {
+            return $this->tryJqcSelect($selector, $value);
+        });
     }
 
     public function jqcSelect($selector, $value)
