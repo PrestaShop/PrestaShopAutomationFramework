@@ -313,8 +313,10 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
             mkdir($screenshotsDir, 0777, true);
         }
 
+        static::getBrowser()->setArtefactsDir($this->getArtefactsDir());
+
         if (!getenv('NO_SCREENSHOTS')) {
-            static::getBrowser()->recordScreenshots($screenshotsDir);
+            static::getBrowser()->setRecordScreenshots();
         }
     }
 
