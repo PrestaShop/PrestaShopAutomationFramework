@@ -4,6 +4,8 @@ namespace PrestaShop\PSTAF\Browser;
 
 use WebDriverElement;
 
+use PrestaShop\PSTAF\Exception\ElementNotFoundException;
+
 class Element implements ElementInterface
 {
 	private $nativeElement;
@@ -49,6 +51,15 @@ class Element implements ElementInterface
 		$options['baseElement'] = $this;
 
 		return $this->browser->find($selector, $options);
+	}
+
+	public function all($selector)
+	{
+		try {
+			return $this->find($selector, ['unique' => false]);
+		} catch (ElementNotFoundException $e) {
+			return [];
+		}
 	}
 
 	public function getTagName()
