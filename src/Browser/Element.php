@@ -11,7 +11,7 @@ class Element implements ElementInterface
 	private $nativeElement;
 	private $browser;
 
-	public function __construct(WebDriverElement $nativeElement, $browser)
+	public function __construct(WebDriverElement $nativeElement, BrowserInterface $browser)
 	{
 		$this->nativeElement = $nativeElement;
 		$this->browser = $browser;

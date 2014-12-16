@@ -80,12 +80,6 @@ interface BrowserInterface
 
 	    /**
 	     * Throws exception if element is not on page.
-	     * Should not wait for it to appear.
-	     */
-	    public function ensureElementIsOnPage($selector, $exception = null);
-
-	    /**
-	     * Throws exception if element is not on page.
 	     * Should wait for it to appear.
 	     */
 	    public function ensureElementShowsUpOnPage($selector, $timeout_in_second = 5, $interval_in_millisecond = 500);
@@ -93,7 +87,7 @@ interface BrowserInterface
 	    /**
 	     * Click an element.
 	     */
-	    public function click($selector, array $options = array());
+	    public function click($selector);
 
 	    /**
 	     * Emulates a mouseover action.

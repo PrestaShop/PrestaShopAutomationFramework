@@ -18,7 +18,7 @@ use WebDriverBy;
 use WebDriverSelect;
 use WebDriverKeys;
 
-class Browser // implements BrowserInterface
+class Browser implements BrowserInterface
 {
     // the underlying WebDriver
     private $driver;
@@ -848,7 +848,7 @@ class Browser // implements BrowserInterface
      * curl
      */
     
-    public function curl($url = null, $options = array())
+    public function curl($url = null, array $options = array())
     {
         if ($url === null)
             $url = $this->getCurrentURL();
@@ -878,5 +878,10 @@ class Browser // implements BrowserInterface
         curl_close($ch);
 
         return $ret;
+    }
+
+    public function takeScreenshot($save_as)
+    {
+        
     }
 }
