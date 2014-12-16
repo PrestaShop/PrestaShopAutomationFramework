@@ -283,4 +283,10 @@ class BrowserTest extends PHPUnit_Framework_TestCase
 		$this->browser->visit('file://' . __DIR__ . '/html/alert.html');
 		$this->browser->acceptAlert();
 	}
+
+	public function testSwitchToIframe()
+	{
+		$this->assertEquals("this is iframe", $this->browser->switchToIFrame('iframe')->getText('#hi'));
+		$this->assertEquals("Ohai!", $this->browser->switchToDefaultContent()->getText('#ohai'));
+	}
 }
