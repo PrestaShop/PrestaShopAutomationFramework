@@ -54,6 +54,7 @@ class CartRulesManagement extends ShopCapability
             $browser
             ->clickLabelFor('apply_discount_to_product')
             ->fillIn('#reductionProductFilter', $options['apply_to_product'])
+            ->waitFor('div.ac_results li')
             ->click('div.ac_results li');
         }
 
