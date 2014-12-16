@@ -129,6 +129,84 @@ class Browser // implements BrowserInterface
     }
 
     /**
+     * refresh
+     */
+    
+    private function _refresh()
+    {
+        $this->driver->navigate()->refresh();
+
+        return $this;
+    }
+
+    public function refresh()
+    {
+        return $this->wrap(__FUNCTION__, func_get_args());
+    }
+
+    /**
+     * reload
+     */
+    
+    private function _reload()
+    {
+        $this->visit($this->getCurrentURL());
+
+        return $this;
+    }
+
+    public function reload()
+    {
+        return $this->wrap(__FUNCTION__, func_get_args());
+    }
+
+    /**
+     * sleep
+     */
+    
+    private function _sleep($seconds)
+    {
+        sleep($seconds);
+
+        return $this;
+    }
+
+    public function sleep($seconds)
+    {
+        return $this->wrap(__FUNCTION__, func_get_args());
+    }
+
+    /**
+     * clearCookies
+     */
+    
+    private function _clearCookies()
+    {
+        $this->driver->manage()->deleteAllCookies();
+
+        return $this;
+    }
+
+    public function clearCookies()
+    {
+        return $this->wrap(__FUNCTION__, func_get_args());
+    }
+
+    /**
+     * executeScript
+     */
+    
+    private function _executeScript($script, array $args = array())
+    {
+        return $this->driver->executeScript($script, $args);
+    }
+
+    public function executeScript($script, array $args = array())
+    {
+        return $this->wrap(__FUNCTION__, func_get_args());
+    }
+
+    /**
      * find
      */
 

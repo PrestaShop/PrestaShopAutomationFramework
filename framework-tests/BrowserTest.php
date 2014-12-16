@@ -257,4 +257,16 @@ class BrowserTest extends PHPUnit_Framework_TestCase
 		$this->browser->clickLabelFor('checkbox');
 		$this->assertEquals(true, $this->browser->checkbox('#checkbox'));
 	}
+
+	public function testExecuteScript()
+	{
+		$this->assertEquals("", $this->browser->getText('#executeScript'));
+		$this->browser->executeScript(
+			"document.getElementById('executeScript').innerHTML = arguments[0];",
+			["hello script"]
+		);
+		$this->assertEquals("hello script", $this->browser->getText('#executeScript'));
+
+		$this->assertEquals("42", $this->browser->executeScript('return 2*20 + 2'));
+	}
 }
