@@ -25,6 +25,13 @@ class Element implements ElementInterface
 		return $this->getAttribute('value');
 	}
 
+	public function sendKeys($keys)
+	{
+		$this->nativeElement->sendKeys($keys);
+
+		return $this;
+	}
+
 	public function fillIn($value)
 	{
 		$this->nativeElement->clear()->sendKeys($value);

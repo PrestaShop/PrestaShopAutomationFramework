@@ -10,6 +10,8 @@ interface ElementInterface
 
 	public function fillIn($value);
 
+	public function sendKeys($keys);
+
 	public function getText();
 
 	public function find($selector, array $options = array());
