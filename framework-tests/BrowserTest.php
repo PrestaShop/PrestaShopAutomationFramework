@@ -295,4 +295,15 @@ class BrowserTest extends PHPUnit_Framework_TestCase
 		$this->browser->setFile('#file', __FILE__);
 		$this->assertEquals(basename(__FILE__), $this->browser->getValue('#file'));
 	}
+
+	public function testJqcSelect()
+	{
+		$this->browser->visit('file://' . __DIR__ . '/html/jqchosen.html');
+
+		$this->browser->jqcSelect('#select', 'b');
+		$this->assertEquals('b', $this->browser->getValue('#select'));
+
+		$this->browser->jqcSelect('#select-optgroups', 'y');
+		$this->assertEquals('y', $this->browser->getValue('#select-optgroups'));
+	}
 }

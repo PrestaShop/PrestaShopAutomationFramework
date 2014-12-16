@@ -7,6 +7,7 @@ use PrestaShop\PSTAF\Helper\URL;
 use PrestaShop\PSTAF\Exception\ElementNotFoundException;
 use PrestaShop\PSTAF\Exception\TooManyElementsFoundException;
 use PrestaShop\PSTAF\Exception\NoAlertException;
+use PrestaShop\PSTAF\Exception\SelectValueNotFoundException;
 
 use Exception;
 
@@ -509,6 +510,67 @@ class Browser // implements BrowserInterface
     }
 
     public function select($selector, $value)
+    {
+        return $this->wrap(__FUNCTION__, func_get_args());
+    }
+
+    /**
+     * jqcSelect
+     */
+    
+    private function _jqcSelect($selector, $value)
+    {
+        $nativeSelect = $this->find($selector);
+        $chosenSelect = $nativeSelect->find(
+            "{xpath}./following-sibling::div[contains(concat(' ',normalize-space(@class),' '),' chosen-container ')][1]"
+        );
+        $chosenSelect->click();
+
+        $option_containers = [$nativeSelect];
+
+        $optgroups = $nativeSelect->all('optgroup');
+        if (!empty($optgroups)) {
+            $option_containers = $optgroups;
+        }
+
+        $n = 0;
+
+        $found = false;
+
+        foreach ($option_containers as $option_container) {
+            if ($option_container->getTagName() === 'optgroup') {
+                $n += 1;
+            }
+
+            $optionElements = $option_container->all('option');
+
+            foreach ($optionElements as $element) {
+                $v = $element->getValue();
+                if ($v == $value) {
+                    $chosenSelect->find('*[data-option-array-index="'.$n.'"]')->click();
+                    $found = true;
+                    break 2;
+                }
+
+                $n += 1;
+            }
+        }
+
+        if (!$found) {
+            throw new SelectValueNotFoundException();
+        }
+
+        $actual = $this->getSelectedValue($selector);
+        if ($actual != $value) {
+            throw new Exception(
+                'JQuery Choosen selection of value `' . $value . '` seems to have failed, `'. $actual .'` got selected instead.'
+            );
+        }
+
+        return $this;
+    }
+
+    public function jqcSelect($selector, $value)
     {
         return $this->wrap(__FUNCTION__, func_get_args());
     }

@@ -16,6 +16,8 @@ interface ElementInterface
 
 	public function find($selector, array $options = array());
 
+	public function all($selector);
+
 	public function getTagName();
 
 	public function isDisplayed();
