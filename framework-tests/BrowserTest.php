@@ -246,4 +246,15 @@ class BrowserTest extends PHPUnit_Framework_TestCase
 		$this->browser->checkbox('#checkbox', false);
 		$this->assertEquals(false, $this->browser->checkbox('#checkbox'));
 	}
+
+	public function testClickLabelFor()
+	{
+		// make sure the checkbox is unchecked
+		$this->browser->checkbox('#checkbox', false);
+		$this->assertEquals(false, $this->browser->checkbox('#checkbox'));
+
+		// click its label
+		$this->browser->clickLabelFor('checkbox');
+		$this->assertEquals(true, $this->browser->checkbox('#checkbox'));
+	}
 }
