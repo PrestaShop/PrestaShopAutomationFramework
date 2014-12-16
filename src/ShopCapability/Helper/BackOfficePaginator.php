@@ -28,14 +28,10 @@ class BackOfficePaginator
     public function getNextPageNumber()
     {
         $next = $this->getCurrentPageNumber() + 1;
-        try {
-            $this->pagination->getShop()->getBrowser()
-            ->find($this->settings['container_selector'].' ul.pagination li a[data-page="'.$next.'"]', ['wait' => false]);
 
-            return $next;
-        } catch (\Exception $e) {
-            return false;
-        }
+        $selector = $this->settings['container_selector'].' ul.pagination li a[data-page="'.$next.'"]';
+
+        return $this->pagination->getShop()->getBrowser()->hasVisible($selector);
     }
 
     public function getLastPageNumber()
@@ -54,7 +50,7 @@ class BackOfficePaginator
     public function gotoPage($n)
     {
         $this->pagination->getShop()->getBrowser()
-        ->click($this->settings['container_selector'].' ul.pagination li a[data-page="'.$n.'"]');
+        ->clickFirst($this->settings['container_selector'].' ul.pagination li a[data-page="'.$n.'"]');
     }
 
     private function getHeaderName($header)
@@ -73,7 +69,7 @@ class BackOfficePaginator
         if ($type === 'verbatim') {
             return $td->getText();
         } elseif (preg_match('/^switch:(.+)$/', $type, $m)) {
-            return $td->findElement(\WebDriverBy::cssSelector('.'.$m[1]))->isDisplayed();
+            return $td->find('.'.$m[1])->isDisplayed();
         } elseif (preg_match('/^i18n:(.+)$/', $type, $m)) {
             $value = $this->pagination->i18nParse($td->getText(), $m[1]);
 
@@ -99,7 +95,7 @@ class BackOfficePaginator
         {
             $row = [];
             $n = 0;
-            foreach ($tr->findElements(\WebDriverBy::cssSelector('td')) as $i => $td) {
+            foreach ($tr->all('td') as $i => $td) {
                 /**
 				 * Ignore cells corresponding to columns without text
 				 * this is useful because an extra column appears when there are bulk actions
