@@ -93,7 +93,7 @@ class BrowserTest extends PHPUnit_Framework_TestCase
 
 	public function testWaitForEventuallyVisible()
 	{
-		$this->browser->waitFor('#eventually-visible');
+		$this->browser->waitFor('#eventually-visible', 5);
 	}
 
 	public function testHasVisible()
