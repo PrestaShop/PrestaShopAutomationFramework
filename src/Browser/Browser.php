@@ -709,7 +709,7 @@ class Browser implements BrowserInterface
      * clickFirst
      */
 
-    private function _clickFirst($selector, array $options)
+    private function _clickFirst($selector, array $options = array())
     {
         $options['unique'] = false;
 
@@ -720,7 +720,7 @@ class Browser implements BrowserInterface
         return $this;
     }
 
-    public function clickFirst($selector, array $options)
+    public function clickFirst($selector, array $options = array())
     {
         return $this->wrap(__FUNCTION__, func_get_args());
     }
@@ -876,5 +876,13 @@ class Browser implements BrowserInterface
     public function takeScreenshot($save_as)
     {
 
+    }
+
+    public function wait()
+    {
+        $handle = fopen ("php://stdin","r");
+        $line = fgets($handle);
+        fclose($handle);
+        return $this;
     }
 }

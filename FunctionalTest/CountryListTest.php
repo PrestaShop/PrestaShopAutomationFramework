@@ -6,6 +6,9 @@ use PrestaShop\PSTAF\TestCase\LazyTestCase;
 
 class CountryListTest extends LazyTestCase
 {
+    /**
+     * @maxattempts 1
+     */
     public function testRetrievalOfCountryList()
     {
         $browser = static::getShop()
@@ -18,6 +21,7 @@ class CountryListTest extends LazyTestCase
         ->getPaginatorFor('AdminCountries');
 
         $this->assertEquals(1, $paginator->getCurrentPageNumber());
+
         $this->assertEquals(2, $paginator->getNextPageNumber());
 
         $this->assertEquals(5, $paginator->getLastPageNumber());

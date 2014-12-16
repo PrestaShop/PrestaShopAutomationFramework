@@ -108,7 +108,7 @@ interface BrowserInterface
 	     * Click the first element matching given options,
 	     * where options are any combination of: displayed, enabled
 	     */
-	    public function clickFirst($selector, array $options);
+	    public function clickFirst($selector, array $options = array());
 
 	    /**
 	     * Click the first enabled button with the given name.
