@@ -232,6 +232,36 @@ class Browser // implements BrowserInterface
     }
 
     /**
+     * switchToIFrame
+     */
+    
+    private function _switchToIFrame($name)
+    {
+        $this->driver->switchTo()->frame($name);
+        return $this;
+    }
+
+    public function switchToIFrame($name)
+    {
+        return $this->wrap(__FUNCTION__, func_get_args());
+    }
+
+    /**
+     * switchToDefaultContent
+     */
+    
+    private function _switchToDefaultContent()
+    {
+        $this->driver->switchTo()->defaultContent();
+        return $this;
+    }
+
+    public function switchToDefaultContent()
+    {
+        return $this->wrap(__FUNCTION__, func_get_args());
+    }
+
+    /**
      * find
      */
 
