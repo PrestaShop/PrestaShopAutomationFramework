@@ -35,8 +35,7 @@ class BackOfficeNavigation extends ShopCapability
         $browser = $this->getShop()->getBrowser();
         $maintabs = $browser->find('li.maintab', ['unique' => false]);
         foreach ($maintabs as $maintab) {
-            $as = $maintab->findElements(\WebDriverBy::tagName('a'));
-            foreach ($as as $a) {
+            foreach ($maintab->all('a') as $a) {
                 $href = $a->getAttribute('href');
                 $m = [];
                 if (preg_match('/\?controller=(\w+)\b/', $href, $m)) {
@@ -120,7 +119,7 @@ class BackOfficeNavigation extends ShopCapability
         ->fillIn('#email', $options['admin_email'])
         ->fillIn('#passwd', $options['admin_password'])
         ->checkbox('#stay_logged_in', $options['stay_logged_in'])
-        ->click('button[name=submitLogin]');
+        ->clickButtonNamed('submitLogin');
 
         try {
             $browser->ensureElementShowsUpOnPage('#maintab-AdminDashboard', 15);
