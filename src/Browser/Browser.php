@@ -6,6 +6,7 @@ use PrestaShop\PSTAF\Helper\Spinner;
 use PrestaShop\PSTAF\Helper\URL;
 use PrestaShop\PSTAF\Exception\ElementNotFoundException;
 use PrestaShop\PSTAF\Exception\TooManyElementsFoundException;
+use PrestaShop\PSTAF\Exception\NoAlertException;
 
 use Exception;
 
@@ -202,6 +203,30 @@ class Browser // implements BrowserInterface
     }
 
     public function executeScript($script, array $args = array())
+    {
+        return $this->wrap(__FUNCTION__, func_get_args());
+    }
+
+    /**
+     * acceptAlert
+     */
+    private function _acceptAlert()
+    {
+        $spinner = new Spinner('Did not find alert.', $this->defaultTimeout, $this->defaultInterval);
+
+        try {
+            $spinner->assertNoException(function() {
+                $alert = $this->driver->switchTo()->alert();
+                $alert->accept();
+            });
+        } catch (Exception $e) {
+            throw new NoAlertException("There was no alert to accept.", 1, $e);
+        }
+
+        return $this;
+    }
+
+    public function acceptAlert()
     {
         return $this->wrap(__FUNCTION__, func_get_args());
     }
