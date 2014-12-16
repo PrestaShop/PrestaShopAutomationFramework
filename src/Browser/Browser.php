@@ -607,4 +607,20 @@ class Browser // implements BrowserInterface
     {
         return $this->wrap(__FUNCTION__, func_get_args());
     }
+
+    /**
+     * clickLabelFor
+     */
+    
+    private function _clickLabelFor($for)
+    {
+         $this->find("label[for=$for]")->click();
+
+         return $this;
+    }
+    
+    public function clickLabelFor($for)
+    {
+        return $this->wrap(__FUNCTION__, func_get_args());
+    }
 }
