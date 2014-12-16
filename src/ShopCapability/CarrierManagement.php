@@ -56,7 +56,7 @@ class CarrierManagement extends ShopCapability
                 ->sleep(1);
 
                 foreach ($browser->find('tr.fees td:nth-child('.$index.') input', ['unique' => false]) as $input) {
-                    $browser->setElementValue($input, $value);
+                    $input->fillIn($value);
                 }
 
                 $index += 1;
