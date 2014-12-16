@@ -289,4 +289,10 @@ class BrowserTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals("this is iframe", $this->browser->switchToIFrame('iframe')->getText('#hi'));
 		$this->assertEquals("Ohai!", $this->browser->switchToDefaultContent()->getText('#ohai'));
 	}
+
+	public function testSetFile()
+	{
+		$this->browser->setFile('#file', __FILE__);
+		$this->assertEquals(basename(__FILE__), $this->browser->getValue('#file'));
+	}
 }

@@ -443,6 +443,31 @@ class Browser // implements BrowserInterface
     }
 
     /**
+     * setFile
+     */
+
+    private function _setFile($selector, $path)
+    {
+        $element = $this->find($selector);
+        if (!$element->isDisplayed()) {
+            $this->executeScript("
+                arguments[0].style.setProperty('display', 'inherit', 'important');
+                arguments[0].style.setProperty('visibility', 'visible', 'important');
+                arguments[0].style.setProperty('width', 'auto', 'important');
+                arguments[0].style.setProperty('height', 'auto', 'important');
+            ", [$element->getNativeElement()]);
+        }
+        $element->sendKeys($path);
+
+        return $this;
+    }
+
+    public function setFile($selector, $value)
+    {
+        return $this->wrap(__FUNCTION__, func_get_args());
+    }
+
+    /**
      * getValue
      */
 
