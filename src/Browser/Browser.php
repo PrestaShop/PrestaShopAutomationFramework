@@ -26,6 +26,9 @@ class Browser implements BrowserInterface
     private $defaultTimeout = 5;
     private $defaultInterval = 500;
 
+    private $artefactsDir;
+    private $recordScreenshots = false;
+
     public function __construct(array $settings = array())
     {
         $defaults = [
@@ -45,6 +48,21 @@ class Browser implements BrowserInterface
         $this->driver = RemoteWebDriver::create($host, $settings);
 
         $this->resizeWindow(1920, 1200);
+    }
+
+
+    public function setArtefactsDir($pathToDir)
+    {
+        $this->artefactsDir = $pathToDir;
+
+        return $this;
+    }
+    
+    public function setRecordScreenshots($trueOrFalse = true)
+    {
+        $this->recordScreenshots = $trueOrFalse;
+
+        return $this;
     }
 
     public function quit()
@@ -350,7 +368,7 @@ class Browser implements BrowserInterface
                 throw $e;
             }
 
-            throw new ElementNotFoundException('Could not find element(s).', 1, $e);
+            throw new ElementNotFoundException('Could not find element(s) (selector: `' . $selector . '`).', 1, $e);
         }
     }
 
@@ -436,6 +454,8 @@ class Browser implements BrowserInterface
     private function _fillIn($selector, $value)
     {
         $this->find($selector)->fillIn($value);
+
+        return $this;
     }
 
     public function fillIn($selector, $value)
@@ -557,7 +577,7 @@ class Browser implements BrowserInterface
         }
 
         if (!$found) {
-            throw new SelectValueNotFoundException();
+            throw new SelectValueNotFoundException("value: $value");
         }
 
         $actual = $this->getSelectedValue($selector);
@@ -882,6 +902,6 @@ class Browser implements BrowserInterface
 
     public function takeScreenshot($save_as)
     {
-        
+
     }
 }
