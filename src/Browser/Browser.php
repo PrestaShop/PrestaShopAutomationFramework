@@ -109,6 +109,10 @@ class Browser // implements BrowserInterface
         return URL::getParameter($url, $param);
     }
 
+    /**
+     * visit
+     */
+
     private function _visit($url, array $basic_auth = null)
     {
         if ($basic_auth) {
@@ -124,7 +128,9 @@ class Browser // implements BrowserInterface
         return $this->wrap(__FUNCTION__, func_get_args());
     }
 
-    
+    /**
+     * find
+     */
 
     private function _find($selector, array $options = array())
     {
@@ -219,6 +225,10 @@ class Browser // implements BrowserInterface
         return $this->wrap(__FUNCTION__, func_get_args());
     }
 
+    /**
+     * waitFor
+     */
+
     private function _waitFor($selector, $timeout_in_second = 5, $interval_in_millisecond = 500)
     {
         $this->find($selector, [
@@ -236,6 +246,10 @@ class Browser // implements BrowserInterface
         return $this->wrap(__FUNCTION__, func_get_args());
     }
 
+    /**
+     * all
+     */
+
     public function all($selector)
     {
         try {
@@ -245,10 +259,18 @@ class Browser // implements BrowserInterface
         }
     }
 
+    /**
+     * count
+     */
+
     public function count($selector)
     {
         return count($this->all($selector));
     }
+
+    /**
+     * getAttribute
+     */
 
     private function _getAttribute($selector, $attribute)
     {
@@ -260,6 +282,10 @@ class Browser // implements BrowserInterface
         return $this->wrap(__FUNCTION__, func_get_args());
     }
 
+    /**
+     * fillIn
+     */
+
     private function _fillIn($selector, $value)
     {
         $this->find($selector)->fillIn($value);
@@ -269,6 +295,10 @@ class Browser // implements BrowserInterface
     {
         return $this->wrap(__FUNCTION__, func_get_args());
     }
+
+    /**
+     * getValue
+     */
 
     private function _getValue($selector)
     {
@@ -280,6 +310,10 @@ class Browser // implements BrowserInterface
         return $this->wrap(__FUNCTION__, func_get_args());
     }
 
+    /**
+     * getText
+     */
+
     private function _getText($selector)
     {
         return $this->find($selector)->getText();
@@ -290,6 +324,10 @@ class Browser // implements BrowserInterface
         return $this->wrap(__FUNCTION__, func_get_args());
     }
 
+    /**
+     * select
+     */
+
     private function _select($selector, $value)
     {
         $element = $this->find($selector)->getNativeElement();
@@ -298,6 +336,15 @@ class Browser // implements BrowserInterface
 
         return $this;
     }
+
+    public function select($selector, $value)
+    {
+        return $this->wrap(__FUNCTION__, func_get_args());
+    }
+
+    /**
+     * getSelectOptions
+     */
 
     private function _getSelectOptions($selector)
     {
@@ -318,10 +365,9 @@ class Browser // implements BrowserInterface
         return $this->wrap(__FUNCTION__, func_get_args());
     }
 
-    public function select($selector, $value)
-    {
-        return $this->wrap(__FUNCTION__, func_get_args());
-    }
+    /**
+     * getSelectedValue
+     */
 
     private function _getSelectedValue($selector)
     {
@@ -337,6 +383,10 @@ class Browser // implements BrowserInterface
         return $this->wrap(__FUNCTION__, func_get_args());
     }
 
+    /**
+     * getSelectedText
+     */
+
     private function _getSelectedText($selector)
     {
         $select = new WebDriverSelect($this->find($selector)->getNativeElement());
@@ -350,6 +400,10 @@ class Browser // implements BrowserInterface
     {
         return $this->wrap(__FUNCTION__, func_get_args());
     }
+
+    /**
+     * multiSelect
+     */
 
     private function _multiSelect($selector, array $values)
     {
@@ -389,6 +443,10 @@ class Browser // implements BrowserInterface
         return $this->wrap(__FUNCTION__, func_get_args());
     }
 
+    /**
+     * getSelectedValues
+     */
+
     private function _getSelectedValues($selector)
     {
         $select = new WebDriverSelect($this->find($selector)->getNativeElement());
@@ -405,6 +463,10 @@ class Browser // implements BrowserInterface
         return $this->wrap(__FUNCTION__, func_get_args());
     }
 
+    /**
+     * click
+     */
+
     private function _click($selector)
     {
         $this->find($selector)->click();
@@ -416,6 +478,10 @@ class Browser // implements BrowserInterface
     {
         return $this->wrap(__FUNCTION__, func_get_args());
     }
+
+    /**
+     * clickFirst
+     */
 
     private function _clickFirst($selector, array $options)
     {
@@ -448,6 +514,10 @@ class Browser // implements BrowserInterface
         ]);
     }
 
+    /**
+     * clickButtonNamed
+     */
+
     private function _clickButtonNamed($name)
     {
         return $this->clickFirstVisibleAndEnabled('button[name=' . $name . ']');
@@ -457,6 +527,10 @@ class Browser // implements BrowserInterface
     {
         return $this->wrap(__FUNCTION__, func_get_args());
     }
+
+    /**
+     * hover
+     */
 
     private function _hover($selector)
     {
@@ -470,6 +544,10 @@ class Browser // implements BrowserInterface
     {
         return $this->wrap(__FUNCTION__, func_get_args());
     }
+
+    /**
+     * sendKeys
+     */
 
     private function _sendKeys($keys)
     {
@@ -491,5 +569,29 @@ class Browser // implements BrowserInterface
         } catch (ElementNotFoundException $e) {
             return false;
         }
+    }
+
+    /**
+     * checkbox
+     */
+    
+    private function _checkbox($selector, $on_off = null)
+    {
+        $checkbox = $this->find($selector);
+
+        if (null === $on_off) {
+            return $checkbox->isSelected();
+        }
+
+        if ($on_off xor $checkbox->isSelected()) {
+            $checkbox->click();
+        }
+
+        return $this;
+    }
+    
+    public function checkbox($selector, $on_off = null)
+    {
+        return $this->wrap(__FUNCTION__, func_get_args());
     }
 }

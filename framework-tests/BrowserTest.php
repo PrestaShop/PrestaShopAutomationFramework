@@ -216,4 +216,34 @@ class BrowserTest extends PHPUnit_Framework_TestCase
 		$this->browser->clickButtonNamed('button');
 		$this->assertEquals('clicked', $this->browser->getText('#clickButtonNamed'));
 	}
+
+	public function testCheckBox()
+	{
+		$this->assertEquals(false, $this->browser->checkbox('#checkbox'));
+		
+		/**
+		 * false => true
+		 */
+		$this->browser->checkbox('#checkbox', true);
+		$this->assertEquals(true, $this->browser->checkbox('#checkbox'));
+
+		/**
+		 * true => true
+		 */
+		$this->browser->checkbox('#checkbox', true);
+		$this->assertEquals(true, $this->browser->checkbox('#checkbox'));
+
+		/**
+		 * true => false
+		 */
+		$this->browser->checkbox('#checkbox', false);
+		$this->assertEquals(false, $this->browser->checkbox('#checkbox'));
+
+
+		/**
+		 * false => false
+		 */
+		$this->browser->checkbox('#checkbox', false);
+		$this->assertEquals(false, $this->browser->checkbox('#checkbox'));
+	}
 }
