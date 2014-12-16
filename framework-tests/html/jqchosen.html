@@ -1,0 +1,28 @@
+<html>
+	<head>
+		<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.jquery.js"></script>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.1.0/chosen.css">
+	</head>
+	<body>
+		<select id="select">
+			<option value="a">a chosen</option>
+			<option value="b">b chosen</option>
+			<option value="c">c chosen</option>
+		</select>
+
+		<select id="select-optgroups">
+			<optgroup>
+				<option value="x">x chosen</option>
+			</optgroup>
+			<optgroup>
+				<option value="y">y chosen</option>
+				<option value="z">z chosen</option>
+			</optgroup>
+		</select>
+	</body>
+	<script>
+		/* global $ */
+		$('select').chosen();
+	</script>
+</html>
