@@ -246,4 +246,14 @@ interface BrowserInterface
          * Quits the browser, closing the window if any.
          */
         public function quit();
+
+        /**
+         * Set directory for artifacts created by the browser (logs, screenshots...)
+         */
+        public function setArtefactsDir($pathToDir);
+
+        /**
+         * Should the browser record screenshots?
+         */
+        public function setRecordScreenshots($trueOrFalse = true);
 }
