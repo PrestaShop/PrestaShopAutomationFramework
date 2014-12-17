@@ -50,7 +50,7 @@ class TaxManagementTest extends LazyTestCase
         $shop = static::getShop();
         $shop->getBackOfficeNavigator()
         ->visit('AdminTaxes')
-        ->ensureElementIsOnPage('#PS_TAX_on');
+        ->ensureElementIsOnPage('label[for=PS_TAX_on]');
     }
 
     public function testTaxBreakdownCanBeEnabled()
