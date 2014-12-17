@@ -28,6 +28,7 @@ class Browser implements BrowserInterface
 
     private $artefactsDir;
     private $recordScreenshots = false;
+    private $quitted = false;
 
     public function __construct(array $settings = array())
     {
@@ -50,6 +51,11 @@ class Browser implements BrowserInterface
         $this->resizeWindow(1920, 1200);
     }
 
+    public function __destruct()
+    {
+        $this->quit();
+    }
+
 
     public function setArtefactsDir($pathToDir)
     {
@@ -67,9 +73,12 @@ class Browser implements BrowserInterface
 
     public function quit()
     {
-         $this->driver->quit();
+        if (!$this->quitted) {
+            $this->quitted = true;
+            $this->driver->quit();
+        }
 
-         return $this;
+        return $this;
     }
 
     private function before($function, $arguments)
@@ -348,8 +357,10 @@ class Browser implements BrowserInterface
                     throw new Exception('No element found.');
                 }
 
-                if ($options['unique'] && count($elements) > 1) {
-                    throw new TooManyElementsFoundException();
+                $nFound = count($elements);
+
+                if ($options['unique'] && $nFound > 1) {
+                    throw new TooManyElementsFoundException("Found `$nFound` elements matching selector `$finalSelector`.");
                 }
 
                 // reindex array starting at 0
