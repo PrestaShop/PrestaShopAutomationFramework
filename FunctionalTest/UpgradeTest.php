@@ -41,6 +41,8 @@ class UpgradeTest extends TestCase
         $this->browser->clearCookies();
 
         $scenario = $this->getJSONExample('invoice/simple-order.json');
+        // Rename the carrier so that this one gets picked
+        $scenario['carrier']['name'] .= ' Two';
         $output = InvoiceTest::runScenario($this->shop, $scenario);
 
         $this->shop->getTaxManager()->getOrCreateTaxRulesGroupFromString("3.5 + 4.1 + 7");
