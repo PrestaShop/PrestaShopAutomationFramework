@@ -84,6 +84,12 @@ interface BrowserInterface
 	     */
 	    public function ensureElementShowsUpOnPage($selector, $timeout_in_second = 5, $interval_in_millisecond = 500);
 
+        /**
+         * Throws exception if element is not on page.
+         * Should NOT wait for it to appear.
+         */
+        public function ensureElementIsOnPage($selector);
+
 	    /**
 	     * Click an element.
 	     */

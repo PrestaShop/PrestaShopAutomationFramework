@@ -412,6 +412,20 @@ class Browser implements BrowserInterface
     }
 
     /**
+     * ensureElementIsOnPage
+     */
+    
+    private function _ensureElementIsOnPage($selector)
+    {
+        return $this->waitFor($selector, 0);
+    }
+
+    public function ensureElementIsOnPage($selector)
+    {
+        return $this->wrap(__FUNCTION__, func_get_args());
+    }
+
+    /**
      * all
      */
 
