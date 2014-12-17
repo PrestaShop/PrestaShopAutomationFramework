@@ -13,7 +13,7 @@ class AdminLocalization extends PageObject
 
     public function getDefaultLanguageName()
     {
-        return trim($this->getBrowser()->getSelectText('#PS_LANG_DEFAULT'));
+        return trim($this->getBrowser()->getSelectedText('#PS_LANG_DEFAULT'));
     }
 
     public function getDefaultLanguageId()
