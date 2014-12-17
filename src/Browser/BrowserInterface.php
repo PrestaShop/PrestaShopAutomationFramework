@@ -244,6 +244,12 @@ interface BrowserInterface
         public function curl($url = null, array $options = array());
 
         /**
+         * Execute a GET on the given URL, using the browser's XHR.
+         * This is useful to retrieve raw data as the browser would do.
+         */
+        public function xhr($url, array $options = array());
+
+        /**
          * Resize the browser window.
          */
         public function resizeWindow($width, $height);
