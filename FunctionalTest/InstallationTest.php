@@ -47,7 +47,8 @@ class InstallationTest extends TestCase
 	*/
     public function testInstallationForLanguageAndCountry($language, $country)
     {
-        static::getShop()->getInstaller()->install(['language' => $language, 'country' => $country]);
-        static::getShop()->getBackOfficeNavigator()->login();
+        $this->shop->getInstaller()->install(['language' => $language, 'country' => $country]);
+        $this->shop->getBackOfficeNavigator()->login();
+        $this->shop->getOrderManager()->visit(5)->validate();
     }
 }

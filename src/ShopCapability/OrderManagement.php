@@ -19,7 +19,8 @@ class OrderManagement extends ShopCapability
         $this
         ->getBrowser()
         ->jqcSelect('#id_order_state', 2)
-        ->clickButtonNamed('submitState');
+        ->clickButtonNamed('submitState')
+        ->ensureElementIsOnPage('[data-selenium-id="view_invoice"]');
 
         return $this;
     }
