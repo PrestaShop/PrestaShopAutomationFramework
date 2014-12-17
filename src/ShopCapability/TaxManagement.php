@@ -271,9 +271,11 @@ class TaxManagement extends ShopCapability
 
         foreach ($taxRules as $taxRule) {
             // We need to get the numerical tax rate to check correct display later
-            $tax_rate = $browser->doThenComeBack(function () use ($taxRule) {
-                return $this->getTaxRateFromIdTax($taxRule['id_tax']);
-            });
+            if (!$nocheck) {
+                $url = $browser->getCurrentURL();
+                $tax_rate = $this->getTaxRateFromIdTax($taxRule['id_tax']);
+                $browser->visit($url);
+            }
 
             $behavior = 0;
             if ($taxRule['behavior'] === '+')
@@ -341,16 +343,14 @@ class TaxManagement extends ShopCapability
                 if (isset($location['state']) && $location['state']) {
                     $browser->waitFor('#states');
 
-                    if (!$state_names) {
+                    if (!$state_names && !$nocheck) {
                         $state_names = $browser->getSelectOptions('#states');
+                        foreach ($location['state'] as $id) {
+                            $expected_states[] = $state_names[$id];
+                        }
                     }
 
                     $browser->multiSelect('#states', $location['state']);
-
-                    foreach ($location['state'] as $id)
-                        $expected_states[] = $state_names[$id];
-
-                    //$browser->waitForUserInput();
                 } else {
                     $expected_states = ['--'];
                 }
@@ -364,14 +364,16 @@ class TaxManagement extends ShopCapability
                         continue;
 
                     if (!$location['country'] || $location['country'] == $value) {
-                        foreach ($expected_states as $state) {
-                            $expected[] = [
-                                'country' => $name,
-                                'state' => $state,
-                                'behavior' => $behavior_names[$behavior],
-                                'tax' => $tax_rate,
-                                'ziprange' => $location['ziprange']
-                            ];
+                        if (!$nocheck) {
+                            foreach ($expected_states as $state) {
+                                $expected[] = [
+                                    'country' => $name,
+                                    'state' => $state,
+                                    'behavior' => $behavior_names[$behavior],
+                                    'tax' => $tax_rate,
+                                    'ziprange' => $location['ziprange']
+                                ];
+                            }
                         }
                     }
                 }

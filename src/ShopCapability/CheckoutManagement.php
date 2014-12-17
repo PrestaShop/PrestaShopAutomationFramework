@@ -25,7 +25,7 @@ class CheckoutManagement extends ShopCapability
 
         $browser
         ->visit($shop->getFrontOfficeURL())
-        ->click('div.shopping_cart a')
+        ->clickFirst('div.shopping_cart a')
         ->click('a.standard-checkout')
         ->clickButtonNamed('processAddress')
         ->clickLabelFor('cgv');
