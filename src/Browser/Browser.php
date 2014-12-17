@@ -887,6 +887,18 @@ class Browser implements BrowserInterface
         return $ret;
     }
 
+    public function xhr($url, array $options = array())
+    {
+        $script = "
+            var req = new XMLHttpRequest();
+            req.open('GET', arguments[0], false);
+            req.send();
+            return req.responseText;
+        ";
+
+        return $this->executeScript($script, [$url]);
+    }
+
     public function takeScreenshot($save_as)
     {
 
