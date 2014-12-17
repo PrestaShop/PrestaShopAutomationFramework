@@ -11,7 +11,6 @@ use PrestaShop\PSTAF\OptionProvider;
 class ShopManager
 {
     private $configuration_file_path;
-    private $configuration;
     private $optionProvider;
 
     private static $managers = [];
@@ -19,10 +18,9 @@ class ShopManager
     public function __construct($configuration_file_path)
     {
         $this->configuration_file_path = $configuration_file_path;
-        $this->configuration = $this->getNewConfiguration();
         $this->optionProvider = new OptionProvider();
         $this->optionProvider->setDefaultValues(
-            $this->configuration->get('shop.default_options')
+            $this->getNewConfiguration()->get('shop.default_options')
         );
     }
 
@@ -102,11 +100,6 @@ class ShopManager
         return new ConfigurationFile($this->configuration_file_path);
     }
 
-    public function getConfiguration()
-    {
-        return $this->configuration;
-    }
-
     /**
 	 * getShop uses the configuration file and
 	 * provided options to build a Shop ready for use by selenium
@@ -141,7 +134,7 @@ class ShopManager
     {
         $inplace = getenv('PSTAF_INPLACE') === '1';
 
-        $conf = $this->getConfiguration();
+        $conf = $this->getNewConfiguration();
 
         if (isset($options['conf'])) {
             $conf->update($options['conf']);
