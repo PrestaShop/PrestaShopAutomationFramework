@@ -48,7 +48,7 @@ class OrderManagement extends ShopCapability
         $browser = $this->getBrowser();
 
         $invoice_json_link = $this->getInvoiceLink().'&debug=1';
-        $text = $browser->curl($invoice_json_link);
+        $text = $browser->xhr($invoice_json_link);
         $json = json_decode($text, true);
 
         if (!$json)
