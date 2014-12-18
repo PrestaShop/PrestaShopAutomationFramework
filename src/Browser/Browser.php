@@ -108,6 +108,15 @@ class Browser implements BrowserInterface
             return;
         }
 
+        // Not interesting
+        if ($type === 'after' && in_array($function, ['getValue', 'getAttribute'])) {
+            return;
+        }
+
+        if ($type === 'before' && in_array($function, ['fillIn', 'checkbox'])) {
+            return;
+        }
+
         $comment = "$type $function";
 
         $this->screenshotNumber++;
@@ -118,8 +127,15 @@ class Browser implements BrowserInterface
         if ($comment !== '') {
             $filename .= ' - '.$comment;
         }
-        $filename .= '.png';
-        $this->takeScreenshot($filename);
+        $this->takeScreenshot($filename . '.png');
+
+        if (function_exists('imagecreatefrompng') && function_exists('imagejpeg')) {
+            $image = imagecreatefrompng($filename . '.png');
+            imagejpeg($image, $filename . '.jpg', 50);
+            imagedestroy($image);
+            unlink($filename . '.png');
+        }
+        
     }
 
     private function wrap($function, $arguments)
