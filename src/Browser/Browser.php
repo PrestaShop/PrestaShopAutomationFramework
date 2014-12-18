@@ -28,7 +28,10 @@ class Browser implements BrowserInterface
 
     private $artefactsDir;
     private $recordScreenshots = false;
+    private $screenshotNumber = 0;
     private $quitted = false;
+
+    private $wrappedStackDepth = 0;
 
     public function __construct(array $settings = array())
     {
@@ -67,7 +70,6 @@ class Browser implements BrowserInterface
     public function setRecordScreenshots($trueOrFalse = true)
     {
         $this->recordScreenshots = $trueOrFalse;
-
         return $this;
     }
 
@@ -83,12 +85,41 @@ class Browser implements BrowserInterface
 
     private function before($function, $arguments)
     {
+        $this->autoScreenshot('before', $function);
 
+        $this->wrappedStackDepth++;
     }
 
     private function after($function, $arguments)
     {
+        $this->wrappedStackDepth--;
 
+        $this->autoScreenshot('after', $function);
+    }
+
+    private function autoScreenshot($type, $function)
+    {
+        if (!$this->recordScreenshots || $this->wrappedStackDepth !== 0) {
+            return;
+        }
+
+        // Way too common
+        if ($function === 'find') {
+            return;
+        }
+
+        $comment = "$type $function";
+
+        $this->screenshotNumber++;
+        $n = sprintf("%'06d) ", $this->screenshotNumber);
+        $base = $this->artefactsDir.DIRECTORY_SEPARATOR.'screenshots'.DIRECTORY_SEPARATOR.$n.strftime("%a %d %b %Y, %H;%M;%S");
+        $filename = $base;
+
+        if ($comment !== '') {
+            $filename .= ' - '.$comment;
+        }
+        $filename .= '.png';
+        $this->takeScreenshot($filename);
     }
 
     private function wrap($function, $arguments)
@@ -912,7 +943,8 @@ class Browser implements BrowserInterface
 
     public function takeScreenshot($save_as)
     {
-
+        $this->driver->takeScreenshot($save_as);
+        return $this;
     }
 
     public function wait()
