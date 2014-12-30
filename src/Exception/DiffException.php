@@ -10,7 +10,7 @@ class DiffException extends \Exception
             $msg = sprintf('Invalid value for property `%1$s`: expected `%2$s` but got `%3$s`.', $field, $expected, $actual);
             parent::__construct($msg);
         } else {
-            parent::__construct();
+            parent::__construct($field);
         }
     }
 }

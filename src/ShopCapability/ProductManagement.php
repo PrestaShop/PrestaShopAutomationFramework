@@ -104,7 +104,11 @@ $script = <<<'EOS'
     $("#qty_0 input").trigger("change");
 EOS;
 
-            $browser->executeAsyncScript($script);
+            try {
+                $browser->executeAsyncScript($script);
+            } catch (\ScriptTimeoutException $e) {
+                throw new ProductCreationIncorrectException('Could not set quantity.');
+            }
 
             $this->saveProduct();
 
@@ -112,16 +116,12 @@ EOS;
             ->click('#link-Quantities')
             ->waitFor('#qty_0');
 
-            $spinner = new Spinner();
+            $actualQuantity = (int) $this->i18nParse($browser->getValue('#qty_0 input'), 'float');
+            $expectedQuantity = (int) $options['quantity'];
 
-            $spinner->assertNoException(function () use ($browser, $options) {
-                $a = (int) $this->i18nParse($browser->getValue('#qty_0 input'), 'float');
-                $e = (int) $options['quantity'];
-
-                if ($e !== $a) {
-                    throw new \PrestaShop\PSTAF\Exception\ProductCreationIncorrectException('quantity', $e, $a);
-                }
-            });
+            if ($expectedQuantity !== $actualQuantity) {
+                throw new \PrestaShop\PSTAF\Exception\ProductCreationIncorrectException('quantity', $expectedQuantity, $actualQuantity);
+            }
         }
 
         $dimensions = ['width', 'height', 'depth', 'weight'];
@@ -152,8 +152,9 @@ EOS;
 
         $id_product = (int) $browser->getURLParameter('id_product');
 
-        if ($id_product <= 0)
+        if ($id_product <= 0) {
             throw new \PrestaShop\PSTAF\Exception\ProductCreationIncorrectException();
+        }
 
         return [
             'id' => $id_product,
