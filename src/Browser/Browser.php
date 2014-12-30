@@ -51,8 +51,6 @@ class Browser implements BrowserInterface
 
         $this->driver = RemoteWebDriver::create($host, $settings);
 
-        $this->driver->manage()->timeouts()->setScriptTimeout(15);
-
         $this->resizeWindow(1920, 1200);
     }
 
@@ -292,6 +290,13 @@ class Browser implements BrowserInterface
     public function executeAsyncScript($script, array $args = array())
     {
         return $this->wrap(__FUNCTION__, func_get_args());
+    }
+
+    public function setScriptTimeout($seconds)
+    {
+        $this->driver->manage()->timeouts()->setScriptTimeout($seconds);
+
+        return $this;
     }
 
     /**

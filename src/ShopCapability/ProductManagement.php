@@ -77,8 +77,7 @@ class ProductManagement extends ShopCapability
         if (!empty($options['quantity'])) {
             $browser
             ->click('#link-Quantities')
-            ->waitFor('#qty_0')
-            ->fillIn('#qty_0 input', $options['quantity']);
+            ->waitFor('#qty_0');
 
             /**
              * Ok, so this next part is tricky!
@@ -90,10 +89,14 @@ class ProductManagement extends ShopCapability
              * We need to watch the DOM before triggering the event, because to make
              * things easier, the notification is transient.
              *
+             * This is a bit suboptimal because it fails to emulate exactly the user behaviour,
+             * but it should be close enough. If anybody has a better idea, please PR!
+             *
              */
 
-$script = <<<'EOS'
-    var done = arguments[0]; // Selenium wraps us inside a function, and we need to call done when done.
+$qset = <<<'EOS'
+    var quantity = arguments[0];
+    var done = arguments[1]; // Selenium wraps us inside a function, and we need to call done when done.
     var observer = new MutationObserver(function () {
         if ($('#growls .growl.growl-notice').length > 0) {
             done();
@@ -101,13 +104,18 @@ $script = <<<'EOS'
         }
     });
     observer.observe(document.documentElement, {childList: true, subtree: true});
+    $("#qty_0 input").val(quantity);
     $("#qty_0 input").trigger("change");
 EOS;
 
             try {
-                $browser->executeAsyncScript($script);
+                $browser->setScriptTimeout(5);
+                $spinner = new Spinner(null, 20, 5000);
+                $spinner->assertNoException(function () use ($browser, $qset, $options) {
+                    $browser->executeAsyncScript($qset, [$options['quantity']]);
+                });
             } catch (\ScriptTimeoutException $e) {
-                throw new ProductCreationIncorrectException('Could not set quantity.');
+                throw new \PrestaShop\PSTAF\Exception\ProductCreationIncorrectException('Could not set quantity.');
             }
 
             $this->saveProduct();
