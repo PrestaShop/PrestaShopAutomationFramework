@@ -21,17 +21,17 @@ class ProductManagement extends ShopCapability
     }
 
     /**
-	 * Create a product
-	 * $options is an array with the the following keys:
-	 * - name
-	 * - price: price before tax
-	 * - quantity: quantity (only regular stock, not advanced one)
-	 * - tax_rules_group: id of the tax group to use for this product
-	 *
-	 * Returns an array with keys:
-	 * - id: the id of the product
-	 * - fo_url: the URL to access this product in FO
-	 */
+     * Create a product
+     * $options is an array with the the following keys:
+     * - name
+     * - price: price before tax
+     * - quantity: quantity (only regular stock, not advanced one)
+     * - tax_rules_group: id of the tax group to use for this product
+     *
+     * Returns an array with keys:
+     * - id: the id of the product
+     * - fo_url: the URL to access this product in FO
+     */
     public function createProduct($options)
     {
         $browser = $this->getShop()->getBackOfficeNavigator()->visit('AdminProducts', 'new');
@@ -80,7 +80,31 @@ class ProductManagement extends ShopCapability
             ->waitFor('#qty_0')
             ->fillIn('#qty_0 input', $options['quantity']);
 
-            $browser->executeScript('$("#qty_0 input").trigger("change");');
+            /**
+             * Ok, so this next part is tricky!
+             *
+             * We need to detect the successful change of the quantity field.
+             * So, we trigger the change by injecting javascript, and watch the DOM
+             * to detect the success notification (div.growl.growl-notice).
+             *
+             * We need to watch the DOM before triggering the event, because to make
+             * things easier, the notification is transient.
+             *
+             */
+
+$script = <<<'EOS'
+    var done = arguments[0]; // Selenium wraps us inside a function, and we need to call done when done.
+    var observer = new MutationObserver(function () {
+        if ($('#growls .growl.growl-notice').length > 0) {
+            done();
+            observer.disconnect();
+        }
+    });
+    observer.observe(document.documentElement, {childList: true, subtree: true});
+    $("#qty_0 input").trigger("change");
+EOS;
+
+            $browser->executeAsyncScript($script);
 
             $this->saveProduct();
 
@@ -94,8 +118,9 @@ class ProductManagement extends ShopCapability
                 $a = (int) $this->i18nParse($browser->getValue('#qty_0 input'), 'float');
                 $e = (int) $options['quantity'];
 
-                if ($e !== $a)
+                if ($e !== $a) {
                     throw new \PrestaShop\PSTAF\Exception\ProductCreationIncorrectException('quantity', $e, $a);
+                }
             });
         }
 

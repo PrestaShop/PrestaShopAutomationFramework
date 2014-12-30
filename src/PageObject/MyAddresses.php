@@ -14,9 +14,7 @@ class MyAddresses extends PageObject
     public function hasAddressWithAlias($alias)
     {
     	try {
-	    	foreach (
-	    		$this->getBrowser()->find('h3.page-subheading', ['unique' => false]) as $heading
-	    	) {
+	    	foreach ($this->getBrowser()->find('h3.page-subheading', ['unique' => false]) as $heading) {
 	    		$text = strtolower($heading->getText());
 	    		if (strpos($text, strtolower($alias)) !== false) {
 	    			return true;
@@ -33,13 +31,13 @@ class MyAddresses extends PageObject
     {
     	$xpath = '//div[contains(@class,"address") and not(contains(@class, "addresses")) and //h3[contains(., "'.$alias.'")]]//a[not(contains(@href, "delete"))]';
 		$this->getBrowser()->click('{xpath}'.$xpath)->waitFor('#alias');
-		return $this->getPageObject('EditAddress');    	
+		return $this->getPageObject('EditAddress');
     }
 
     public function deleteAddress($alias)
     {
     	$xpath = '//div[contains(@class,"address") and not(contains(@class, "addresses")) and //h3[contains(., "'.$alias.'")]]//a[contains(@href, "delete")]';
-		
+
 		// don't take screenshot, it fails if alert is open!
 		$this->getBrowser()->click('{xpath}'.$xpath, ['screenshot' => false])->acceptAlert();
 
