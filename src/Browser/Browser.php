@@ -51,6 +51,8 @@ class Browser implements BrowserInterface
 
         $this->driver = RemoteWebDriver::create($host, $settings);
 
+        $this->driver->manage()->timeouts()->setScriptTimeout(15);
+
         $this->resizeWindow(1920, 1200);
     }
 
@@ -66,7 +68,7 @@ class Browser implements BrowserInterface
 
         return $this;
     }
-    
+
     public function setRecordScreenshots($trueOrFalse = true)
     {
         $this->recordScreenshots = $trueOrFalse;
@@ -99,7 +101,7 @@ class Browser implements BrowserInterface
 
     private function autoScreenshot($type, $function)
     {
-        if (!$this->recordScreenshots || $this->wrappedStackDepth !== 0) {
+        if (!$this->recordScreenshots || $this->wrappedStackDepth !== 0 || (int)getenv('NO_SCREENSHOTS')) {
             return;
         }
 
@@ -135,7 +137,7 @@ class Browser implements BrowserInterface
             imagedestroy($image);
             unlink($filename . '.png');
         }
-        
+
     }
 
     private function wrap($function, $arguments)
@@ -148,7 +150,7 @@ class Browser implements BrowserInterface
             $this->after($function, $arguments);
         }
     }
-    
+
     public function resizeWindow($width, $height)
     {
         $this->driver->manage()->window()->setSize(new WebDriverDimension($width, $height));
@@ -207,7 +209,7 @@ class Browser implements BrowserInterface
     /**
      * refresh
      */
-    
+
     private function _refresh()
     {
         $this->driver->navigate()->refresh();
@@ -223,7 +225,7 @@ class Browser implements BrowserInterface
     /**
      * reload
      */
-    
+
     private function _reload()
     {
         $this->visit($this->getCurrentURL());
@@ -239,7 +241,7 @@ class Browser implements BrowserInterface
     /**
      * sleep
      */
-    
+
     private function _sleep($seconds)
     {
         sleep($seconds);
@@ -255,7 +257,7 @@ class Browser implements BrowserInterface
     /**
      * clearCookies
      */
-    
+
     private function _clearCookies()
     {
         $this->driver->manage()->deleteAllCookies();
@@ -271,13 +273,23 @@ class Browser implements BrowserInterface
     /**
      * executeScript
      */
-    
+
     private function _executeScript($script, array $args = array())
     {
         return $this->driver->executeScript($script, $args);
     }
 
     public function executeScript($script, array $args = array())
+    {
+        return $this->wrap(__FUNCTION__, func_get_args());
+    }
+
+    private function _executeAsyncScript($script, array $args = array())
+    {
+        return $this->driver->executeAsyncScript($script, $args);
+    }
+
+    public function executeAsyncScript($script, array $args = array())
     {
         return $this->wrap(__FUNCTION__, func_get_args());
     }
@@ -309,7 +321,7 @@ class Browser implements BrowserInterface
     /**
      * switchToIFrame
      */
-    
+
     private function _switchToIFrame($name)
     {
         $this->driver->switchTo()->frame($name);
@@ -324,7 +336,7 @@ class Browser implements BrowserInterface
     /**
      * switchToDefaultContent
      */
-    
+
     private function _switchToDefaultContent()
     {
         $this->driver->switchTo()->defaultContent();
@@ -421,7 +433,7 @@ class Browser implements BrowserInterface
 
             });
         } catch (Exception $e) {
-            
+
             if ($e instanceof TooManyElementsFoundException) {
                 throw $e;
             }
@@ -472,7 +484,7 @@ class Browser implements BrowserInterface
     /**
      * ensureElementIsOnPage
      */
-    
+
     private function _ensureElementIsOnPage($selector)
     {
         return $this->waitFor($selector, 0);
@@ -609,7 +621,7 @@ class Browser implements BrowserInterface
     /**
      * jqcSelect
      */
-    
+
     private function tryJqcSelect($selector, $value)
     {
         $script = "$(arguments[0]).val(arguments[1]).trigger('chosen:updated').trigger('liszt:updated');";
@@ -872,7 +884,7 @@ class Browser implements BrowserInterface
     /**
      * checkbox
      */
-    
+
     private function _checkbox($selector, $on_off = null)
     {
         $checkbox = $this->find($selector);
@@ -887,7 +899,7 @@ class Browser implements BrowserInterface
 
         return $this;
     }
-    
+
     public function checkbox($selector, $on_off = null)
     {
         return $this->wrap(__FUNCTION__, func_get_args());
@@ -896,14 +908,14 @@ class Browser implements BrowserInterface
     /**
      * clickLabelFor
      */
-    
+
     private function _clickLabelFor($for)
     {
          $this->find("label[for=$for]")->click();
 
          return $this;
     }
-    
+
     public function clickLabelFor($for)
     {
         return $this->wrap(__FUNCTION__, func_get_args());
@@ -912,7 +924,7 @@ class Browser implements BrowserInterface
     /**
      * curl
      */
-    
+
     public function curl($url = null, array $options = array())
     {
         if ($url === null)

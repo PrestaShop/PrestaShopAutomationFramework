@@ -51,7 +51,7 @@ interface BrowserInterface
         *
         * Selectors are interpreted as CSS by default,
         * example: ".main ul li"
-        * 
+        *
         * To use an xpath selector, prefix it with {xpath},
         * for instance "{xpath}}//div".
         *
@@ -216,6 +216,8 @@ interface BrowserInterface
          * array in the $args argument.
          */
         public function executeScript($script, array $args = array());
+
+		public function executeAsyncScript($script, array $args = array());
 
         /**
          * Accept the currently displayed alert, throw exception if not found.
