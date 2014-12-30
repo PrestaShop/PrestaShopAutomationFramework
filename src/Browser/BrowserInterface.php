@@ -219,6 +219,8 @@ interface BrowserInterface
 
 		public function executeAsyncScript($script, array $args = array());
 
+		public function setScriptTimeout($seconds);
+
         /**
          * Accept the currently displayed alert, throw exception if not found.
          */
