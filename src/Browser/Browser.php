@@ -104,7 +104,7 @@ class Browser implements BrowserInterface
         }
 
         // Way too common
-        if ($function === 'find') {
+        if (in_array($function, ['find', 'clearCookies'])) {
             return;
         }
 
