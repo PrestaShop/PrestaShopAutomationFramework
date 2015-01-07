@@ -981,6 +981,10 @@ class Browser implements BrowserInterface
         try {
             $this->driver->switchTo()->alert()->getText();
         } catch (\NoAlertOpenException $e){
+            /**
+             * I know how this looks... but we can't take a screenshot while
+             * an alert is open, and this seems to be the only way to detect one...
+             */
             $this->driver->takeScreenshot($save_as);
         }
 
