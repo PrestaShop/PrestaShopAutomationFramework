@@ -52,6 +52,7 @@ class Browser implements BrowserInterface
 
         $this->driver = RemoteWebDriver::create($host, $settings);
 
+
         $this->resizeWindow(1920, 1200);
     }
 
@@ -977,7 +978,12 @@ class Browser implements BrowserInterface
 
     public function takeScreenshot($save_as)
     {
-        $this->driver->takeScreenshot($save_as);
+        try {
+            $this->driver->switchTo()->alert()->getText();
+        } catch (\NoAlertOpenException $e){
+            $this->driver->takeScreenshot($save_as);
+        }
+
         return $this;
     }
 
