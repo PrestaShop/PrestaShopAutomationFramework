@@ -14,23 +14,23 @@ class CartRulesManagementTest extends LazyTestCase
 
     public function testCreateCartRuleAppliedToProduct()
     {
-        $shop = static::getShop();
+        $shop = $this->shop;
 
         $product_name = 'My Cool Product';
 
         $shop->getProductManager()->createProduct(['name' => $product_name, 'price' => 42]);
 
-        $data = $shop->getCartRulesManager()->createCartRule(array(
+        $shop->getCartRulesManager()->createCartRule(array(
             'name' => "Discount After Tax On $product_name",
             'discount' => '10 after tax',
             'apply_to_product' => $product_name
         ));
     }
 
+
     public function testCreateCartRule()
     {
-        $shop = static::getShop();
-        $data = $shop->getCartRulesManager()->createCartRule(array(
+        $this->shop->getCartRulesManager()->createCartRule(array(
             'name' => 'Discount After Tax',
             'discount' => '10 after tax'
         ));
@@ -38,8 +38,7 @@ class CartRulesManagementTest extends LazyTestCase
 
     public function testCreateCartRuleWithDiscount()
     {
-        $shop = static::getShop();
-        $data = $shop->getCartRulesManager()->createCartRule(array(
+        $this->shop->getCartRulesManager()->createCartRule(array(
             'name' => 'Free Shipping!',
             'free_shipping' => true
         ));

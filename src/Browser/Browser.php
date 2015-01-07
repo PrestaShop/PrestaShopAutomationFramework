@@ -36,7 +36,8 @@ class Browser implements BrowserInterface
     public function __construct(array $settings = array())
     {
         $defaults = [
-            'browserName' => 'firefox'
+            'browserName' => 'firefox',
+            'nativeEvents' => true
         ];
 
         $settings = array_merge($defaults, $settings);
