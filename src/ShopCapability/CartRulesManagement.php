@@ -2,6 +2,7 @@
 
 namespace PrestaShop\PSTAF\ShopCapability;
 
+use Exception;
 use PrestaShop\PSTAF\Helper\Spinner;
 
 class CartRulesManagement extends ShopCapability
@@ -54,17 +55,19 @@ class CartRulesManagement extends ShopCapability
 
         if (isset($options['apply_to_product'])) {
 
-            $spinner = new Spinner('Could not select product to which the cart rule should be applied.', 15, 1000);
+            $spinner = new Spinner(null, 15, 1000);
 
-            // This tends to fail, try it over and over again for a while!
-
-            $spinner->assertNoException(function() use ($browser, $options) {
-                $browser
-                ->clickLabelFor('apply_discount_to_product')
-                ->fillIn('#reductionProductFilter', $options['apply_to_product'])
-                ->waitFor('div.ac_results li')
-                ->click('div.ac_results li');
-            });
+            try {
+                $spinner->assertNoException(function() use ($browser, $options) {
+                    $browser
+                    ->clickLabelFor('apply_discount_to_product')                    
+                    ->fillIn('#reductionProductFilter', $options['apply_to_product'])
+                    ->waitFor('div.ac_results li')
+                    ->click('div.ac_results li');
+                });
+            } catch (Exception $e) {
+                throw new Exception('Could not select product to which the cart rule should be applied.');
+            }
         }
 
         $browser
