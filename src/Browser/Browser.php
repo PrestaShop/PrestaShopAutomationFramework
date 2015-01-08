@@ -75,6 +75,11 @@ class Browser implements BrowserInterface
         return $this;
     }
 
+    public function getRecordScreenshots()
+    {
+        return $this->recordScreenshots;
+    }
+
     public function quit()
     {
         if (!$this->quitted) {
@@ -978,15 +983,7 @@ class Browser implements BrowserInterface
 
     public function takeScreenshot($save_as)
     {
-        try {
-            $this->driver->switchTo()->alert()->getText();
-        } catch (\NoAlertOpenException $e){
-            /**
-             * I know how this looks... but we can't take a screenshot while
-             * an alert is open, and this seems to be the only way to detect one...
-             */
-            $this->driver->takeScreenshot($save_as);
-        }
+        $this->driver->takeScreenshot($save_as);
 
         return $this;
     }
