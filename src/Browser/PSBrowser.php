@@ -2,6 +2,8 @@
 
 namespace PrestaShop\PSTAF\Browser;
 
+use Exception;
+
 use PrestaShop\PSTAF\Exception\StandardSuccessMessageNotDisplayedException;
 use PrestaShop\PSTAF\Exception\StandardErrorMessageDisplayedException;
 
@@ -9,8 +11,10 @@ class PSBrowser extends Browser
 {
 	public function ensureStandardSuccessMessageDisplayed($error_explanation = null)
 	{
-		if (!$this->hasVisible('div.alert.alert-success')) {
-			throw new StandardSuccessMessageNotDisplayedException($error_explanation); 
+		try {
+			$this->waitFor('div.alert.alert-success');
+		} catch (Exception $e) {
+			throw new StandardSuccessMessageNotDisplayedException($error_explanation);
 		}
 
 	    return $this;
@@ -19,8 +23,10 @@ class PSBrowser extends Browser
 	public function ensureStandardErrorMessageNotDisplayed($error_explanation = null)
 	{
 	    if ($this->hasVisible('div.alert.alert-error')) {
-	    	throw new StandardErrorMessageDisplayedException($error_explanation); 
+	    	throw new StandardErrorMessageDisplayedException($error_explanation);
 	    }
+
+		return $this;
 	}
 
     /**

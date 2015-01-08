@@ -18,12 +18,12 @@ class CartRulesManagementTest extends LazyTestCase
 
         $product_name = 'My Cool Product';
 
-        $shop->getProductManager()->createProduct(['name' => $product_name, 'price' => 42]);
+        $product = $shop->getProductManager()->createProduct(['name' => $product_name, 'price' => 42]);
 
         $shop->getCartRulesManager()->createCartRule(array(
             'name' => "Discount After Tax On $product_name",
             'discount' => '10 after tax',
-            'apply_to_product' => $product_name
+            'apply_to_product' => $product['id']
         ));
     }
 

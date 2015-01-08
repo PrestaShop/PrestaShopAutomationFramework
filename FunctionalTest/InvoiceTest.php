@@ -15,7 +15,7 @@ class InvoiceTest extends TestCase
         $breakdowns = ['product_tax_breakdown', 'shipping_tax_breakdown', 'ecotax_tax_breakdown', 'wrapping_tax_breakdown'];
         foreach ($breakdowns as $bd) {
             if (isset($invoice['tax_tab'][$bd])) {
-                foreach ($invoice['tax_tab'][$bd] as $rate => $data) {
+                foreach ($invoice['tax_tab'][$bd] as $data) {
                     $tax_amount += $data['total_amount'];
                 }
             }
@@ -159,6 +159,11 @@ class InvoiceTest extends TestCase
                     $discount = ['name' => $name, 'discount' => $discount];
                 } else {
                     $discount['name'] = $name;
+                    if (isset($discount['apply_to_product']) && !is_int($discount['apply_to_product'])) {
+                        // apply_to_product may be specified with the product name,
+                        // but createCartRule expects an id_product
+                        $discount['apply_to_product'] = $scenario['products'][$discount['apply_to_product']]['info']['id'];
+                    }
                 }
 
                 $shop->getCartRulesManager()->createCartRule($discount);
