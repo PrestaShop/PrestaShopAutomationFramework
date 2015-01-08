@@ -111,17 +111,29 @@ class Browser implements BrowserInterface
             return;
         }
 
-        // Way too common
-        if (in_array($function, ['find', 'clearCookies'])) {
+        /**
+         * Ignore a few actions when taking screenshots,
+         * because screenshots are expensive both in terms of CPU and of
+         * disk space
+         */
+
+        if ($type === 'before' && in_array($function, [
+            'fillIn',
+            'checkbox',
+            'visit',
+            'waitFor',
+            'click',
+            'clickLabelFor',
+            'executeScript'
+        ])) {
             return;
         }
 
-        // Not interesting
         if ($type === 'after' && in_array($function, ['getValue', 'getAttribute'])) {
             return;
         }
 
-        if ($type === 'before' && in_array($function, ['fillIn', 'checkbox'])) {
+        if (in_array($function, ['find', 'clearCookies', 'sleep', 'getSelectOptions'])) {
             return;
         }
 
