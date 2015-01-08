@@ -54,20 +54,14 @@ class CartRulesManagement extends ShopCapability
         }
 
         if (isset($options['apply_to_product'])) {
-
-            $spinner = new Spinner(null, 15, 1000);
-
-            try {
-                $spinner->assertNoException(function() use ($browser, $options) {
-                    $browser
-                    ->clickLabelFor('apply_discount_to_product')                    
-                    ->fillIn('#reductionProductFilter', $options['apply_to_product'])
-                    ->waitFor('div.ac_results li')
-                    ->click('div.ac_results li');
-                });
-            } catch (Exception $e) {
-                throw new Exception('Could not select product to which the cart rule should be applied.');
-            }
+            /**
+             * This is not how a user would do it, but JQuery autocomplete
+             * will NOT be triggered if the window doesn't have focus,
+             * so unfortunately we can't rely on it.
+             */
+            $browser
+            ->clickLabelFor('apply_discount_to_product')
+            ->executeScript('$("#reduction_product").val(arguments[0])', [$options['apply_to_product']]);
         }
 
         $browser

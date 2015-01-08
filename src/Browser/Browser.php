@@ -37,7 +37,7 @@ class Browser implements BrowserInterface
     {
         $defaults = [
             'browserName' => 'firefox',
-            'nativeEvents' => true
+            // 'nativeEvents' => true
         ];
 
         $settings = array_merge($defaults, $settings);
@@ -52,6 +52,7 @@ class Browser implements BrowserInterface
 
         $this->driver = RemoteWebDriver::create($host, $settings);
 
+        $this->driver->manage()->timeouts()->implicitlyWait(5);
 
         $this->resizeWindow(1920, 1200);
     }
