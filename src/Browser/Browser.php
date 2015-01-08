@@ -984,14 +984,31 @@ class Browser implements BrowserInterface
 
     public function xhr($url, array $options = array())
     {
-        $script = "
-            var req = new XMLHttpRequest();
-            req.open('GET', arguments[0], false);
-            req.send();
-            return req.responseText;
-        ";
+        $script = <<<'EOS'
 
-        return $this->executeScript($script, [$url]);
+        var done = arguments[1];
+
+        var oReq = new XMLHttpRequest();
+        oReq.open("GET", arguments[0], true);
+        oReq.responseType = "arraybuffer";
+
+        oReq.onload = function (oEvent) {
+            var arrayBuffer = oReq.response;
+            if (arrayBuffer) {
+                var byteArray = new Uint8Array(arrayBuffer);
+                var len = byteArray.byteLength;
+                var binary = '';
+                for (var i = 0; i < len; i++) {
+                    binary += String.fromCharCode(byteArray[i]);
+                }
+                done(window.btoa(binary));
+            }
+        };
+
+        oReq.send(null);
+EOS;
+
+        return base64_decode($this->executeAsyncScript($script, [$url]));
     }
 
     public function takeScreenshot($save_as)
