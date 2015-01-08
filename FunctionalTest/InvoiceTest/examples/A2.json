@@ -34,7 +34,7 @@
 	"expect": {
 		"invoice": {
 			"total": {
-				"to_pay_tax_included": 7097.65
+				"to_pay_tax_included": 7097.64
 			},
 			"tax": {
 				"products": {
