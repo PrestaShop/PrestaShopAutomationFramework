@@ -39,7 +39,18 @@ class MyAddresses extends PageObject
     	$xpath = '//div[contains(@class,"address") and not(contains(@class, "addresses")) and //h3[contains(., "'.$alias.'")]]//a[contains(@href, "delete")]';
 
 		// don't take screenshot, it fails if alert is open!
-		$this->getBrowser()->click('{xpath}'.$xpath, ['screenshot' => false])->acceptAlert();
+		$recordingScreenshots = $this->getBrowser()->getRecordScreenshots();
+
+		try {
+            $this->getBrowser()
+            ->setRecordScreenshots(false)
+            ->click('{xpath}'.$xpath)
+            ->acceptAlert();
+        } finally {
+            // Whatever happens, set original recordScreenshots property back
+            $this->getBrowser()
+            ->setRecordScreenshots($recordingScreenshots);
+        }
 
 		sleep(1);
 

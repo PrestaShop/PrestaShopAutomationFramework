@@ -271,5 +271,6 @@ interface BrowserInterface
         /**
          * Should the browser record screenshots?
          */
-        public function setRecordScreenshots($trueOrFalse = true);
+		public function setRecordScreenshots($trueOrFalse = true);
+		public function getRecordScreenshots();
 }
