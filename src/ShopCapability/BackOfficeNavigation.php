@@ -170,4 +170,12 @@ class BackOfficeNavigation extends ShopCapability
 
         return $browser->visit($url);
     }
+
+    public function deleteModule($module_name)
+    {
+        $browser = $this->getShop()->getBrowser();
+        $url = $this->getCRUDLink('AdminModules', null, null).'&delete='.$module_name.'&module_name='.$module_name;
+
+        return $browser->visit($url);
+    }
 }
