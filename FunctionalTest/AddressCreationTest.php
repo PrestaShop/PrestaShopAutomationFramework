@@ -68,7 +68,7 @@ class AddressCreationTest extends LazyTestCase
 	 */
 	public function testAddressCanBeDeleted()
 	{
-		$ok = $this->shop
+		$this->shop
 		->getPageObject('MyAccount')->visit()
 		->goToMyAddresses()
 		->deleteAddress('This Alias is new');
