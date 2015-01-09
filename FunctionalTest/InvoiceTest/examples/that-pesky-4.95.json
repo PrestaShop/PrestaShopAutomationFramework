@@ -1,7 +1,7 @@
 {
 	"meta": {
-		"rounding_type": "line",
-		"rounding_mode": "half_down"
+		"rounding_type": "total",
+		"rounding_mode": "half_up"
 	},
 	"carrier": {
 		"name": "SeleniumShipping",
