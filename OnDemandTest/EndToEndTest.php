@@ -109,6 +109,12 @@ class EndToEndTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 
 		$this->shop->getBackOfficeNavigator()->login();
 
+		if (!empty($secrets['smtp'])) {
+			$smtp = $secrets['smtp'];
+			$this->shop->getPageObject('AdminStores')->visit()->setShopEmail($smtp['sender']);
+			$this->shop->getPageObject('AdminEmails')->visit()->setSMTP($smtp);
+		}
+
 		$loc = $this->shop->getPageObject('AdminLocalization')->visit();
 
 		$actualLanguage = $loc->getDefaultLanguageName();
@@ -149,7 +155,7 @@ class EndToEndTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 	public function customersCanRegister()
 	{
 		$this->browser->clearCookies();
-		
+
 		$registrationAddress =  $this->getRegistrationAddress();
 		$this->shop->getRegistrationManager()->registerCustomer([
 			'customer_email' => $registrationAddress,
@@ -182,7 +188,7 @@ class EndToEndTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 		$addressForm->setPostCode($addressData['postCode'])
 					->setPhone('12345655')
 					->setAlias('My Cool Selenium Address');
-		
+
 		$addressForm->save();
 
 		$this->shop->getOptionProvider()->setDefaultValues([
@@ -192,7 +198,7 @@ class EndToEndTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 			]
 		]);
 	}
-	
+
 	public function emailsAreSent()
 	{
 		$this->browser->clearCookies();
@@ -210,7 +216,7 @@ class EndToEndTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 		$this->getEmailReader()->ensureAnEmailIsSentTo($emailTestAddress);
 	}
 
-	
+
 	public function basicSellingFeatures()
 	{
 		$this->browser->clearCookies();
