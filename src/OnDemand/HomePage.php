@@ -21,11 +21,11 @@ class HomePage extends OnDemandPage
 		if (!$url) {
 			$url = $this->getSecrets()["homePageURL"];
 		}
-		
+
 		$match = [];
     		preg_match('#(\w+://[^/]+)#', $url, $match);
     		$hostPart = $match[1];
-		
+
 		$this->getBrowser()->visit($url, $this->getSecrets()["htaccess"][$hostPart]);
 
 		return $this;
@@ -37,7 +37,7 @@ class HomePage extends OnDemandPage
 			throw new InvalidParameterException("Invalid language code: $twoLetterCode.");
 		}
 
-		
+
 		$wantedLanguage = mb_strtolower(trim(static::$twoLetterLanguageCodes[$twoLetterCode]), 'UTF-8');
 		$currentLanguage = mb_strtolower(trim($this->getBrowser()->getText('#menu-language')), 'UTF-8');
 
@@ -62,8 +62,14 @@ class HomePage extends OnDemandPage
 
 	public function submitShopCreationBannerForm($shop_name, $email)
 	{
-		$this->getBrowser()
-		->fillIn('#create-online-store-shop_name', $shop_name)
+		$browser = $this->getBrowser();
+
+		// Depending on the environment, there may be a button to click
+		if ($browser->hasVisible('div.store a.btn.get-me-started')) {
+			$browser->click('div.store a.btn.get-me-started');
+		}
+
+		$browser->fillIn('#create-online-store-shop_name', $shop_name)
 		->fillIn('#create-online-store-email', $email)
 		// ->sleep(15)
 		->click('a.submit.btn.get-me-started')
