@@ -24,9 +24,28 @@ class InvoiceTest extends TestCase
         $actual_tax_amount = (float) $invoice['order']['total_paid_tax_incl'] - (float) $invoice['order']['total_paid_tax_excl'];
 
         if ("$tax_amount" != "$actual_tax_amount")
+        {
             throw new \PrestaShop\PSTAF\Exception\InvoiceIncorrectException(
                 "Actual tax amount `$actual_tax_amount` differs from sum of VAT amount in the tax breakdown (`$tax_amount`)."
             );
+        }
+
+        $paranoid_mode = false;
+
+        if ($paranoid_mode) {
+            $discounted_products_before_tax_from_breakdown = 0;
+            foreach ($invoice['tax_tab']['product_tax_breakdown'] as $details)
+            {
+                $discounted_products_before_tax_from_breakdown += $details['total_price_tax_excl'];
+            }
+            $discounted_products_before_tax_from_footer = $invoice['order']['total_products'] - $invoice['product_discounts'];
+
+            if ("$discounted_products_before_tax_from_footer" !== "$discounted_products_before_tax_from_breakdown") {
+                throw new \PrestaShop\PSTAF\Exception\InvoiceIncorrectException(
+                    "The sum of tax bases in the products breakdown (`$discounted_products_before_tax_from_breakdown`) is different from the discounted products price on the invoice footer (`$discounted_products_before_tax_from_footer`)."
+                );
+            }
+        }
     }
 
     public static function checkInvoiceJson($expected, $actual)
@@ -202,6 +221,7 @@ class InvoiceTest extends TestCase
     /**
 	 * @dataProvider jsonExampleFiles
 	 * @parallelize 4
+	 * @maxattempts 1
 	 */
     public function testInvoice($exampleFile)
     {
