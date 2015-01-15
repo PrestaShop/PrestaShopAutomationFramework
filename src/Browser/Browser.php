@@ -37,7 +37,7 @@ class Browser implements BrowserInterface
     {
         $defaults = [
             'browserName' => 'firefox',
-            // 'nativeEvents' => true
+            'nativeEvents' => false
         ];
 
         $settings = array_merge($defaults, $settings);
