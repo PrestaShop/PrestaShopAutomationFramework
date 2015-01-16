@@ -22,11 +22,12 @@ class HomePage extends OnDemandPage
 			$url = $this->getSecrets()["homePageURL"];
 		}
 
+		/*
 		$match = [];
-    		preg_match('#(\w+://[^/]+)#', $url, $match);
-    		$hostPart = $match[1];
+    	preg_match('#(\w+://[^/]+)#', $url, $match);
+    	$hostPart = $match[1];*/
 
-		$this->getBrowser()->visit($url, $this->getSecrets()["htaccess"][$hostPart]);
+		$this->getBrowser()->visit($url); // , $this->getSecrets()["htaccess"][$hostPart]);
 
 		return $this;
 	}
