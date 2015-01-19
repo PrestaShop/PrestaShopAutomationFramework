@@ -115,12 +115,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/djfm/ftr.git",
-                "reference": "44b62e9b09f86b6d854471669fd1d87ef24e423f"
+                "reference": "8476c42355df9e5987b60b9aabcc8aa46fc51e56"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/djfm/ftr/zipball/44b62e9b09f86b6d854471669fd1d87ef24e423f",
-                "reference": "44b62e9b09f86b6d854471669fd1d87ef24e423f",
+                "url": "https://api.github.com/repos/djfm/ftr/zipball/8476c42355df9e5987b60b9aabcc8aa46fc51e56",
+                "reference": "8476c42355df9e5987b60b9aabcc8aa46fc51e56",
                 "shasum": ""
             },
             "require": {
@@ -132,6 +132,9 @@
             "require-dev": {
                 "phpunit/phpunit": "dev-master"
             },
+            "bin": [
+                "bin/ftr"
+            ],
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -148,7 +151,7 @@
                 }
             ],
             "description": "A functional test runner",
-            "time": "2015-01-19 07:37:28"
+            "time": "2015-01-19 08:32:37"
         },
         {
             "name": "djfm/process",
@@ -1529,6 +1532,7 @@
         "symfony/css-selector": 20
     },
     "prefer-stable": false,
+    "prefer-lowest": false,
     "platform": [],
     "platform-dev": []
 }
