@@ -1,0 +1,37 @@
+{
+	"meta": {
+		"rounding_type": "total",
+		"rounding_mode": "half_up"
+	},
+	"carrier": {
+		"name": "SeleniumShipping",
+		"delay": "28 days later",
+		"handling": false,
+		"free": true
+	},
+	"products": {
+		"25.999852 pretax": {
+			"price": 25.999852,
+			"vat": 20,
+			"quantity": 1
+		},
+		"19.555000 pretax": {
+			"price": 19.555,
+			"vat": 10,
+			"quantity": 1
+		}
+	},
+	"discounts": {
+		"50% off the 25.999852 product": {
+			"apply_to_product": "25.999852 pretax",
+			"discount": "50%"
+		}
+	},
+	"expect": {
+		"invoice": {
+			"total": {
+				"to_pay_tax_included": 37.11
+			}
+		}
+	}
+}

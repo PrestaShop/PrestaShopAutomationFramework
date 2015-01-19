@@ -31,13 +31,13 @@
 	"expect": {
 		"invoice": {
 			"total": {
-				"to_pay_tax_included": 2.34,
+				"to_pay_tax_included": 2.33,
 				"shipping_tax_excluded": 3
 			},
 			"tax": {
 				"products": {
 					"10": 0.07,
-					"20": 0.27
+					"20": 0.26
 				}
 			}
 		}
