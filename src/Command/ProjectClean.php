@@ -18,9 +18,21 @@ class ProjectClean extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $manager = ShopManager::getInstance();
-        $manager->cleanDirectory();
-        if ($input->getOption('update'))
-            $manager->updateRepo();
+        $manager = null;
+        try {
+            $manager = ShopManager::getInstance();
+        } catch (\Exception $e) {
+            // no shop, but still things to clean, probably
+        }
+
+        if ($manager) {
+            $manager->cleanProject();
+            if ($input->getOption('update'))
+            {
+                $manager->updateRepo();
+            }
+        } else {
+            ShopManager::cleanDirectory();
+        }
     }
 }

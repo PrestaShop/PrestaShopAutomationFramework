@@ -93,7 +93,7 @@ class FileSystem
         return static::_lsRecursive($dir, $exclude_exceptions, $exclude_regexps, $dir);
     }
 
-    public static function rmR($dir)
+    public static function rmR($dir, $onlyContents = false)
     {
         foreach (
             new \RecursiveIteratorIterator(
@@ -104,7 +104,10 @@ class FileSystem
         {
             $path->isDir() ? rmdir($path->getPathname()) : unlink($path->getPathname());
         }
-        rmdir($dir);
+
+        if (!$onlyContents) {
+            rmdir($dir);
+        }
     }
 
     public static function webRmR($directory, $url)
@@ -165,7 +168,7 @@ EOS;
             }
         }
 EOS;
-        
+
         $actor = str_replace('[@$actions@]', var_export($actions, true), $actor);
 
         $actorName = 'webActionsActor_tmp.php';

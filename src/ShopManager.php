@@ -313,11 +313,10 @@ class ShopManager
         }
     }
 
-    public function cleanDirectory()
+    public static function cleanDirectory($dir = '.')
     {
-        $home = $this->getWorkingDirectory();
-        foreach (scandir($home) as $entry) {
-            $path = FS::join($home, $entry);
+        foreach (scandir($dir) as $entry) {
+            $path = FS::join($dir, $entry);
             $m = [];
             if (preg_match('/pstaf\.(\w+)\.istate\.shop/', $entry, $m)) {
                 echo "Removing cached shop $entry...\n";
@@ -335,15 +334,34 @@ class ShopManager
                 file_put_contents($entry, '');
             } elseif ($entry === 'php_errors.log') {
                 echo "Cleaning local php error log file $entry...\n";
-                file_put_contents($entry, '');
+                file_put_contents($path, '');
             } elseif ($entry === 'test-results') {
                 echo "Removing test results folder $entry...\n";
-                FS::rmR($path);
+                FS::rmR($path, true);
+            } elseif ($entry === 'test-history') {
+                foreach (scandir($path) as $nestedEntry) {
+                    if ($nestedEntry[0] === '.') {
+                        continue;
+                    }
+                    $nested = FS::join($path, $nestedEntry);
+                    if (is_dir($nested)) {
+                        FS::rmR($nested);
+                    } elseif ($nestedEntry === 'history.json.stream') {
+                        file_put_contents($nested, '');
+                    } else {
+                        unlink($nested);
+                    }
+                }
             } elseif ($entry === 'selenium.pid' && !SeleniumManager::isSeleniumStarted()) {
                 echo "Removing stale pid file $entry...\n";
                 unlink($path);
             }
         }
+    }
+
+    public function cleanProject()
+    {
+        self::cleanDirectory($this->getWorkingDirectory());
     }
 
     public function updateRepo()
