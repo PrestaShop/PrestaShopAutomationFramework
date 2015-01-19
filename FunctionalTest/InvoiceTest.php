@@ -30,7 +30,7 @@ class InvoiceTest extends TestCase
             );
         }
 
-        $paranoid_mode = false;
+        $paranoid_mode = true;
 
         if ($paranoid_mode) {
             $discounted_products_before_tax_from_breakdown = 0;
@@ -198,7 +198,7 @@ class InvoiceTest extends TestCase
             ->setQuantity($data['quantity'])
             ->addToCart();
 
-            sleep(5);
+            sleep(1);
         }
 
         $data = $shop->getCheckoutManager()->orderCurrentCartFiveSteps([

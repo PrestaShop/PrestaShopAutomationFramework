@@ -33,11 +33,11 @@
     "invoice": {
       "total": {
         "to_pay_tax_excluded": 37.04,
-        "to_pay_tax_included": 41.42
+        "to_pay_tax_included": 41.41
       },
       "tax": {
         "products": {
-          "5.5": 1.17,
+          "5.5": 1.16,
           "20": 3.21
         }
       }
