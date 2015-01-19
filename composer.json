@@ -15,6 +15,8 @@
 		"phpunit/phpunit": "4.1.*",
 		"brianium/paratest": "dev-master",
 		"djfm/ptest": "dev-master",
+		"djfm/ftr": "dev-master",
+		"djfm/socket-rpc": "dev-master",
 		"djfm/process": "dev-master",
 		"sebastian/diff": "*",
 		"symfony/dom-crawler": "3.0.*@dev",
