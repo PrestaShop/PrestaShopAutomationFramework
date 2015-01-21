@@ -38,7 +38,7 @@ class InvoiceTest extends TestCase
             {
                 $discounted_products_before_tax_from_breakdown += $details['total_price_tax_excl'];
             }
-            $discounted_products_before_tax_from_footer = $invoice['order']['total_products'] - $invoice['product_discounts'];
+            $discounted_products_before_tax_from_footer = $invoice['footer']['products_after_discounts_tax_excl'];
 
             if ("$discounted_products_before_tax_from_footer" !== "$discounted_products_before_tax_from_breakdown") {
                 throw new \PrestaShop\PSTAF\Exception\InvoiceIncorrectException(
