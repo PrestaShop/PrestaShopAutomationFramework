@@ -101,6 +101,10 @@ class CartRulesManagement extends ShopCapability
             $browser
             ->clickLabelFor('apply_discount_to_product')
             ->executeScript('$("#reduction_product").val(arguments[0])', [$options['apply_to_product']]);
+        } else if (!empty($options['apply_to_selected_products'])) {
+            $browser->clickLabelFor('apply_discount_to_selection');
+        } else if (!empty($options['apply_to_cheapest_product'])) {
+            $browser->clickLabelFor('apply_discount_to_cheapest');
         }
 
         $browser
