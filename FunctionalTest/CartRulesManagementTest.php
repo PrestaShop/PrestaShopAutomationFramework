@@ -46,13 +46,14 @@ class CartRulesManagementTest extends LazyTestCase
 
     public function testCreateCartRuleWithProductRestrictions()
     {
-        $this->shop->getCartRulesManager()->createCartRule(array(
+        $this->shop->getCartRulesManager()->createCartRule([
             'name' => 'Discount After Tax On printed chiffon dress',
             'discount' => '10 after tax',
             'product_restrictions' => [
                 'products' => [1, 2]
-                ]
-            ));
-        }
+            ],
+            'apply_discount_to_selection' => true
+        ]);
+    }
 
 }
