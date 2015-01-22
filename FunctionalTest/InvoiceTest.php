@@ -183,6 +183,11 @@ class InvoiceTest extends TestCase
                         // but createCartRule expects an id_product
                         $discount['apply_to_product'] = $scenario['products'][$discount['apply_to_product']]['info']['id'];
                     }
+                    if (isset($discount['product_restrictions']['products'])) {
+                        foreach ($discount['product_restrictions']['products'] as $key => $productName) {
+                            $discount['product_restrictions']['products'][$key] = $scenario['products'][$productName]['info']['id'];
+                        }
+                    }
                 }
 
                 $shop->getCartRulesManager()->createCartRule($discount);
