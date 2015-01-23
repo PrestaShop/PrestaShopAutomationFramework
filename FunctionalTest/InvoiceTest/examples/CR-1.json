@@ -38,6 +38,13 @@
 		"invoice": {
 			"total": {
 				"to_pay_tax_included": 128.33
+			},
+			"tax": {
+				"products": {
+					"10": 5.5,
+					"20": 7.33,
+					"30": 5.5
+				}
 			}
 		}
 	}
