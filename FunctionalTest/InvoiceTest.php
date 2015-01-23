@@ -32,7 +32,8 @@ class InvoiceTest extends TestCase
 
         $paranoid_mode = true;
 
-        if ($paranoid_mode) {
+        if ($paranoid_mode && !$invoice['tax_tab']['use_one_after_another_method']) {
+
             $discounted_products_before_tax_from_breakdown = 0;
             foreach ($invoice['tax_tab']['product_tax_breakdown'] as $details)
             {
@@ -42,9 +43,25 @@ class InvoiceTest extends TestCase
 
             if ("$discounted_products_before_tax_from_footer" !== "$discounted_products_before_tax_from_breakdown") {
                 throw new \PrestaShop\PSTAF\Exception\InvoiceIncorrectException(
-                    "The sum of tax bases in the products breakdown (`$discounted_products_before_tax_from_breakdown`) is different from the discounted products price on the invoice footer (`$discounted_products_before_tax_from_footer`)."
+                "The sum of tax bases in the products breakdown (`$discounted_products_before_tax_from_breakdown`) is different from the discounted products price on the invoice footer (`$discounted_products_before_tax_from_footer`)."
                 );
             }
+
+            foreach ($invoice['tax_tab']['product_tax_breakdown'] as $details)
+            {
+                $prec = $invoice['ps_price_compute_precision'];
+                $unit = pow(10, $prec);
+                foreach ($invoice['tax_tab']['product_tax_breakdown'] as $rate => $details) {
+                    $expected_total_amount = (float)$rate * $details['total_price_tax_excl'] / 100;
+                    $delta = round(abs($unit * ($expected_total_amount - $details['total_amount'])));
+                    if ($delta > 2) {
+                        throw new \PrestaShop\PSTAF\Exception\InvoiceIncorrectException(
+                            "Products Breakdown is too approximative, `($rate) % x {$details['total_price_tax_excl']} !== $expected_total_amount`."
+                        );
+                    }
+                }
+            }
+
         }
     }
 
