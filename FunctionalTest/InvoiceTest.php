@@ -56,7 +56,7 @@ class InvoiceTest extends TestCase
                     $delta = round(abs($unit * ($expected_total_amount - $details['total_amount'])));
                     if ($delta > 2) {
                         throw new \PrestaShop\PSTAF\Exception\InvoiceIncorrectException(
-                            "Products Breakdown is too approximative, `($rate) % x {$details['total_price_tax_excl']} !== $expected_total_amount`."
+                            "Products Breakdown is too approximative, `($rate) % x {$details['total_price_tax_excl']} !== $expected_total_amount (expected: {$details['total_amount']})`."
                         );
                     }
                 }
