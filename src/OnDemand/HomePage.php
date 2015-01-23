@@ -22,12 +22,16 @@ class HomePage extends OnDemandPage
 			$url = $this->getSecrets()["homePageURL"];
 		}
 
-		/*
+
 		$match = [];
     	preg_match('#(\w+://[^/]+)#', $url, $match);
-    	$hostPart = $match[1];*/
+    	$hostPart = $match[1];
 
-		$this->getBrowser()->visit($url); // , $this->getSecrets()["htaccess"][$hostPart]);
+		if ($hostPart === 'www.prestashop.com') {
+			$this->getBrowser()->visit($url);
+		} else {
+			$this->getBrowser()->visit($url, $this->getSecrets()["htaccess"][$hostPart]);
+		}
 
 		return $this;
 	}
