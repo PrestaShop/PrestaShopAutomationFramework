@@ -267,14 +267,14 @@ class TaxManagementTest extends LazyTestCase
 
     public function testTaxRulesGroupsCanBeDeleted()
     {
-        foreach ($this->getShop()->getDataStore()->get('tax_rules_groups') as $name => $data) {
+        foreach ($this->getShop()->getDataStore()->get('tax_rules_groups') as $data) {
             $this->getShop()->getTaxManager()->deleteTaxRulesGroup($data['id_tax_rules_group']);
         }
     }
 
     public function testTaxRulesCanBeDeleted()
     {
-        foreach ($this->getShop()->getDataStore()->get('tax_rules') as $name => $data) {
+        foreach ($this->getShop()->getDataStore()->get('tax_rules') as $data) {
             $this->getShop()->getTaxManager()->deleteTaxRule($data['id_tax']);
         }
     }

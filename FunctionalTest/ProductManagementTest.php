@@ -14,8 +14,7 @@ class ProductManagementTest extends LazyTestCase
 
     public function testCreateProduct()
     {
-        $shop = static::getShop();
-        $data = $shop->getProductManager()->createProduct(array(
+        $this->shop->getProductManager()->createProduct(array(
             'name' => 'Toto',
             'price' => 12.1234,
             'tax_rule' => 5,
@@ -25,23 +24,20 @@ class ProductManagementTest extends LazyTestCase
 
     public function testCreateProductWithSpecificPrice()
     {
-        $shop = static::getShop();
-        $browser = $shop->getBrowser();
-
-        $product = $shop->getProductManager()->createProduct(array(
+        $product = $this->shop->getProductManager()->createProduct(array(
             'name' => 'Cheapy Product',
             'price' => 0.01,
             'quantity' => 2,
             'specific_price' => '80%'
         ));
 
-        $shop
+        $this->shop
         ->getPageObject('FrontOfficeProductSheet')
         ->visit($product['fo_url'])
         ->setQuantity(1)
         ->addToCart();
 
-        $summary = $shop->getPageObject('ShoppingCartSummary')->visit();
+        $summary = $this->shop->getPageObject('ShoppingCartSummary')->visit();
 
         $pct = $summary->getPercentReduction($product['id']);
 
