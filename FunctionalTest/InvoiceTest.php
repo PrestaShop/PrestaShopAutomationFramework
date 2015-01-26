@@ -54,7 +54,7 @@ class InvoiceTest extends TestCase
                 foreach ($invoice['tax_tab']['product_tax_breakdown'] as $rate => $details) {
                     $expected_total_amount = (float)$rate * $details['total_price_tax_excl'] / 100;
                     $delta = round(abs($unit * ($expected_total_amount - $details['total_amount'])));
-                    if ($delta > 2) {
+                    if ($delta > 1) {
                         throw new \PrestaShop\PSTAF\Exception\InvoiceIncorrectException(
                             "Products Breakdown is too approximative, `($rate) % x {$details['total_price_tax_excl']} !== $expected_total_amount (expected: {$details['total_amount']})`."
                         );
