@@ -1,4 +1,5 @@
 {
+	"name": "PrestaShop/PrestaShopAutomationFramework",
 	"repositories": [
         {
             "type": "git",
