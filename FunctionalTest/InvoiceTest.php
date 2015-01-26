@@ -30,9 +30,7 @@ class InvoiceTest extends TestCase
             );
         }
 
-        $paranoid_mode = true;
-
-        if ($paranoid_mode && !$invoice['tax_tab']['use_one_after_another_method']) {
+        if (!empty($invoice['tax_tab']['display_tax_bases_in_breakdowns'])) {
 
             $discounted_products_before_tax_from_breakdown = 0;
             foreach ($invoice['tax_tab']['product_tax_breakdown'] as $details)
