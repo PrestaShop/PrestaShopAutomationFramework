@@ -39,6 +39,10 @@ class Install extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if (!SeleniumManager::isSeleniumStarted()) {
+            SeleniumManager::spawnSelenium();
+        }
+
         SeleniumManager::ensureSeleniumIsRunning();
 
         $shop = ShopManager::getInstance()->getShop([

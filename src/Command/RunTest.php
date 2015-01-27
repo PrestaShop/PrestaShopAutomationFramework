@@ -9,6 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 
 use PrestaShop\PSTAF\Helper\FileSystem as FS;
+use PrestaShop\PSTAF\SeleniumManager;
 
 class RunTest extends Command
 {
@@ -26,10 +27,15 @@ class RunTest extends Command
         $this->addOption('filter', 'f', InputOption::VALUE_REQUIRED, 'Filter tests.');
         $this->addOption('data-provider-filter', 'z', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Filter datasets returned by the dataProviders');
         $this->addOption('inplace', 'I', InputOption::VALUE_NONE, 'Run tests against the current shop, when its source dir and target dir are the same.');
+        $this->addOption('headless', 'H', InputOption::VALUE_NONE, 'Run tests headlessly (needs Xvfb).');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if (!SeleniumManager::isSeleniumStarted()) {
+            SeleniumManager::spawnSelenium($input->getOption('headless'));
+        }
+
         $runners = ['phpunit', 'paratest', 'ptest', 'ftr'];
 
         $parallel = max(1, (int) $input->getOption('parallel'));
@@ -147,6 +153,8 @@ class RunTest extends Command
             $options,
             ['wait' => true]
         );
+
+        $process->setEnv('SELENIUM_HOST', SeleniumManager::getHost());
 
         if ($input->getOption('inplace')) {
             echo "-----------------------------------------------------\n";

@@ -2,10 +2,14 @@
 
 namespace PrestaShop\PSTAF;
 
-use \PrestaShop\PSTAF\Helper\FileSystem as FS;
+use PrestaShop\PSTAF\Helper\FileSystem as FS;
+use djfm\Process\Process;
 
 class SeleniumManager
 {
+    private static $host;
+    private static $processesToKill = array();
+
     public static function findOpenPort($startInclusive = 4444, $endInclusive = 8888)
     {
         for ($p = $startInclusive; $p <= $endInclusive; $p++) {
@@ -36,7 +40,7 @@ class SeleniumManager
         return $path;
     }
 
-    public static function start($directory = null)
+    private static function buildStartProcess()
     {
         $sjp = static::getSeleniumJARPath();
 
@@ -45,7 +49,16 @@ class SeleniumManager
         $process = new \djfm\Process\Process('java', [], [
             '-jar' => $sjp,
             '-port' => $port
+        ], [
+            'upid' => true
         ]);
+
+        return [$process, $port];
+    }
+
+    public static function start($directory = null)
+    {
+        list($process, $port) = self::buildStartProcess();
 
         $upid = $process->run(STDIN, 'selenium.log', 'selenium.log');
 
@@ -59,6 +72,8 @@ class SeleniumManager
             'port' => $port,
             'host' => 'http://127.0.0.1:'.$port.'/wd/hub'
         ]));
+
+        return $process;
     }
 
     public static function stop($walkDirectoryTreeUp = false)
@@ -115,26 +130,78 @@ class SeleniumManager
 
     public static function isSeleniumStarted()
     {
-        if (getenv('SELENIUM_HOST')) {
-            return true;
-        }
-
-       return static::started(true) ? true : false;
+        return self::getHost() ? true : false;
     }
 
     public static function getHost()
     {
         if (($sh = getenv('SELENIUM_HOST'))) {
             return $sh;
+        } else if (self::$host) {
+            return self::$host;
+        } else if (($started = static::started(true))) {
+            return $started['host'];
         }
 
-        return static::started(true)['host'];
+        return false;
     }
 
     public static function ensureSeleniumIsRunning()
     {
-        if (!static::started(true) && !getenv('SELENIUM_HOST')) {
+        if (!self::isSeleniumStarted()) {
             throw new \PrestaShop\PSTAF\Exception\SeleniumIsNotRunningException();
         }
     }
+
+    public static function spawnSelenium($headless = false)
+    {
+        $display = null;
+
+        if ($headless) {
+            for ($displayNumber = 10; $displayNumber < 50; ++$displayNumber) {
+
+                $xprocess = new Process('Xvfb', [':' . $displayNumber], ['-ac' => ''], ['upid' => true]);
+                $xprocess->run();
+
+                sleep(1);
+
+                if ($xprocess->running()) {
+                    self::$processesToKill[] = $xprocess;
+                    $display = ':' . $displayNumber;
+                    break;
+                }
+            }
+        }
+
+        list($process, $port) = self::buildStartProcess();
+
+        self::$processesToKill[] = $process;
+
+        if ($display) {
+            $process->setEnv('DISPLAY', $display);
+        }
+
+        $process->run(STDIN, 'selenium.log', 'selenium.log');
+
+        sleep(1);
+
+        if ($process->running()) {
+            self::$host = 'http://127.0.0.1:' . $port . '/wd/hub';
+        }
+
+        register_shutdown_function(function () {
+            self::unSpawnSelenium();
+        });
+    }
+
+    public static function unSpawnSelenium()
+    {
+        foreach (self::$processesToKill as $process) {
+            $process->kill();
+        }
+
+        self::$processesToKill = [];
+        self::$host = null;
+    }
+
 }
