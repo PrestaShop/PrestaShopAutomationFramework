@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "ef5dfe2a74507a063d8d4c107c29fba8",
+    "hash": "be05b961db18ef44fd1913c7c8db6704",
     "packages": [
         {
             "name": "brianium/habitat",
@@ -115,12 +115,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/djfm/ftr.git",
-                "reference": "06d00ce06377a5664158a45ed7269546d26cede6"
+                "reference": "7da9df7cfe3c5407c8459909714fe76d8589ecff"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/djfm/ftr/zipball/06d00ce06377a5664158a45ed7269546d26cede6",
-                "reference": "06d00ce06377a5664158a45ed7269546d26cede6",
+                "url": "https://api.github.com/repos/djfm/ftr/zipball/7da9df7cfe3c5407c8459909714fe76d8589ecff",
+                "reference": "7da9df7cfe3c5407c8459909714fe76d8589ecff",
                 "shasum": ""
             },
             "require": {
@@ -151,7 +151,7 @@
                 }
             ],
             "description": "A functional test runner",
-            "time": "2015-01-19 13:52:41"
+            "time": "2015-01-26 08:05:17"
         },
         {
             "name": "djfm/process",
@@ -159,7 +159,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/djfm/process",
-                "reference": "affd26788f512618f4a7dafcbed773bd62884369"
+                "reference": "6b221245c765e5d40ebf8fb12c1c8f7aa8ef8504"
             },
             "type": "library",
             "autoload": {
@@ -167,7 +167,7 @@
                     "djfm\\": "src/"
                 }
             },
-            "time": "2014-09-29 12:01:20"
+            "time": "2015-01-27 09:54:55"
         },
         {
             "name": "djfm/ptest",
