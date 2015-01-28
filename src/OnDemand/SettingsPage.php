@@ -2,6 +2,8 @@
 
 namespace PrestaShop\PSTAF\OnDemand;
 
+use Exception;
+
 class SettingsPage extends OnDemandPage
 {
 	public function gotoNewFtpUserPage()
@@ -20,5 +22,16 @@ class SettingsPage extends OnDemandPage
 	public function getFtpUserNameContaining($name)
 	{
 		return trim($this->getBrowser()->getText('{xpath}//a[contains(., "'.$name.'")]'));
+	}
+
+	public function isDomainActive($domainName)
+	{
+		$row = $this->getBrowser()->find('{xpath}//tr[.//a[contains(@href, "' . $domainName . '")]]');
+		try {
+			$row->find('i.fa.fa-circle.green');
+			return true;
+		} catch (Exception $e) {
+			return false;
+		}
 	}
 }

@@ -2,6 +2,8 @@
 
 namespace PrestaShop\PSTAF\OnDemand;
 
+use Exception;
+
 class DomainsPage extends OnDemandPage
 {
 	public function checkIfDomainIsAvailable($domain)
@@ -11,8 +13,8 @@ class DomainsPage extends OnDemandPage
 
 		$this->getBrowser()
 		->click('#buyDomainLabel')
-		->waitFor('#inputNameDomain')
-		->fillIn('#inputNameDomain', $name)
+		->waitFor('#buyDomainForm #inputNameDomain')
+		->fillIn('#buyDomainForm #inputNameDomain', $name)
 		->select('#top-level-domain', $tld)
 		->click('#check-domain-availability');
 
@@ -38,7 +40,17 @@ class DomainsPage extends OnDemandPage
 		if(strpos($this->getBrowser()->getCurrentURL(), 'init=address') !== false) {
 			return new AddressFormPage($this);
 		} else {
-			throw new \Exception('Not Implemented Yet');
+			throw new \Exception('Not Implemented Yet: Order domain while having an address already.');
 		}
+	}
+
+	public function bindDomain($domain)
+	{
+		$this->getBrowser()
+		->click('#alreadyHaveDomainLabel')
+		->fillIn('#alreadyHaveDomainForm #inputNameDomain', $domain)
+		->click('#alreadyHaveDomainForm button')
+		;
+		// $this->getBrowser()->click('{xpath}//form[contains(@action, "order_domain")]//button');
 	}
 }

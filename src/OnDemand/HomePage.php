@@ -27,7 +27,7 @@ class HomePage extends OnDemandPage
     	preg_match('#(\w+://[^/]+)#', $url, $match);
     	$hostPart = $match[1];
 
-		if ($hostPart === 'www.prestashop.com') {
+		if ($hostPart === 'https://www.prestashop.com') {
 			$this->getBrowser()->visit($url);
 		} else {
 			$this->getBrowser()->visit($url, $this->getSecrets()["htaccess"][$hostPart]);
@@ -85,11 +85,17 @@ class HomePage extends OnDemandPage
 	public function login($email, $password)
 	{
 		$this->getBrowser()
-		->click('#signin_menu a')
+		->click('#signin_menu > a')
 		->fillIn('#header_ips_username', $email)
 		->fillIn('#header_ips_password', $password)
 		->click('#signin_menu button');
 
 		return new MyStoresPage($this->getBrowser(), $this->getSecrets());
+	}
+
+	public function gotoMyStores()
+	{
+		$this->getBrowser()->click('.store.have-store a.get-me-started');
+		return new MyStoresPage($this);
 	}
 }
