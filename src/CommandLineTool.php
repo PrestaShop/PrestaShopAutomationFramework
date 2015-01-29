@@ -21,5 +21,6 @@ class CommandLineTool extends Application
         $this->add(new Command\ShopAddOrUpdateLanguage());
         $this->add(new Command\DatabaseDump());
         $this->add(new Command\DatabaseLoad());
+        $this->add(new Command\ReportsServer());
     }
 }

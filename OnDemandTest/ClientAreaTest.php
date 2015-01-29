@@ -3,6 +3,7 @@
 namespace PrestaShop\PSTAF\OnDemandTest;
 
 use PrestaShop\PSTAF\OnDemand\AccountCreation;
+use PrestaShop\PSTAF\Helper\Spinner;
 
 class ClientAreaTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 {
@@ -25,7 +26,6 @@ class ClientAreaTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 	}
 
 	/**
-	 * @maxattempts 1
 	 * @parallelize
 	 * @dataProvider languageAndCountryPairs
 	 */
@@ -53,9 +53,8 @@ class ClientAreaTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 
 		$myStoresPage = $data['myStoresPage'];
 
-		/*
-		$myStoresPage = $this->homePage->visit()->login(
-			'prestashop.john.doe+cYbTndwbLenbzbqdpcleHdwcRegbMeo@gmail.com',
+		/*$myStoresPage = $this->homePage->visit()->login(
+			'prestabot+dBchbXeQdYcqcuwddorfGbadfbK@gmail.com',
 			'123456789'
 		);*/
 
@@ -84,7 +83,7 @@ class ClientAreaTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 
 
 		$this->browser->click('a.be2bill_link')->clickFirstVisible('[name="submitBe2billForm"]');
-		
+
 		try {
 			$this->browser->ensureElementShowsUpOnPage('#be2bill_iframe');
 			$this->browser->switchToIFrame('be2bill_iframe');
@@ -92,5 +91,23 @@ class ClientAreaTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 		} catch (\Exception $e) {
 			throw new \Exception('It seems the be2bill iframe did not show up.');
 		}
+	}
+
+	public function testSubdomainsCanBeBound()
+	{
+		$domainsPage = $this->homePage->visit()->gotoMyStores()->gotoDomains();
+
+		$domain = md5(microtime()) . $this->getSecrets()['subdomain'];
+
+		$domainsPage->bindDomain($domain);
+
+		$settingsPage = $this->homePage->visit()->gotoMyStores()->gotoSettings();
+
+		$spinner = new Spinner('Domain `' . $domain . '` wasn\'t bound in 30 minutes.', 1800, 1000);
+
+		$spinner->assertBecomesTrue(function () use ($settingsPage, $domain) {
+			$this->getBrowser()->reload();
+			return $settingsPage->isDomainActive($domain);
+		});
 	}
 }

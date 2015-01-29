@@ -79,7 +79,7 @@ class AccountCreation
 					if ($crawler->count() > 0) {
 						$activationLink = $crawler->link()->getUri();
 						return true;
-					}				
+					}
 				}
 
 				return false;
@@ -103,6 +103,7 @@ class AccountCreation
 
 		if ($options['waitForSubdomain']) {
 			$this->waitFor200($frontOfficeURL);
+			sleep(300); // wait 5 minutes for the host to be ready
 		}
 
 		$shopSettings = [
@@ -120,7 +121,7 @@ class AccountCreation
 			'BackOfficeLogin' => [
 			    'admin_email'     => $options['email'],
 			    'admin_password'  => $options['password']
-			]	
+			]
 		]);
 
 		$shop->setOptionProvider($optionProvider);
