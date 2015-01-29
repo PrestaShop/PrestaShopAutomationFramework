@@ -10,39 +10,9 @@ use PrestaShop\PSTAF\Exception\FailedTestException;
 
 class EndToEndTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 {
-	/**
-	 * This is used to make reasonably unique, human readable names.
-	 */
-	private function _randomAnimalName()
-	{
-		static $data;
-
-		if (!$data) {
-			$data = json_decode(file_get_contents(__DIR__.'/data/animals.json'), true);
-		}
-
-		$item = $data[rand(0, count($data) - 1)];
-		$item = implode('', array_reverse(explode(',', $item)));
-		$m = [];
-		$n = preg_match_all('/\w+/', $item, $m);
-		return implode('', array_map('ucfirst', $m[0]));
-	}
-
-	public function randomAnimalName($maxLength = 15)
-	{
-		do {
-			$animalName = $this->_randomAnimalName();
-		} while (strlen($animalName) > $maxLength);
-
-		return $animalName;
-	}
-
 	public function newUid()
 	{
-		$left  = $this->randomAnimalName(15);
-		$right = '_'.date("dMYhis").getmypid();
-
-		return $left.$right;
+		return microtime().date("dMYhis").getmypid();
 	}
 
 	public function languageAndCountryPairs()
@@ -55,20 +25,6 @@ class EndToEndTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 			['nl', 'Netherlands'],
 			['pt', 'Brazil']
 		];
-	}
-
-	public function getLanguageAndCountryIdentifier($language, $country)
-	{
-		$countryParts = preg_split('/\s+/', $country);
-		if (count($countryParts) > 1) {
-			$c = implode('', array_map(function ($part) {
-				return strtoupper($part[0]);
-			}, $countryParts));
-		} else {
-			$c = ucfirst(strtolower(substr($country, 0, 2)));
-		}
-		$l = substr(strtolower($language), 0, 2);
-		return $l.$c;
 	}
 
 	/**
@@ -87,14 +43,17 @@ class EndToEndTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 
 		$secrets = $this->getSecrets();
 
-		$uid = $this->newUid().'_'.$this->getLanguageAndCountryIdentifier($language, $country);
+		$uid = HumanHash::humanMd5($this->newUid().$language.$country);
 
-		$uid = HumanHash::humanMd5($uid);
+		$this->writeMetaData('uid', $uid);
 
 		self::setValue('uid', $uid);
 
 		$email =  implode("+$uid@", explode('@', $secrets['customer']['email']));
 		$shop_name = $uid;
+
+		$this->writeMetaData('email', $email);
+		$this->writeMetaData('password', $secrets['customer']['password']);
 
 		$data = $accountCreation->createAccountAndShop([
 			'email' 	=> $email,
@@ -106,6 +65,8 @@ class EndToEndTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 
 		$this->shop = $data['shop'];
 		self::setShop($this->shop);
+
+		$this->writeMetaData('backOfficeURL', $this->shop->getBackOfficeURL());
 
 		$this->shop->getBackOfficeNavigator()->login();
 
