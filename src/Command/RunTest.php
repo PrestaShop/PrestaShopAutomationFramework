@@ -147,6 +147,10 @@ class RunTest extends Command
             }
         }
 
+        if ($runner === 'ftr') {
+            $arguments[] = '--shallow';
+        }
+
         $process = new \djfm\Process\Process(
             $runner_path,
             $arguments,
