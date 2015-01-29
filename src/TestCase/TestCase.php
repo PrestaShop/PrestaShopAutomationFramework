@@ -173,7 +173,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
     {
         $class = explode('\\', get_called_class());
         $class = end($class);
-        
+
         $testPath = $this->getTestPath();
 
         if ($testPath) {
@@ -249,7 +249,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
             if (!is_dir($dir)) {
                 mkdir($dir, 0777, true);
             }
-        }        
+        }
 
         return $dir;
     }
@@ -261,8 +261,21 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
         return $this;
     }
 
+    public function writeMetaData($key, $value)
+    {
+        $metaDataFile = FS::join($this->getArtefactsDir(), 'metadata.json');
+        $metaData = [];
+        if (file_exists($metaDataFile)) {
+            $metaData = json_decode(file_get_contents($metaDataFile), true);
+        }
+        $metaData[$key] = $value;
+        file_put_contents($metaDataFile, json_encode($metaData, JSON_PRETTY_PRINT));
+
+        return $this;
+    }
+
     public function makeFileNameCompatibleRepresentation($value) {
-        
+
         $clean = function($str) {
             return str_replace(
                 ['<', '>', ':', '"', '/', '\\', '|', '?', '*'],
@@ -299,7 +312,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
         $this->shortName = $shortName;
 
         $dir = $this->getArtefactsDir();
-        
+
         $screenshotsDir = FS::join($dir, 'screenshots');
 
         if (is_dir($screenshotsDir)) {
