@@ -150,10 +150,12 @@ class Browser implements BrowserInterface
         $this->takeScreenshot($filename . '.png');
 
         if (function_exists('imagecreatefrompng') && function_exists('imagejpeg') && file_exists($filename . '.png')) {
-            $image = imagecreatefrompng($filename . '.png');
-            imagejpeg($image, $filename . '.jpg', 50);
-            imagedestroy($image);
-            unlink($filename . '.png');
+            $image = @imagecreatefrompng($filename . '.png');
+            if ($image) {
+                imagejpeg($image, $filename . '.jpg', 50);
+                imagedestroy($image);
+                unlink($filename . '.png');
+            }
         }
 
     }
