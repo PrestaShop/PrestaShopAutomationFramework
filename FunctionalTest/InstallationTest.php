@@ -15,6 +15,7 @@ class InstallationTest extends TestCase
     {
         return [
             ['ca', 'es'], ['ca', 'fr'],
+            ['qc', 'ca'], ['qc', 'us'],
             ['de', 'de'], ['de', 'fr'],
             ['en', 'us'], ['en', 'de'],
             ['es', 'es'], ['es', 'it'],
