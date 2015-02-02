@@ -48,7 +48,7 @@ class DomainsPage extends OnDemandPage
 	{
 		$this->getBrowser()
 		->click('#alreadyHaveDomainLabel')
-		->fillIn('#alreadyHaveDomainForm #inputNameDomain', $domain)
+		->fillIn('#alreadyHaveDomainForm [name="full_domain_name"]', $domain)
 		->click('#alreadyHaveDomainForm button')
 		;
 		// $this->getBrowser()->click('{xpath}//form[contains(@action, "order_domain")]//button');
