@@ -60,7 +60,11 @@ class ClientAreaTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 
 		$domains = $myStoresPage->gotoDomains();
 
-		while(!$domains->checkIfDomainIsAvailable(md5(microtime()).'.com'));
+
+		$spinner = new Spinner('Could not find an available domain to order.', 60, 1000);
+		$spinner->assertBecomesTrue(function () use ($domains) {
+			return $domains->checkIfDomainIsAvailable(md5(microtime()).'.com');
+		});
 
 		$addressForm = $domains->orderDomain();
 
