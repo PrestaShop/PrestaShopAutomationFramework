@@ -2,8 +2,11 @@
 
 namespace PrestaShop\PSTAF;
 
+use Exception;
+
 use PrestaShop\PSTAF\Helper\FileSystem as FS;
 use djfm\Process\Process;
+
 
 class SeleniumManager
 {
@@ -160,10 +163,14 @@ class SeleniumManager
         if ($headless) {
             for ($displayNumber = 10; $displayNumber < 50; ++$displayNumber) {
 
-                $xprocess = new Process('Xvfb', [':' . $displayNumber], ['-ac' => ''], ['upid' => true]);
-                $xprocess->run();
+                try {
+                    $xprocess = new Process('Xvfb', [':' . $displayNumber], ['-ac' => ''], ['upid' => true]);
+                    $xprocess->run();
+                    sleep(1);
+                } catch (Exception $e) {
+                    // never mind, try next display...
+                }
 
-                sleep(1);
 
                 if ($xprocess->running()) {
                     self::$processesToKill[] = $xprocess;
