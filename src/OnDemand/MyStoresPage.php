@@ -6,15 +6,38 @@ class MyStoresPage extends OnDemandPage
 {
 	public function gotoDomains()
 	{
-		$this->getBrowser()->click('{xpath}//a[contains(@href, "init=select_domain")]');
+		$this->getBrowser()->click('nav.menu[role=navigation] li:nth-of-type(2) a');
 
 		return new DomainsPage($this);
 	}
 
-	public function gotoSettings()
+	public function gotoDetails($storeName = null)
 	{
-		$this->getBrowser()->click('{xpath}//a[contains(@href, "init=manage") and descendant::img]');
+		$this
+		->getStoreWidgetRoot($storeName)
+		->find('{xpath}.//a[contains(@href, "init=manage") and descendant::img]')
+		->click();
 
-		return new SettingsPage($this);
+		return new StoreDetailsPage($this);
+	}
+
+	public function getStoreWidgetRoot($storeName = null)
+	{
+		if (null === $storeName) {
+			return $this->getBrowser()->find('div.listingStore');
+		}
+
+		$xpath = '{xpath}//div[contains(@class, "listingStore") and .//h5[contains(., "' . $storeName . '")]]';
+		return $this->getBrowser()->find($xpath);
+	}
+
+	public function getFrontOfficeURL($storeName)
+	{
+		return $this->getStoreWidgetRoot($storeName)->find('span.domain')->getText();
+	}
+
+	public function getBackOfficeURL($storeName)
+	{
+		return $this->getStoreWidgetRoot($storeName)->find('a[data-sel="bo-link"]')->getAttribute('href');
 	}
 }

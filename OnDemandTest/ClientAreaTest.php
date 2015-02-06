@@ -99,19 +99,19 @@ class ClientAreaTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 
 	public function testSubdomainsCanBeBound()
 	{
-		$domainsPage = $this->homePage->visit()->gotoMyStores()->gotoDomains();
+		$storeDetailsPage = $this->homePage->visit()->gotoMyStores()->gotoDetails();
 
 		$domain = md5(microtime()) . $this->getSecrets()['subdomain'];
 
-		$domainsPage->bindDomain($domain);
+		$storeDetailsPage->bindDomain($domain);
 
-		$settingsPage = $this->homePage->visit()->gotoMyStores()->gotoSettings();
+		$detailsPage = $this->homePage->visit()->gotoMyStores()->gotoDetails();
 
 		$spinner = new Spinner('Domain `' . $domain . '` wasn\'t bound in 30 minutes.', 1800, 1000);
 
-		$spinner->assertBecomesTrue(function () use ($settingsPage, $domain) {
+		$spinner->assertBecomesTrue(function () use ($detailsPage, $domain) {
 			$this->getBrowser()->reload();
-			return $settingsPage->isDomainActive($domain);
+			return $detailsPage->isDomainActive($domain);
 		});
 	}
 }

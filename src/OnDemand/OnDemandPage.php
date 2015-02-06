@@ -27,4 +27,13 @@ class OnDemandPage
 	{
 		return $this->secrets;
 	}
+
+	public function confirmPassword()
+	{
+		$password = $this->getSecrets()['customer']['password'];
+		
+		$this->getBrowser()
+		->fillIn('#modal_password_confirm', $password)
+		->click('#confirm_pwd_action');
+	}
 }

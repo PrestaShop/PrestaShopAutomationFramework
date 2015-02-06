@@ -14,8 +14,6 @@ class NewFTPUserPage extends OnDemandPage
 		->click('#confirm_pwd_action')
 		->ensureStandardSuccessMessageDisplayed();
 
-		$settingsPage = new SettingsPage($this);
-
-		return $settingsPage;
+		return new StoreDetailsPage($this);
 	}
 }

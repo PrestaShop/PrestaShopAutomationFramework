@@ -7,6 +7,8 @@ use PrestaShop\PSTAF\Exception\FailedTestException;
 
 class HomePage extends OnDemandPage
 {
+	private $url;
+
 	public static $twoLetterLanguageCodes = [
 		'en' => 'English',
 		'fr' => 'Français',
@@ -16,11 +18,27 @@ class HomePage extends OnDemandPage
 		'nl' => 'Dutch'
 	];
 
+	public function getURL()
+	{
+		if (!$this->url) {
+			$this->url = $this->getSecrets()["homePageURL"];
+		}
+
+		return $this->url;
+	}
+
+	public function getNewStoreURL()
+	{
+		return rtrim($this->getURL(), '/') . '/en/create-your-online-store';
+	}
+
 	public function visit($url = null)
 	{
 		if (!$url) {
-			$url = $this->getSecrets()["homePageURL"];
+			$url = $this->getURL();
 		}
+
+		$this->url = $url;
 
 
 		$match = [];

@@ -258,6 +258,18 @@ class Browser implements BrowserInterface
         return $this->wrap(__FUNCTION__, func_get_args());
     }
 
+    public function back()
+    {
+        $this->driver->navigate()->back();
+        return $this;
+    }
+
+    public function forward()
+    {
+        $this->driver->navigate()->forward();
+        return $this;
+    }
+
     /**
      * sleep
      */

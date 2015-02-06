@@ -337,4 +337,9 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
     {
         return $this->shortName;
     }
+
+    public static function newUID()
+    {
+        return md5(microtime().getmypid());
+    }
 }

@@ -6,51 +6,50 @@ use Exception;
 
 class DomainsPage extends OnDemandPage
 {
-	public function checkIfDomainIsAvailable($domain)
+	public function isDomainActive($domainName)
 	{
-		list($name, $tld) = explode('.', $domain, 2);
-		$tld = ".$tld";
+		$xpath = '{xpath}//tr[.//a[contains(@href, "' . $domainName . '")]]';
+		$row = $this->getBrowser()->find($xpath);
+		try {
+			$row->find('i.fa.fa-circle.green');
+			return true;
+		} catch (Exception $e) {
+			return false;
+		}
+	}
 
-		$this->getBrowser()
-		->click('#buyDomainLabel')
-		->waitFor('#buyDomainForm #inputNameDomain')
-		->fillIn('#buyDomainForm #inputNameDomain', $name)
-		->select('#top-level-domain', $tld)
-		->click('#check-domain-availability');
+	public function getDomainWidgetRoot($domain)
+	{
+		return $this->getBrowser()->find('{xpath}//tr[.//td[contains(., "' . $domain . '")]]');
+	}
+
+	public function setPrimary($domain)
+	{
+		$root = $this->getDomainWidgetRoot($domain);
+
+		$root->find('a[href="#"]')->click();
+		$root->find('{xpath}.//form[contains(@action, "set_default_domain")]//button')->click();
+
+		$this->confirmPassword();
+
+		return $this;
+	}
+
+	public function unAssign($domain)
+	{
+		$root = $this->getDomainWidgetRoot($domain);
+
+		$root->find('a[href="#"]')->click();
+		$root->find('{xpath}.//form[contains(@action, "delete_domain")]//button')->click();
+
+		$this->confirmPassword();
 
 		try {
-			$this->getBrowser()->waitFor(
-				'{xpath}//form[contains(@action, "order_domain")]//button'
-			);
-			return true;
-		} catch (\Exception $e) {
-			if ($this->getBrowser()->hasVisible(
-				'{xpath}//form[contains(@action, "associate_domain")]//button'
-			)) {
-				return false;
-			} else {
-				throw $e;
-			}
+			$this->getDomainWidgetRoot($domain)->find('i.fa.fa-circle.orange');
+		} catch (Exception $e) {
+			throw new Exception('Domain `' . $domain . '` was not unassigned.');
 		}
-	}
 
-	public function orderDomain()
-	{
-		$this->getBrowser()->click('{xpath}//form[contains(@action, "order_domain")]//button');
-		if(strpos($this->getBrowser()->getCurrentURL(), 'init=address') !== false) {
-			return new AddressFormPage($this);
-		} else {
-			throw new \Exception('Not Implemented Yet: Order domain while having an address already.');
-		}
-	}
-
-	public function bindDomain($domain)
-	{
-		$this->getBrowser()
-		->click('#alreadyHaveDomainLabel')
-		->fillIn('#alreadyHaveDomainForm [name="full_domain_name"]', $domain)
-		->click('#alreadyHaveDomainForm button')
-		;
-		// $this->getBrowser()->click('{xpath}//form[contains(@action, "order_domain")]//button');
+		return $this;
 	}
 }

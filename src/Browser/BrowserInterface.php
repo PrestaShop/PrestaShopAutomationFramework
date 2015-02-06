@@ -199,6 +199,16 @@ interface BrowserInterface
     	 */
         public function reload();
 
+		/**
+		 * Go back in history.
+		 */
+		public function back();
+
+		/**
+		* Go forward in history.
+		*/
+		public function forward();
+
         /**
          * Convenience method to wait a bit and keep chaining methods.
          * Should return $this.

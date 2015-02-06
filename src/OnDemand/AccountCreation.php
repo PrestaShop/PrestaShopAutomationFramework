@@ -31,75 +31,91 @@ class AccountCreation
 		$this->browser = $homePage->getBrowser();
 	}
 
-	public function createAccountAndShop(array $options)
+	public function createAccountAndShop(array $options, $onlyShop = false)
 	{
 		$options = array_merge(['waitForSubdomain' => true], $options);
 
-		$this->homePage
-		->visit()
-		->setLanguage($options['language'])
-		->submitShopCreationBannerForm($options['shop_name'], $options['email'])
-		->chooseCountry($options['country'])
-		->chooseFirstQualification()
-		->submit()
-		->fillFirstname('Jøħn')
-		->fillLastname('Sölünëum')
-		->fillPassword($options['password'])
-		->fillPasswordConfirmation($options['password'])
-		->acceptTandC()
-		->submit()
-		;
+		if ($onlyShop) {
+			$this->browser
+			->visit($this->homePage->getNewStoreURL())
+			->fillIn('#create-online-store-shop_name', $options['shop_name'])
+			->click('a.get-me-started')
+			;
 
-		$waitForEmail = new Spinner('Could not find activation email.', 300);
+			$confPage = new StoreConfigurationPage($this->homePage);
+			$confPage
+			->chooseCountry($options['country'])
+			->chooseFirstQualification()
+			->submit()
+			->fillPassword($options['password'])
+			->fillPasswordConfirmation($options['password'])
+			->acceptTandC()
+			->submit()
+			;
 
-		$reader = new GmailReader(
-			$this->homePage->getSecrets()['customer']['email'],
-			$this->homePage->getSecrets()['customer']['gmail_password']
-		);
+			$this->browser->click('a.get-me-started');
+		}
+		else {
+			$this->homePage
+			->visit()
+			->setLanguage($options['language'])
+			->submitShopCreationBannerForm($options['shop_name'], $options['email'])
+			->chooseCountry($options['country'])
+			->chooseFirstQualification()
+			->submit()
+			->fillFirstname('Jøħn')
+			->fillLastname('Sölünëum')
+			->fillPassword($options['password'])
+			->fillPasswordConfirmation($options['password'])
+			->acceptTandC()
+			->submit()
+			;
 
-		$expectedActivationEmailButtonTitle = static::$expectedActivationEmailButtonTitle[$options['language']];
+			$waitForEmail = new Spinner('Could not find activation email.', 300);
 
-		$activationLink = null;
+			$reader = new GmailReader(
+				$this->homePage->getSecrets()['customer']['email'],
+				$this->homePage->getSecrets()['customer']['gmail_password']
+			);
 
-		/**
-		 * @todo : do we want to test the order in which the emails are received?
-		 */
+			$expectedActivationEmailButtonTitle = static::$expectedActivationEmailButtonTitle[$options['language']];
 
-		try {
-			$waitForEmail->assertBecomesTrue(function () use ($reader, $options, $expectedActivationEmailButtonTitle, &$activationLink) {
+			$activationLink = null;
 
-				$emails = $reader->readEmails($options['email']);
+			/**
+			* @todo : do we want to test the order in which the emails are received?
+			*/
 
-				foreach ($emails as $email) {
-					$crawler = new Crawler('', 'http://www.example.com');
-					$crawler->addHtmlContent($email['body']);
+			try {
+				$waitForEmail->assertBecomesTrue(function () use ($reader, $options, $expectedActivationEmailButtonTitle, &$activationLink) {
 
-					$crawler = $crawler->selectLink($expectedActivationEmailButtonTitle);
+					$emails = $reader->readEmails($options['email']);
 
-					if ($crawler->count() > 0) {
-						$activationLink = $crawler->link()->getUri();
-						return true;
+					foreach ($emails as $email) {
+						$crawler = new Crawler('', 'http://www.example.com');
+						$crawler->addHtmlContent($email['body']);
+
+						$crawler = $crawler->selectLink($expectedActivationEmailButtonTitle);
+
+						if ($crawler->count() > 0) {
+							$activationLink = $crawler->link()->getUri();
+							return true;
+						}
 					}
-				}
 
-				return false;
-			}, false);
-		} catch (\Exception $e) {
-			throw new FailedTestException($e->getMessage());
+					return false;
+				}, false);
+			} catch (\Exception $e) {
+				throw new FailedTestException($e->getMessage());
+			}
+
+			$this->browser->visit($activationLink);
 		}
 
-		$this->browser->visit($activationLink);
-
-		try {
-			// Proper markup, but not on all environments
-			$frontOfficeURL = $this->browser->getAttribute('a[data-sel="fo-link"]', 'href');
-			$backOfficeURL 	= $this->browser->getAttribute('a[data-sel="bo-link"]', 'href');
-		} catch (\Exception $e) {
-			// Fallback to horrible css selectors
-			$backOfficeURL 	= $this->browser->getAttribute('a.btn-store:nth-child(1)', 'href');
-			$tmpFrontOfficeURL = $this->browser->getAttribute('a.btn-store:nth-child(2)', 'href');
-			$frontOfficeURL = preg_replace('/^(\w+:\/\/)([^.]+)/', "\${1}{$options['shop_name']}", $tmpFrontOfficeURL);
-		}
+		$myStores = new MyStoresPage($this->homePage);
+	
+		$frontOfficeURL = $myStores->getFrontOfficeURL($options['shop_name']);
+		$backOfficeURL 	= $myStores->getBackOfficeURL($options['shop_name']);
 
 		if ($options['waitForSubdomain']) {
 			$this->waitFor200($frontOfficeURL);
@@ -125,8 +141,6 @@ class AccountCreation
 		]);
 
 		$shop->setOptionProvider($optionProvider);
-
-		$myStores = new MyStoresPage($this->browser, $this->homePage->getSecrets());
 
 		return [
 			'shop' => $shop,
