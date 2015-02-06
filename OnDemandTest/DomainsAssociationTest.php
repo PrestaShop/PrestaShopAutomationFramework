@@ -136,6 +136,9 @@ class DomainsAssociationTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 		$domainsPage->unAssign(self::getValue('sd3'));
 	}
 
+	/**
+	 * @depends testSubdomains2and3AreUnassignedFromShopA
+	 */
 	public function testCreateShopB()
 	{
 		$uidB = self::newUID();
@@ -154,5 +157,31 @@ class DomainsAssociationTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 			'email' => $email,
 			'waitForSubdomain' => false
 		], true);
+	}
+
+	/**
+	 * @depends testCreateShopB
+	 */
+	public function testICanReAssignSd2ToBandSd3toA()
+	{
+		$domainsPage = $this->homePage->visit()->gotoMyStores()->gotoDomains();
+
+		$spinner = new Spinner('Cannot assign domains that are not green.', 300, 1000);
+
+		$spinner->assertBecomesTrue(function () use ($domainsPage) {
+			return $domainsPage->isGreen(self::getValue('sd2')) && $domainsPage->isGreen(self::getValue('sd3'));
+		});
+
+		$domainsPage->assignDomainToShop(self::getValue('sd2'), self::getValue('uidB'));
+		$domainsPage->assignDomainToShop(self::getValue('sd3'), self::getValue('uidA'));
+
+		$spinner = new Spinner('Domains weren\'t bound in 30 minutes.', 1800, 1000);
+
+		$spinner->assertBecomesTrue(function () use ($domainsPage) {
+			$this->getBrowser()->reload();
+			$sd2 = $domainsPage->isDomainActive(self::getValue('sd2'));
+			$sd3 = $domainsPage->isDomainActive(self::getValue('sd3'));
+			return $sd2 && $sd3;
+		});
 	}
 }
