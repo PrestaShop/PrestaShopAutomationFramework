@@ -188,12 +188,11 @@ class SeleniumManager
             $process->setEnv('DISPLAY', $display);
         }
 
-        $process->run(STDIN, 'selenium.log', 'selenium.log');
-
-        sleep(1);
+        $process->run(null, 'selenium.log', 'selenium.log');
 
         if ($process->running()) {
             self::$host = 'http://127.0.0.1:' . $port . '/wd/hub';
+            sleep(5);
         }
 
         register_shutdown_function(function () {
