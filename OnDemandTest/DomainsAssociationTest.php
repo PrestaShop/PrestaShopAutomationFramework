@@ -14,14 +14,33 @@ class DomainsAssociationTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 		return 'EndToEndTest';
 	}
 
-	private function checkDomainPointsToShopWithoutRedirection($domain, $shopName)
+	private function checkDomainPointsToShopWithoutRedirection($domain, $shopName, $timeout = 300)
 	{
-		$spinner = new Spinner(null, 300, 1000);
+		$spinner = new Spinner(null, $timeout, 5000);
 
 		$url = $this->getBrowser()->getCurrentURL();
 
 		$spinner->assertNoException(function () use ($domain, $shopName) {
-			$this->getBrowser()->visit($domain);
+
+			if (!preg_match('#^\w+://#', $domain)) {
+				$url = "http://$domain";
+			} else {
+				$url = $domain;
+			}
+
+			$ch = curl_init($url);
+			curl_setopt($ch, CURLOPT_NOBODY, true);
+			curl_exec($ch);
+			$status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+			curl_close($ch);
+
+			if ($status === 301) {
+				throw new Exception('Expected status code 200 on `' . $url . '`, but got 301. This is very bad because 301 is permanent.');
+			} elseif ($status !== 200) {
+				throw new Exception('Expected status code 200 on `' . $url . '`, but got ' . $status . '.');
+			}
+
+			$this->getBrowser()->visit($url);
 
 			$currentURL = $this->getBrowser()->getCurrentURL();
 
