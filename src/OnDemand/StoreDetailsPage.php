@@ -83,4 +83,18 @@ class StoreDetailsPage extends OnDemandPage
 	{
 		return (new DomainsPage($this))->isDomainActive($domainName);
 	}
+
+	public function deleteStore()
+	{
+		$this->getBrowser()
+		->click('#deleteThisStore')
+		->fillIn('#confirmStoreDeletion', $this->getSecrets()['customer']['password'])
+		->click('#submitStoreDeletion');
+
+		if (!$this->getBrowser()->hasVisible('div.alert.alert-success')) {
+			throw new Exception('Store doesn\'t seem to have been deleted.');
+		}
+
+		return new MyStoresPage($this);
+	}
 }

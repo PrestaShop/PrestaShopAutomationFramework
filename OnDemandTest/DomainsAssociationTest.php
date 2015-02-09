@@ -166,9 +166,10 @@ class DomainsAssociationTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 	{
 		$domainsPage = $this->homePage->visit()->gotoMyStores()->gotoDomains();
 
-		$spinner = new Spinner('Cannot assign domains that are not green.', 300, 1000);
+		$spinner = new Spinner('Cannot assign domains that are not green.', 1800, 1000);
 
 		$spinner->assertBecomesTrue(function () use ($domainsPage) {
+			$this->getBrowser()->reload();
 			return $domainsPage->isGreen(self::getValue('sd2')) && $domainsPage->isGreen(self::getValue('sd3'));
 		});
 
@@ -182,6 +183,56 @@ class DomainsAssociationTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 			$sd2 = $domainsPage->isDomainActive(self::getValue('sd2'));
 			$sd3 = $domainsPage->isDomainActive(self::getValue('sd3'));
 			return $sd2 && $sd3;
+		});
+
+		return $domainsPage;
+	}
+
+	/**
+	 * @depends testICanReAssignSd2ToBandSd3toA
+	 */
+	public function testICanSetSd2andSd3asPrimary($domainsPage)
+	{
+		$domainsPage->setPrimary(self::getValue('sd2'));
+		$domainsPage->setPrimary(self::getValue('sd3'));
+
+		$this->checkDomainPointsToShopWithoutRedirection(self::getValue('sd2'), self::getValue('uidB'));
+		$this->checkDomainPointsToShopWithoutRedirection(self::getValue('sd3'), self::getValue('uidA'));
+	}
+
+	/**
+	 * @depends testCreateShopB
+	 */
+	public function testSubdomainsFromDeletedShopRemainAvailableToCustomer()
+	{
+		$domainsPage = $this->homePage->visit()->gotoMyStores()
+		->gotoDetails(self::getValue('uidA'))
+		->deleteStore()
+		->gotoDomains();
+
+		$spinner = new Spinner('Domains from deleted shop did not become available.', 1800, 1000);
+
+		$spinner->assertBecomesTrue(function () use ($domainsPage) {
+			$this->getBrowser()->reload();
+			return $domainsPage->isGreen(self::getValue('sd1')) && $domainsPage->isGreen(self::getValue('sd3'));
+		});
+
+		return $domainsPage;
+	}
+
+	/**
+	 * @depends testSubdomainsFromDeletedShopRemainAvailableToCustomer
+	 */
+	public function testDomainsFromDeletedShopCanBeReAssigned($domainsPage)
+	{
+		$domainsPage->assignDomainToShop(self::getValue('sd1'), self::getValue('uidB'));
+		$domainsPage->assignDomainToShop(self::getValue('sd3'), self::getValue('uidB'));
+
+		$spinner = new Spinner('Domains from deleted shop could not be re-assigned to surviving shop.', 1800, 1000);
+
+		$spinner->assertBecomesTrue(function () use ($domainsPage) {
+			$this->getBrowser()->reload();
+			return $domainsPage->isGreen(self::getValue('sd1')) && $domainsPage->isGreen(self::getValue('sd3'));
 		});
 	}
 }
