@@ -197,12 +197,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/djfm/SocketRPC.git",
-                "reference": "7da00c79689fad8268d624be52965082d8c7b059"
+                "reference": "b2da757a0d6f22a52f54bdb6333943ca53fa0ed1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/djfm/SocketRPC/zipball/7da00c79689fad8268d624be52965082d8c7b059",
-                "reference": "7da00c79689fad8268d624be52965082d8c7b059",
+                "url": "https://api.github.com/repos/djfm/SocketRPC/zipball/b2da757a0d6f22a52f54bdb6333943ca53fa0ed1",
+                "reference": "b2da757a0d6f22a52f54bdb6333943ca53fa0ed1",
                 "shasum": ""
             },
             "require-dev": {
@@ -222,7 +222,7 @@
                     "email": "fm.de.jouvencel@gmail.com"
                 }
             ],
-            "time": "2015-02-05 17:12:39"
+            "time": "2015-02-10 14:39:00"
         },
         {
             "name": "facebook/webdriver",
