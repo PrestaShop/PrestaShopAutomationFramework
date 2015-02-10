@@ -53,12 +53,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/brianium/paratest.git",
-                "reference": "5b3c939eb1af6a36f2a5018b6a72795d431ca6c4"
+                "reference": "07b9f2d282fa0d2cd05581fd0331577bcc520f4b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/brianium/paratest/zipball/5b3c939eb1af6a36f2a5018b6a72795d431ca6c4",
-                "reference": "5b3c939eb1af6a36f2a5018b6a72795d431ca6c4",
+                "url": "https://api.github.com/repos/brianium/paratest/zipball/07b9f2d282fa0d2cd05581fd0331577bcc520f4b",
+                "reference": "07b9f2d282fa0d2cd05581fd0331577bcc520f4b",
                 "shasum": ""
             },
             "require": {
@@ -107,7 +107,7 @@
                 "phpunit",
                 "testing"
             ],
-            "time": "2015-01-31 20:44:12"
+            "time": "2015-02-09 17:22:29"
         },
         {
             "name": "djfm/ftr",
@@ -115,12 +115,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/djfm/ftr.git",
-                "reference": "814cd9abe5e14e117ba2019a2f206bda3d6a966d"
+                "reference": "29146ac37d5935e3b62e08e23f78b0c1edb5078c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/djfm/ftr/zipball/814cd9abe5e14e117ba2019a2f206bda3d6a966d",
-                "reference": "814cd9abe5e14e117ba2019a2f206bda3d6a966d",
+                "url": "https://api.github.com/repos/djfm/ftr/zipball/29146ac37d5935e3b62e08e23f78b0c1edb5078c",
+                "reference": "29146ac37d5935e3b62e08e23f78b0c1edb5078c",
                 "shasum": ""
             },
             "require": {
@@ -151,7 +151,7 @@
                 }
             ],
             "description": "A functional test runner",
-            "time": "2015-02-05 15:38:37"
+            "time": "2015-02-10 09:04:45"
         },
         {
             "name": "djfm/process",
@@ -230,12 +230,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/facebook/php-webdriver.git",
-                "reference": "44feb1a7d810a14133a31cf697912faf5cab2579"
+                "reference": "2c5b305ea91b00ebbc433ad1663b7f16c1b31ec5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/facebook/php-webdriver/zipball/44feb1a7d810a14133a31cf697912faf5cab2579",
-                "reference": "44feb1a7d810a14133a31cf697912faf5cab2579",
+                "url": "https://api.github.com/repos/facebook/php-webdriver/zipball/2c5b305ea91b00ebbc433ad1663b7f16c1b31ec5",
+                "reference": "2c5b305ea91b00ebbc433ad1663b7f16c1b31ec5",
                 "shasum": ""
             },
             "require": {
@@ -263,7 +263,7 @@
                 "selenium",
                 "webdriver"
             ],
-            "time": "2015-01-20 18:54:55"
+            "time": "2015-02-09 19:39:34"
         },
         {
             "name": "phpunit/php-code-coverage",
