@@ -12,6 +12,7 @@ class StoreDetailsPage extends OnDemandPage
 		$tld = ".$tld";
 
 		$this->getBrowser()
+		->click('{xpath}//a[contains(@href, "init=select_domain")]')
 		->click('#buyDomainLabel')
 		->waitFor('#buyDomainForm #inputNameDomain')
 		->fillIn('#buyDomainForm #inputNameDomain', $name)
