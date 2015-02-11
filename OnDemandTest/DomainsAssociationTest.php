@@ -4,6 +4,8 @@ namespace PrestaShop\PSTAF\OnDemandTest;
 
 use Exception;
 
+use PrestaShop\PSTAF\Exception\Unexpected301Exception;
+
 use PrestaShop\PSTAF\OnDemand\AccountCreation;
 use PrestaShop\PSTAF\Helper\Spinner;
 
@@ -14,11 +16,33 @@ class DomainsAssociationTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 		return 'EndToEndTest';
 	}
 
+	private function getStatusAndLocation($url)
+	{
+		$ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_NOBODY, true);
+		curl_setopt($ch, CURLOPT_HEADER, true);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER , true);
+		$headers = curl_exec($ch);
+		$status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		curl_close($ch);
+
+		$m = array();
+		$location = null;
+
+		if (preg_match('/^location:\s+(.*?)\s*$/im', $headers, $m)) {
+			$location = $m[1];
+		}
+
+		return [$status, $location];
+	}
+
 	private function checkDomainPointsToShopWithoutRedirection($domain, $shopName, $timeout = 300)
 	{
 		$spinner = new Spinner(null, $timeout, 5000);
 
 		$url = $this->getBrowser()->getCurrentURL();
+
+		$spinner->addPassthroughExceptionClass('PrestaShop\PSTAF\Exception\Unexpected301Exception');
 
 		$spinner->assertNoException(function () use ($domain, $shopName) {
 
@@ -28,14 +52,10 @@ class DomainsAssociationTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 				$url = $domain;
 			}
 
-			$ch = curl_init($url);
-			curl_setopt($ch, CURLOPT_NOBODY, true);
-			curl_exec($ch);
-			$status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-			curl_close($ch);
+			list($status, $location) = $this->getStatusAndLocation($url);
 
 			if ($status === 301) {
-				throw new Exception('Expected status code 200 on `' . $url . '`, but got 301. This is very bad because 301 is permanent.');
+				throw new Unexpected301Exception('Redirected to `' . $location . '`. Expected status code 200 on `' . $url . '`, but got 301. This is very bad because 301 is permanent.');
 			} elseif ($status !== 200) {
 				throw new Exception('Expected status code 200 on `' . $url . '`, but got ' . $status . '.');
 			}
