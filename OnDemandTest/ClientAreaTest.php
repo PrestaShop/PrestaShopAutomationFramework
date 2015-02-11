@@ -58,15 +58,14 @@ class ClientAreaTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 			'123456789'
 		);*/
 
-		$domains = $myStoresPage->gotoDomains();
-
+		$storeDetailsPage = $myStoresPage->gotoDetails();
 
 		$spinner = new Spinner('Could not find an available domain to order.', 60, 1000);
-		$spinner->assertBecomesTrue(function () use ($domains) {
-			return $domains->checkIfDomainIsAvailable(md5(microtime()).'.com');
+		$spinner->assertBecomesTrue(function () use ($storeDetailsPage) {
+			return $storeDetailsPage->checkIfDomainIsAvailable(md5(microtime()).'.com');
 		});
 
-		$addressForm = $domains->orderDomain();
+		$addressForm = $storeDetailsPage->orderDomain();
 
 		$addressForm
 		->setAddress('55, Main Street')
