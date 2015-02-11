@@ -5,6 +5,8 @@ namespace PrestaShop\PSTAF;
 use Exception;
 
 use PrestaShop\PSTAF\Helper\FileSystem as FS;
+use PrestaShop\PSTAF\Helper\Spinner;
+
 use djfm\Process\Process;
 
 
@@ -192,7 +194,15 @@ class SeleniumManager
 
         if ($process->running()) {
             self::$host = 'http://127.0.0.1:' . $port . '/wd/hub';
-            sleep(5);
+
+            $spinner = new Spinner('Could not automatically start selenium.', 20, 1000);
+            $spinner->assertBecomesTrue(function () {
+                $ch = curl_init(self::$host . '/status');
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                $status = json_decode(curl_exec($ch), true);
+                curl_close($ch);
+                return isset($status['status']) && $status['status'] === 0;
+            });
         }
 
         register_shutdown_function(function () {
