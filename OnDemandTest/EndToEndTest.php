@@ -10,11 +10,6 @@ use PrestaShop\PSTAF\Exception\FailedTestException;
 
 class EndToEndTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 {
-	public function newUid()
-	{
-		return microtime().date("dMYhis").getmypid();
-	}
-
 	public function languageAndCountryPairs()
 	{
 		return [
@@ -43,7 +38,7 @@ class EndToEndTest extends \PrestaShop\PSTAF\TestCase\OnDemandTestCase
 
 		$secrets = $this->getSecrets();
 
-		$uid = HumanHash::humanMd5($this->newUid().$language.$country);
+		$uid = HumanHash::humanMd5(self::newUid().$language.$country);
 
 		$this->writeMetaData('uid', $uid);
 
