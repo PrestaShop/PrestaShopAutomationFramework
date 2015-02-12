@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -254,23 +254,27 @@ class AdminEmployeesControllerCore extends AdminController
 		);
 
 		if ($this->restrict_edition)
+		{
 			$this->fields_form['input'][] = array(
 				'type' => 'change-password',
 				'label' => $this->l('Password'),
 				'name' => 'passwd'
 				);
+
+			if(Tab::checkTabRights(Tab::getIdFromClassName('AdminModulesController')))
+				$this->fields_form['input'][] = array(
+					'type' => 'prestashop_addons',
+					'label' => 'PrestaShop Addons',
+					'name' => 'prestashop_addons',
+				);
+		}
 		else
 			$this->fields_form['input'][] = array(
 				'type' => 'password',
 				'label' => $this->l('Password'),
 				'hint' => sprintf($this->l('Password should be at least %s characters long.'), Validate::ADMIN_PASSWORD_LENGTH),
 				'name' => 'passwd'
-				);	
-		$this->fields_form['input'][] = array(
-			'type' => 'prestashop_addons',
-			'label' => 'PrestaShop Addons',
-			'name' => 'prestashop_addons',
-		);
+				);
 
 		$this->fields_form['input'] = array_merge($this->fields_form['input'], array(
 			array(
@@ -420,7 +424,11 @@ class AdminEmployeesControllerCore extends AdminController
 	{
 		if (!($obj = $this->loadObject(true)))
 			return false;
-		$email = $this->getFieldValue($obj, 'email');
+
+		if (Tools::getValue('id_profile') == _PS_ADMIN_PROFILE_ && $this->context->employee->id_profile != _PS_ADMIN_PROFILE_)
+			$this->errors[] = Tools::displayError('The provided profile is invalid');
+
+		$email = $this->getFieldValue($obj, 'email');			
 		if (Validate::isEmail($email) && Employee::employeeExists($email) && (!Tools::getValue('id_employee')
 			|| ($employee = new Employee((int)Tools::getValue('id_employee'))) && $employee->email != $email))
 			$this->errors[] = Tools::displayError('An account already exists for this email address:').' '.$email;

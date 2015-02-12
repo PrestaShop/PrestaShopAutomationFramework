@@ -43,7 +43,7 @@ class StatsForecast extends Module
 	{
 		$this->name = 'statsforecast';
 		$this->tab = 'analytics_stats';
-		$this->version = '1.3.2';
+		$this->version = '1.3.5';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -152,13 +152,13 @@ class StatsForecast extends Module
 				<thead>
 					<tr>
 						<th></th>
-						<th class="center"><span class="title_box active">'.$this->l('Visits').'</span></th>
-						<th class="center"><span class="title_box active">'.$this->l('Registrations').'</span></th>
-						<th class="center"><span class="title_box active">'.$this->l('Placed orders').'</span></th>
-						<th class="center"><span class="title_box active">'.$this->l('Bought items').'</span></th>
-						<th class="center"><span class="title_box active">'.$this->l('Percentage of registrations').'</span></th>
-						<th class="center"><span class="title_box active">'.$this->l('Percentage of orders').'</span></th>
-						<th class="center"><span class="title_box active">'.$this->l('Revenue').'</span></th>
+						<th class="text-center"><span class="title_box active">'.$this->l('Visits').'</span></th>
+						<th class="text-center"><span class="title_box active">'.$this->l('Registrations').'</span></th>
+						<th class="text-center"><span class="title_box active">'.$this->l('Placed orders').'</span></th>
+						<th class="text-center"><span class="title_box active">'.$this->l('Bought items').'</span></th>
+						<th class="text-center"><span class="title_box active">'.$this->l('Percentage of registrations').'</span></th>
+						<th class="text-center"><span class="title_box active">'.$this->l('Percentage of orders').'</span></th>
+						<th class="text-center"><span class="title_box active">'.$this->l('Revenue').'</span></th>
 					</tr>
 				</thead>';
 
@@ -188,13 +188,13 @@ class StatsForecast extends Module
 			$this->html .= '
 			<tr>
 				<td>'.$row['fix_date'].'</td>
-				<td align="center">'.$visits_today.'</td>
-				<td align="center">'.(int)$row['registrations'].'</td>
-				<td align="center">'.(int)$row['countOrders'].'</td>
-				<td align="center">'.(int)$row['countProducts'].'</td>
-				<td align="center">'.($visits_today ? round(100 * (int)$row['registrations'] / $visits_today, 2).' %' : '-').'</td>
-				<td align="center">'.($visits_today ? round(100 * (int)$row['countOrders'] / $visits_today, 2).' %' : '-').'</td>
-				<td align="right">'.Tools::displayPrice($row['totalSales'], $currency).'</td>
+				<td class="text-center">'.$visits_today.'</td>
+				<td class="text-center">'.(int)$row['registrations'].'</td>
+				<td class="text-center">'.(int)$row['countOrders'].'</td>
+				<td class="text-center">'.(int)$row['countProducts'].'</td>
+				<td class="text-center">'.($visits_today ? round(100 * (int)$row['registrations'] / $visits_today, 2).' %' : '-').'</td>
+				<td class="text-center">'.($visits_today ? round(100 * (int)$row['countOrders'] / $visits_today, 2).' %' : '-').'</td>
+				<td class="text-right">'.Tools::displayPrice($row['totalSales'], $currency).'</td>
 			</tr>';
 
 			$this->t1 += $visits_today;
@@ -207,45 +207,46 @@ class StatsForecast extends Module
 		$this->html .= '
 				<tr>
 					<th></th>
-					<th class="center"><span class="title_box active">'.$this->l('Visits').'</span></th>
-					<th class="center"><span class="title_box active">'.$this->l('Registrations').'</span></th>
-					<th class="center"><span class="title_box active">'.$this->l('Placed orders').'</span></th>
-					<th class="center"><span class="title_box active">'.$this->l('Bought items').'</span></th>
-					<th class="center"><span class="title_box active">'.$this->l('Percentage of registrations').'</span></th>
-					<th class="center"><span class="title_box active">'.$this->l('Percentage of orders').'</span></th>
-					<th class="center"><span class="title_box active">'.$this->l('Revenue').'</span></th>
+					<th class="text-center"><span class="title_box active">'.$this->l('Visits').'</span></th>
+					<th class="text-center"><span class="title_box active">'.$this->l('Registrations').'</span></th>
+					<th class="text-center"><span class="title_box active">'.$this->l('Placed orders').'</span></th>
+					<th class="text-center"><span class="title_box active">'.$this->l('Bought items').'</span></th>
+					<th class="text-center"><span class="title_box active">'.$this->l('Percentage of registrations').'</span></th>
+					<th class="text-center"><span class="title_box active">'.$this->l('Percentage of orders').'</span></th>
+					<th class="text-center"><span class="title_box active">'.$this->l('Revenue').'</span></th>
 				</tr>
 				<tr>
 					<td>'.$this->l('Total').'</td>
-					<td class="center">'.(int)$this->t1.'</td>
-					<td class="center">'.(int)$this->t2.'</td>
-					<td class="center">'.(int)$this->t3.'</td>
-					<td class="center">'.(int)$this->t4.'</td>
-					<td class="center">--</td>
-					<td class="center">--</td>
-					<td align="right">'.Tools::displayPrice($this->t8, $currency).'</td>
+					<td class="text-center">'.(int)$this->t1.'</td>
+					<td class="text-center">'.(int)$this->t2.'</td>
+					<td class="text-center">'.(int)$this->t3.'</td>
+					<td class="text-center">'.(int)$this->t4.'</td>
+					<td class="text-center">--</td>
+					<td class="text-center">--</td>
+					<td class="text-right">'.Tools::displayPrice($this->t8, $currency).'</td>
 				</tr>
 				<tr>
 					<td>'.$this->l('Average').'</td>
-					<td class="center">'.(int)($this->t1 / $interval_avg).'</td>
-					<td class="center">'.(int)($this->t2 / $interval_avg).'</td>
-					<td class="center">'.(int)($this->t3 / $interval_avg).'</td>
-					<td class="center">'.(int)($this->t4 / $interval_avg).'</td>
-					<td class="center">'.($this->t1 ? round(100 * $this->t2 / $this->t1, 2).' %' : '-').'</td>
-					<td class="center">'.($this->t1 ? round(100 * $this->t3 / $this->t1, 2).' %' : '-').'</td>
-					<td align="right">'.Tools::displayPrice($this->t8 / $interval_avg, $currency).'</td>
+					<td class="text-center">'.(int)($this->t1 / $interval_avg).'</td>
+					<td class="text-center">'.(int)($this->t2 / $interval_avg).'</td>
+					<td class="text-center">'.(int)($this->t3 / $interval_avg).'</td>
+					<td class="text-center">'.(int)($this->t4 / $interval_avg).'</td>
+					<td class="text-center">'.($this->t1 ? round(100 * $this->t2 / $this->t1, 2).' %' : '-').'</td>
+					<td class="text-center">'.($this->t1 ? round(100 * $this->t3 / $this->t1, 2).' %' : '-').'</td>
+					<td class="text-right">'.Tools::displayPrice($this->t8 / $interval_avg, $currency).'</td>
 				</tr>
 				<tr>
 					<td>'.$this->l('Forecast').'</td>
-					<td class="center">'.(int)($this->t1 * $prop30).'</td>
-					<td class="center">'.(int)($this->t2 * $prop30).'</td>
-					<td class="center">'.(int)($this->t3 * $prop30).'</td>
-					<td class="center">'.(int)($this->t4 * $prop30).'</td>
-					<td class="center">--</td>
-					<td class="center"class="center">--</td>
-					<td align="right">'.Tools::displayPrice($this->t8 * $prop30, $currency).'</td>
+					<td class="text-center">'.(int)($this->t1 * $prop30).'</td>
+					<td class="text-center">'.(int)($this->t2 * $prop30).'</td>
+					<td class="text-center">'.(int)($this->t3 * $prop30).'</td>
+					<td class="text-center">'.(int)($this->t4 * $prop30).'</td>
+					<td class="text-center">--</td>
+					<td class="text-center">--</td>
+					<td class="text-right">'.Tools::displayPrice($this->t8 * $prop30, $currency).'</td>
 				</tr>
-			</table>';
+			</table>
+		</div>';
 
 		$ca = $this->getRealCA();
 
@@ -293,75 +294,75 @@ class StatsForecast extends Module
 			<table class="table">
 				<tbody>
 					<tr>
-						<td rowspan="2" class="center" valign="middle">
+						<td rowspan="2" class="text-center">
 							<p>'.$this->l('Visitors').'</p>
 							<p>'.$visitors.'</p>
 						</td>
-						<td class="center">
+						<td class="text-center">
 							<p><i class="icon-chevron-right"></i></p>
-							<p>'.round(100 * $customers / max(1, $visitors)).' %</p>
+							<p>'.round(100 * $customers / max(1, $visitors), 2).' %</p>
 						</td>
-						<td class="center">
+						<td class="text-center">
 							<p>'.$this->l('Accounts').'</p>
 							<p>'.$customers.'</p>
 						</td>
-						<td class="center">
+						<td class="text-center">
 							<p><i class="icon-chevron-right"></i></p>
-							<p>'.round(100 * $fullcarts / max(1, $customers)).' %</p>
+							<p>'.round(100 * $fullcarts / max(1, $customers), 2).' %</p>
 						</td>
-						<td rowspan="2" class="center">
+						<td rowspan="2" class="text-center">
 							<p>'.$this->l('Full carts').'</p>
 							<p>'.$fullcarts.'</p>
 						</td>
-						<td rowspan="2" class="center">
+						<td rowspan="2" class="text-center">
 							<p><i class="icon-chevron-right"></i></p>
-							<p>'.round(100 * $orders / max(1, $fullcarts)).' %</p>
+							<p>'.round(100 * $orders / max(1, $fullcarts), 2).' %</p>
 						</td>
-						<td rowspan="2" class="center">
+						<td rowspan="2" class="text-center">
 							<p>'.$this->l('Orders').'</p>
 							<p>'.$orders.'</p>
 						</td>
-						<td rowspan="2" class="center">
+						<td rowspan="2" class="text-center">
 							<p>'.$this->l('Registered visitors').'</p>
 						</td>
-						<td rowspan="2" class="center">
+						<td rowspan="2" class="text-center">
 							<i class="icon-chevron-right"></i>
 						</td>
-						<td rowspan="2" class="center">
+						<td rowspan="2" class="text-center">
 							<p>'.round(100 * $orders / max(1, $customers), 2).' %</p>
 						</td>
-						<td rowspan="2" class="center">
+						<td rowspan="2" class="text-center">
 							<i class="icon-chevron-right"></i>
 						</td>
-						<td rowspan="2" class="center">
+						<td rowspan="2" class="text-center">
 							<p>'.$this->l('Orders').'</p>
 						</td>
-						<td rowspan="2" class="center">
+						<td rowspan="2" class="text-center">
 							<p>'.$this->l('Visitors').'</p>
 						</td>
-						<td rowspan="2" class="center">
+						<td rowspan="2" class="text-center">
 							<i class="icon-chevron-right"></i>
 						</td>
-						<td rowspan="2" class="center">
+						<td rowspan="2" class="text-center">
 							<p>'.round(100 * $orders / max(1, $visitors), 2).' %</p>
 						</td>
 						<td rowspan="2" class="center">
 							<i class="icon-chevron-right"></i>
 						</td>
-						<td rowspan="2" class="center">
+						<td rowspan="2" class="text-center">
 							<p>'.$this->l('Orders').'</p>
 						</td>
 					</tr>
 					<tr>
-						<td class="center">
+						<td class="text-center">
 							<p><i class="icon-chevron-right"></i></p>
 							<p>'.round(100 * $carts / max(1, $visitors)).' %</p>
 						</td>
-						<td class="center">
+						<td class="text-center">
 							<p>'.$this->l('Carts').'</p>
 							<p>'.$carts.'</p>
 						</td>
-						<td class="center">
+						<td class="text-center">
 							<p><i class="icon-chevron-right"></i></p>
 							<p>'.round(100 * $fullcarts / max(1, $carts)).' %</p>
 						</td>
@@ -373,7 +374,6 @@ class StatsForecast extends Module
 			<p>'.$this->l('A simple statistical calculation lets you know the monetary value of your visitors:').'</p>
 			<p>'.$this->l('On average, each visitor places an order for this amount:').' <b>'.Tools::displayPrice($ca['ventil']['total'] / max(1, $visitors), $currency).'.</b></p>
 			<p>'.$this->l('On average, each registered visitor places an order for this amount:').' <b>'.Tools::displayPrice($ca['ventil']['total'] / max(1, $customers), $currency).'</b>.</p>
-			</p>
 		</div>';
 
 		$from = strtotime($employee->stats_date_from.' 00:00:00');
@@ -386,7 +386,7 @@ class StatsForecast extends Module
 				<div class="alert alert-info">'
 			.$this->l('The amounts include taxes, so you can get an estimation of the commission due to the payment method.').'
 				</div>
-				<form id="cat" action="'.$ru.'#payment" method="post" class="form-horizontal">
+				<form id="cat" action="'.Tools::safeOutput($ru).'#payment" method="post" class="form-horizontal">
 					<div class="row row-margin-bottom">
 						<label class="control-label col-lg-3">
 							'.$this->l('Zone:').'
@@ -405,20 +405,20 @@ class StatsForecast extends Module
 				<table class="table">
 					<thead>
 						<tr>
-							<th class="center"><span class="title_box active">'.$this->l('Module').'</span></th>
-							<th class="center"><span class="title_box active">'.$this->l('Orders').'</span></th>
-							<th class="center"><span class="title_box active">'.$this->l('Sales').'</span></th>
-							<th class="center"><span class="title_box active">'.$this->l('Average cart value').'</span></th>
+							<th class="text-center"><span class="title_box active">'.$this->l('Module').'</span></th>
+							<th class="text-center"><span class="title_box active">'.$this->l('Orders').'</span></th>
+							<th class="text-center"><span class="title_box active">'.$this->l('Sales').'</span></th>
+							<th class="text-center"><span class="title_box active">'.$this->l('Average cart value').'</span></th>
 						</tr>
 					</thead>
 					<tbody>';
 		foreach ($ca['payment'] as $payment)
 			$this->html .= '
 						<tr>
-							<td class="center">'.$payment['payment_method'].'</td>
-							<td class="center">'.(int)$payment['nb'].'</td>
-							<td align="right">'.Tools::displayPrice($payment['total'], $currency).'</td>
-							<td align="right">'.Tools::displayPrice($payment['cart'], $currency).'</td>
+							<td class="text-center">'.$payment['payment_method'].'</td>
+							<td class="text-center">'.(int)$payment['nb'].'</td>
+							<td class="text-right">'.Tools::displayPrice($payment['total'], $currency).'</td>
+							<td class="text-right">'.Tools::displayPrice($payment['total'] / (int)$payment['nb'], $currency).'</td>
 						</tr>';
 		$this->html .= '
 					</tbody>
@@ -426,7 +426,7 @@ class StatsForecast extends Module
 			</div>
 			<div class="row row-margin-bottom">
 				<h4><i class="icon-sitemap"></i> '.$this->l('Category distribution').'</h4>
-				<form id="cat" action="'.$ru.'#cat" method="post" class="form-horizontal">
+				<form id="cat_1" action="'.Tools::safeOutput($ru).'#cat" method="post" class="form-horizontal">
 					<div class="row row-margin-bottom">
 						<label class="control-label col-lg-3">
 							'.$this->l('Zone').'
@@ -445,24 +445,24 @@ class StatsForecast extends Module
 				<table class="table">
 					<thead>
 						<tr>
-							<th class="center"><span class="title_box active">'.$this->l('Category').'</span></th>
-							<th class="center"><span class="title_box active">'.$this->l('Products sold').'</span></th>
-							<th class="center"><span class="title_box active">'.$this->l('Sales').'</span></th>
-							<th class="center"><span class="title_box active">'.$this->l('Percentage of products sold').'</span></th>
-							<th class="center"><span class="title_box active">'.$this->l('Percentage of sales').'</span></th>
-							<th class="center"><span class="title_box active">'.$this->l('Average price').'</span></th>
+							<th class="text-center"><span class="title_box active">'.$this->l('Category').'</span></th>
+							<th class="text-center"><span class="title_box active">'.$this->l('Products sold').'</span></th>
+							<th class="text-center"><span class="title_box active">'.$this->l('Sales').'</span></th>
+							<th class="text-center"><span class="title_box active">'.$this->l('Percentage of products sold').'</span></th>
+							<th class="text-center"><span class="title_box active">'.$this->l('Percentage of sales').'</span></th>
+							<th class="text-center"><span class="title_box active">'.$this->l('Average price').'</span></th>
 						</tr>
 					</thead>
 					<tbody>';
 		foreach ($ca['cat'] as $catrow)
 			$this->html .= '
 						<tr>
-							<td class="center">'.(empty($catrow['name']) ? $this->l('Unknown') : $catrow['name']).'</td>
-							<td class="center">'.$catrow['orderQty'].'</td>
-							<td align="right">'.Tools::displayPrice($catrow['orderSum'], $currency).'</td>
-							<td class="center">'.number_format((100 * $catrow['orderQty'] / $this->t4), 1, '.', ' ').'%</td>
-							<td class="center">'.((int)$ca['ventil']['total'] ? number_format((100 * $catrow['orderSum'] / $ca['ventil']['total']), 1, '.', ' ') : '0').'%</td>
-							<td align="right">'.Tools::displayPrice($catrow['priveAvg'], $currency).'</td>
+							<td class="text-center">'.(empty($catrow['name']) ? $this->l('Unknown') : $catrow['name']).'</td>
+							<td class="text-center">'.$catrow['orderQty'].'</td>
+							<td class="text-right">'.Tools::displayPrice($catrow['orderSum'], $currency).'</td>
+							<td class="text-center">'.number_format((100 * $catrow['orderQty'] / $this->t4), 1, '.', ' ').'%</td>
+							<td class="text-center">'.((int)$ca['ventil']['total'] ? number_format((100 * $catrow['orderSum'] / $ca['ventil']['total']), 1, '.', ' ') : '0').'%</td>
+							<td class="text-right">'.Tools::displayPrice($catrow['priveAvg'], $currency).'</td>
 						</tr>';
 		$this->html .= '
 					</tbody>
@@ -473,10 +473,10 @@ class StatsForecast extends Module
 				<table class="table">
 					<thead>
 						<tr>
-							<th class="center"><span class="title_box active">'.$this->l('Language').'</span></th>
-							<th class="center"><span class="title_box active">'.$this->l('Sales').'</span></th>
-							<th class="center"><span class="title_box active">'.$this->l('Percentage').'</span></th>
-							<th class="center" colspan="2"><span class="title_box active">'.$this->l('Growth').'</span></th>
+							<th class="text-center"><span class="title_box active">'.$this->l('Language').'</span></th>
+							<th class="text-center"><span class="title_box active">'.$this->l('Sales').'</span></th>
+							<th class="text-center"><span class="title_box active">'.$this->l('Percentage').'</span></th>
+							<th class="text-center" colspan="2"><span class="title_box active">'.$this->l('Growth').'</span></th>
 						</tr>
 					</thead>
 					<tbody>';
@@ -485,11 +485,11 @@ class StatsForecast extends Module
 			$percent = (int)($ca['langprev'][$ophone]) ? number_format((100 * $amount / $ca['langprev'][$ophone]) - 100, 1, '.', ' ') : '&#x221e;';
 			$this->html .= '
 					<tr '.(($percent < 0) ? 'class="alt_row"' : '').'>
-						<td class="center">'.$ophone.'</td>
-						<td align="right">'.Tools::displayPrice($amount, $currency).'</td>
-						<td class="center">'.((int)$ca['ventil']['total'] ? number_format((100 * $amount / $ca['ventil']['total']), 1, '.', ' ').'%' : '-').'</td>
-						<td class="center">'.(($percent > 0 || $percent == '&#x221e;') ? '<img src="../img/admin/arrow_up.png" />' : '<img src="../img/admin/arrow_down.png" /> ').'</td>
-						<td class="center">'.(($percent > 0 || $percent == '&#x221e;') ? '+' : '').$percent.'%</td>
+						<td class="text-center">'.$ophone.'</td>
+						<td class="text-right">'.Tools::displayPrice($amount, $currency).'</td>
+						<td class="text-center">'.((int)$ca['ventil']['total'] ? number_format((100 * $amount / $ca['ventil']['total']), 1, '.', ' ').'%' : '-').'</td>
+						<td class="text-center">'.(($percent > 0 || $percent == '&#x221e;') ? '<img src="../img/admin/arrow_up.png" alt="" />' : '<img src="../img/admin/arrow_down.png" alt="" /> ').'</td>
+						<td class="text-center">'.(($percent > 0 || $percent == '&#x221e;') ? '+' : '').$percent.'%</td>
 					</tr>';
 		}
 		$this->html .= '
@@ -501,22 +501,22 @@ class StatsForecast extends Module
 				<table class="table">
 					<thead>
 						<tr>
-							<th class="center"><span class="title_box active">'.$this->l('Zone').'</span></th>
-							<th class="center"><span class="title_box active">'.$this->l('Orders').'</span></th>
-							<th class="center"><span class="title_box active">'.$this->l('Sales').'</span></th>
-							<th class="center"><span class="title_box active">'.$this->l('Percentage of orders').'</span></th>
-							<th class="center"><span class="title_box active">'.$this->l('Percentage of sales').'</span></th>
+							<th class="text-center"><span class="title_box active">'.$this->l('Zone').'</span></th>
+							<th class="text-center"><span class="title_box active">'.$this->l('Orders').'</span></th>
+							<th class="text-center"><span class="title_box active">'.$this->l('Sales').'</span></th>
+							<th class="text-center"><span class="title_box active">'.$this->l('Percentage of orders').'</span></th>
+							<th class="text-center"><span class="title_box active">'.$this->l('Percentage of sales').'</span></th>
 						</tr>
 					</thead>
 					<tbody>';
 		foreach ($ca['zones'] as $zone)
 			$this->html .= '
 					<tr>
-						<td class="center">'.(isset($zone['name']) ? $zone['name'] : $this->l('Undefined')).'</td>
-						<td class="center">'.(int)($zone['nb']).'</td>
-						<td align="right">'.Tools::displayPrice($zone['total'], $currency).'</td>
-						<td class="center">'.($ca['ventil']['nb'] ? number_format((100 * $zone['nb'] / $ca['ventil']['nb']), 1, '.', ' ') : '0').'%</td>
-						<td class="center">'.((int)$ca['ventil']['total'] ? number_format((100 * $zone['total'] / $ca['ventil']['total']), 1, '.', ' ') : '0').'%</td>
+						<td class="text-center">'.(isset($zone['name']) ? $zone['name'] : $this->l('Undefined')).'</td>
+						<td class="text-center">'.(int)($zone['nb']).'</td>
+						<td class="text-right">'.Tools::displayPrice($zone['total'], $currency).'</td>
+						<td class="text-center">'.($ca['ventil']['nb'] ? number_format((100 * $zone['nb'] / $ca['ventil']['nb']), 1, '.', ' ') : '0').'%</td>
+						<td class="text-center">'.((int)$ca['ventil']['total'] ? number_format((100 * $zone['total'] / $ca['ventil']['total']), 1, '.', ' ') : '0').'%</td>
 					</tr>';
 		$this->html .= '
 					</tbody>
@@ -524,7 +524,7 @@ class StatsForecast extends Module
 			</div>
 			<div class="row row-margin-bottom">
 				<h4><i class="icon-money"></i> '.$this->l('Currency distribution').'</h4>
-				<form id="cat" action="'.$ru.'#currencies" method="post" class="form-horizontal">
+				<form id="cat_2" action="'.Tools::safeOutput($ru).'#currencies" method="post" class="form-horizontal">
 					<div class="row row-margin-bottom">
 						<label class="control-label col-lg-3">
 							'.$this->l('Zone:').'
@@ -543,22 +543,22 @@ class StatsForecast extends Module
 				<table class="table">
 					<thead>
 						<tr>
-							<th class="center"><span class="title_box active">'.$this->l('Currency').'</span></th>
-							<th class="center"><span class="title_box active">'.$this->l('Orders').'</span></th>
-							<th align="right"><span class="title_box active">'.$this->l('Sales (converted)').'</span></th>
-							<th class="center"><span class="title_box active">'.$this->l('Percentage of orders').'</span></th>
-							<th class="center"><span class="title_box active">'.$this->l('Percentage of sales').'</span></th>
+							<th class="text-center"><span class="title_box active">'.$this->l('Currency').'</span></th>
+							<th class="text-center"><span class="title_box active">'.$this->l('Orders').'</span></th>
+							<th class="text-right"><span class="title_box active">'.$this->l('Sales (converted)').'</span></th>
+							<th class="text-center"><span class="title_box active">'.$this->l('Percentage of orders').'</span></th>
+							<th class="text-center"><span class="title_box active">'.$this->l('Percentage of sales').'</span></th>
 						</tr>
 					</thead>
 					<tbody>';
 		foreach ($ca['currencies'] as $currency_row)
 			$this->html .= '
 						<tr>
-							<td class="center">'.$currency_row['name'].'</td>
-							<td class="center">'.(int)($currency_row['nb']).'</td>
-							<td align="right">'.Tools::displayPrice($currency_row['total'], $currency).'</td>
-							<td class="center">'.($ca['ventil']['nb'] ? number_format((100 * $currency_row['nb'] / $ca['ventil']['nb']), 1, '.', ' ') : '0').'%</td>
-							<td class="center">'.((int)$ca['ventil']['total'] ? number_format((100 * $currency_row['total'] / $ca['ventil']['total']), 1, '.', ' ') : '0').'%</td>
+							<td class="text-center">'.$currency_row['name'].'</td>
+							<td class="text-center">'.(int)($currency_row['nb']).'</td>
+							<td class="text-right">'.Tools::displayPrice($currency_row['total'], $currency).'</td>
+							<td class="text-center">'.($ca['ventil']['nb'] ? number_format((100 * $currency_row['nb'] / $ca['ventil']['nb']), 1, '.', ' ') : '0').'%</td>
+							<td class="text-center">'.((int)$ca['ventil']['total'] ? number_format((100 * $currency_row['total'] / $ca['ventil']['total']), 1, '.', ' ') : '0').'%</td>
 						</tr>';
 		$this->html .= '
 					</tbody>
@@ -569,18 +569,18 @@ class StatsForecast extends Module
 				<table class="table">
 					<thead>
 						<tr>
-							<th class="center"><span class="title_box active">'.$this->l('Group').'</span></th>
-							<th class="center"><span class="title_box active">'.$this->l('Attribute').'</span></th>
-							<th class="center"><span class="title_box active">'.$this->l('Quantity of products sold').'</span></th>
+							<th class="text-center"><span class="title_box active">'.$this->l('Group').'</span></th>
+							<th class="text-center"><span class="title_box active">'.$this->l('Attribute').'</span></th>
+							<th class="text-center"><span class="title_box active">'.$this->l('Quantity of products sold').'</span></th>
 						</tr>
 					</thead>
 					<tbody>';
 		foreach ($ca['attributes'] as $attribut)
 			$this->html .= '
 						<tr>
-							<td class="center">'.$attribut['gname'].'</td>
-							<td class="center">'.$attribut['aname'].'</td>
-							<td class="center">'.(int)($attribut['total']).'</td>
+							<td class="text-center">'.$attribut['gname'].'</td>
+							<td class="text-center">'.$attribut['aname'].'</td>
+							<td class="text-center">'.(int)($attribut['total']).'</td>
 						</tr>';
 		$this->html .= '
 					</tbody>
@@ -650,17 +650,31 @@ class StatsForecast extends Module
 			$ca['langprev'] = array();
 		}
 
-		$sql = 'SELECT op.payment_method, SUM(amount / o.conversion_rate) as total, COUNT(*) as nb, AVG(amount / o.conversion_rate) as cart
-				FROM `'._DB_PREFIX_.'orders` o
-				LEFT JOIN `'._DB_PREFIX_.'order_payment` op ON o.reference = op.order_reference
-				'.$join.'
-				WHERE o.valid = 1
-				AND o.`invoice_date` BETWEEN '.ModuleGraph::getDateBetween().'
-				'.$where.'
-				'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
-				GROUP BY op.payment_method
-				ORDER BY total DESC';
-		$ca['payment'] = Db::getInstance()->executeS($sql);
+		$sql = 'SELECT reference
+					FROM `'._DB_PREFIX_.'orders` o
+					'.$join.'
+					WHERE o.valid
+					'.$where.'
+					'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
+					AND o.invoice_date BETWEEN '.ModuleGraph::getDateBetween().'';
+		$result = Db::getInstance()->executeS($sql);
+		if (count($result))
+		{
+			$references = array();
+			foreach ($result as $r)
+				$references[] = $r['reference'];
+			$sql = 'SELECT op.payment_method, SUM(op.amount / op.conversion_rate) as total, COUNT(DISTINCT op.order_reference) as nb
+					FROM `'._DB_PREFIX_.'order_payment` op
+					WHERE op.`date_add` BETWEEN '.ModuleGraph::getDateBetween().'
+					AND op.order_reference IN (
+						"'.implode('","', $references).'"
+					)
+					GROUP BY op.payment_method
+					ORDER BY total DESC';
+			$ca['payment'] = Db::getInstance()->executeS($sql);
+		}
+		else
+			$ca['payment'] = array();
 
 		$sql = 'SELECT z.name, SUM(o.total_paid_tax_excl / o.conversion_rate) as total, COUNT(*) as nb
 				FROM `'._DB_PREFIX_.'orders` o

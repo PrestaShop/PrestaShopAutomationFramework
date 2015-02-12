@@ -37,7 +37,7 @@ class ThemeConfigurator extends Module
 	{
 		$this->name = 'themeconfigurator';
 		$this->tab = 'front_office_features';
-		$this->version = '1.1.0';
+		$this->version = '1.1.8';
 		$this->bootstrap = true;
 		$this->secure_key = Tools::encrypt($this->name);
 		$this->default_language = Language::getLanguage(Configuration::get('PS_LANG_DEFAULT'));
@@ -51,6 +51,30 @@ class ThemeConfigurator extends Module
 		$this->uploads_path = _PS_MODULE_DIR_.$this->name.'/img/';
 		$this->admin_tpl_path = _PS_MODULE_DIR_.$this->name.'/views/templates/admin/';
 		$this->hooks_tpl_path = _PS_MODULE_DIR_.$this->name.'/views/templates/hooks/';
+	}
+
+	public function createAjaxController()
+	{
+		$tab = new Tab();
+		$tab->active = 1;
+		$languages = Language::getLanguages(false);
+		if (is_array($languages))
+			foreach ($languages as $language)
+				$tab->name[$language['id_lang']] = 'themeconfigurator';
+		$tab->class_name = 'AdminThemeConfigurator';
+		$tab->module = $this->name;
+		$tab->id_parent = - 1;
+		return (bool)$tab->add();
+	}
+
+	private function _removeAjaxContoller()
+	{
+		if ($tab_id = (int)Tab::getIdFromClassName('AdminThemeConfigurator'))
+		{
+			$tab = new Tab($tab_id);
+			$tab->delete();
+		}
+		return true;
 	}
 
 	public function install()
@@ -94,7 +118,9 @@ class ThemeConfigurator extends Module
 			!Configuration::updateValue('PS_TC_FONTS', serialize($themes_fonts)) ||
 			!Configuration::updateValue('PS_TC_THEME', '') ||
 			!Configuration::updateValue('PS_TC_FONT', '') ||
-			!Configuration::updateValue('PS_TC_ACTIVE', 1)
+			!Configuration::updateValue('PS_TC_ACTIVE', 1) ||
+			!Configuration::updateValue('PS_SET_DISPLAY_SUBCATEGORIES', 1) ||
+			!$this->createAjaxController()
 		)
 			return false;
 
@@ -136,9 +162,9 @@ class ThemeConfigurator extends Module
 		$height = (isset($sizes[1]) && $sizes[1])? (int)$sizes[1] : 0;
 
 		$result &= Db::getInstance()->Execute('
-			INSERT INTO `'._DB_PREFIX_.'themeconfigurator` ( 
+			INSERT INTO `'._DB_PREFIX_.'themeconfigurator` (
 					`id_shop`, `id_lang`, `item_order`, `title`, `title_use`, `hook`, `url`, `target`, `image`, `image_w`, `image_h`, `html`, `active`
-			) VALUES ( 
+			) VALUES (
 				\''.(int)$id_shop.'\',
 				\''.(int)$id_lang.'\',
 				\''.(int)$id_image.'\',
@@ -163,7 +189,7 @@ class ThemeConfigurator extends Module
 
 		if ($languages === null)
 			$languages = Language::getLanguages(true);
-		
+
 		foreach ($languages as $language)
 		{
 			for ($i = 1; $i < 6; $i++)
@@ -175,15 +201,17 @@ class ThemeConfigurator extends Module
 
 		return $result;
 	}
-	
-	
+
+
 	public function uninstall()
 	{
-		$images = Db::getInstance()->executeS('SELECT image FROM `'._DB_PREFIX_.'themeconfigurator`');
+		$images = array();
+		if (count(Db::getInstance()->executeS('SHOW TABLES LIKE \''._DB_PREFIX_.'themeconfigurator\'')))
+			$images = Db::getInstance()->executeS('SELECT image FROM `'._DB_PREFIX_.'themeconfigurator`');
 		foreach ($images as $image)
 			$this->deleteImage($image['image']);
 
-		if (!Db::getInstance()->Execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.'themeconfigurator`') || !parent::uninstall())
+		if (!Db::getInstance()->Execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.'themeconfigurator`') || !$this->_removeAjaxContoller() || !parent::uninstall())
 			return false;
 
 		return true;
@@ -199,11 +227,17 @@ class ThemeConfigurator extends Module
 		$this->context->controller->addJS($this->_path.'js/admin.js');
 	}
 
+	protected function checkEnvironment()
+	{
+		$cookie = new Cookie('psAdmin', '', (int)Configuration::get('PS_COOKIE_LIFETIME_BO'));
+		return isset($cookie->id_employee) && isset($cookie->passwd) && Employee::checkPassword($cookie->id_employee, $cookie->passwd);
+	}
+
 	public function hookdisplayHeader()
 	{
 		$this->context->controller->addCss($this->_path.'css/hooks.css', 'all');
 
-		if ((int)Configuration::get('PS_TC_ACTIVE') == 1 && Tools::getValue('live_configurator_token') && Tools::getValue('live_configurator_token') == $this->getLiveConfiguratorToken())
+		if ((int)Configuration::get('PS_TC_ACTIVE') == 1 && Tools::getValue('live_configurator_token') && Tools::getValue('live_configurator_token') == $this->getLiveConfiguratorToken() && $this->checkEnvironment())
 		{
 			$this->context->controller->addCSS($this->_path.'css/live_configurator.css');
 			$this->context->controller->addJS($this->_path.'js/live_configurator.js');
@@ -222,8 +256,17 @@ class ThemeConfigurator extends Module
 			if (Configuration::get('PS_TC_FONT') != '')
 				$this->context->controller->addCss($this->_path.'css/'.Configuration::get('PS_TC_FONT').'.css', 'all');
 		}
+
+		if (isset($this->context->controller->php_self) && $this->context->controller->php_self == 'category')
+		{
+			$this->context->smarty->assign(array(
+				'display_subcategories' => (int)Configuration::get('PS_SET_DISPLAY_SUBCATEGORIES')
+			));
+
+			return $this->display(__FILE__, 'hook.tpl');
+		}
 	}
-	
+
 	public function hookActionObjectLanguageAddAfter($params)
 	{
 		return $this->installFixtures(array(array('id_lang' => (int)$params['object']->id)));
@@ -237,7 +280,7 @@ class ThemeConfigurator extends Module
 	public function hookdisplayTop()
 	{
 		if (!isset($this->context->controller->php_self) || $this->context->controller->php_self != 'index')
-			return;
+			return ;
 		$this->context->smarty->assign(array(
 			'htmlitems' => $this->getItemsFromHook('top'),
 			'hook' => 'top'
@@ -280,7 +323,7 @@ class ThemeConfigurator extends Module
 	{
 		$html = '';
 
-		if ((int)Configuration::get('PS_TC_ACTIVE') == 1 && Tools::getValue('live_configurator_token') && Tools::getValue('live_configurator_token') == $this->getLiveConfiguratorToken() && Tools::getIsset('id_employee'))
+		if ((int)Configuration::get('PS_TC_ACTIVE') == 1 && Tools::getValue('live_configurator_token') && Tools::getValue('live_configurator_token') == $this->getLiveConfiguratorToken() && Tools::getIsset('id_employee') && $this->checkEnvironment())
 		{
 			if (Tools::isSubmit('submitLiveConfigurator'))
 			{
@@ -294,16 +337,19 @@ class ThemeConfigurator extends Module
 				$ad_image = $this->_path.'img/en/advertisement.png';
 
 			$this->smarty->assign(array(
-				'themes' => unserialize(Configuration::get('PS_TC_THEMES')),
-				'fonts' => unserialize(Configuration::get('PS_TC_FONTS')),
+				'themes' => Tools::unserialize(Configuration::get('PS_TC_THEMES')),
+				'fonts' => Tools::unserialize(Configuration::get('PS_TC_FONTS')),
 				'theme_font' => Tools::getValue('theme_font', Configuration::get('PS_TC_FONT')),
 				'live_configurator_token' => $this->getLiveConfiguratorToken(),
 				'id_shop' => (int)$this->context->shop->id,
 				'id_employee' => is_object($this->context->employee) ? (int)$this->context->employee->id :
 					Tools::getValue('id_employee'),
 				'advertisement_image' => $ad_image,
-				'advertisement_url' => 'http://addons.prestashop.com/en/205-premium-templates?utm_source=backoffice_configurator',
-				'advertisement_text' => $this->l('Over 500+ PrestaShop premium templates! Browse now!')
+				'advertisement_url' => 'http://addons.prestashop.com/en/205-premium-templates?utm_source=back-office'
+					.'&utm_medium=theme-configurator'
+					.'&utm_campaign=back-office-'.Tools::strtoupper($this->context->language->iso_code)
+					.'&utm_content='.(defined('_PS_HOST_MODE_') ? 'ondemand' : 'download'),
+				'advertisement_text' => $this->l('Over 800 PrestaShop premium templates! Browse now!')
 			));
 
 			$html .= $this->display(__FILE__, 'live_configurator.tpl');
@@ -353,10 +399,10 @@ class ThemeConfigurator extends Module
 		if (Db::getInstance()->Affected_Rows() == 1)
 		{
 			Db::getInstance()->execute('
-				UPDATE `'._DB_PREFIX_.'themeconfigurator` 
-				SET item_order = item_order-1 
+				UPDATE `'._DB_PREFIX_.'themeconfigurator`
+				SET item_order = item_order-1
 				WHERE (
-					item_order > '.(int)Tools::getValue('item_order').' AND 
+					item_order > '.(int)Tools::getValue('item_order').' AND
 					id_shop = '.(int)$this->context->shop->id.' AND
 					hook = \''.pSQL(Tools::getValue('item_hook')).'\')'
 			);
@@ -395,7 +441,7 @@ class ThemeConfigurator extends Module
 		}
 
 		if (!Db::getInstance()->execute('
-			UPDATE `'._DB_PREFIX_.'themeconfigurator` SET 
+			UPDATE `'._DB_PREFIX_.'themeconfigurator` SET
 					title = \''.pSQL($title).'\',
 					title_use = '.(int)Tools::getValue('item_title_use').',
 					hook = \''.pSQL(Tools::getValue('item_hook')).'\',
@@ -405,10 +451,9 @@ class ThemeConfigurator extends Module
 					image_w = '.(int)$image_w.',
 					image_h = '.(int)$image_h.',
 					active = '.(int)Tools::getValue('item_active').',
-					html = \''.pSQL($content, true).'\'
+					html = \''.pSQL(Tools::purifyHTML($content), true).'\'
 			WHERE id_item = '.(int)Tools::getValue('item_id')
-		)
-		)
+		))
 		{
 			if ($image = Db::getInstance()->getValue('SELECT image FROM `'._DB_PREFIX_.'themeconfigurator` WHERE id_item = '.(int)Tools::getValue('item_id')))
 				$this->deleteImage($image);
@@ -429,7 +474,9 @@ class ThemeConfigurator extends Module
 		if (is_array($image) && (ImageManager::validateUpload($image, $this->max_image_size) === false) && ($tmp_name = tempnam(_PS_TMP_IMG_DIR_, 'PS')) && move_uploaded_file($image['tmp_name'], $tmp_name))
 		{
 			$salt = sha1(microtime());
-			$img_name = $salt.'_'.Tools::str2url($image['name']);
+			$pathinfo = pathinfo($image['name']);
+			$img_name = $salt.'_'.Tools::str2url($pathinfo['filename']).'.'.$pathinfo['extension'];
+
 			if (ImageManager::resize($tmp_name, dirname(__FILE__).'/img/'.$img_name, $image_w, $image_h))
 				$res = true;
 		}
@@ -450,6 +497,7 @@ class ThemeConfigurator extends Module
 			Configuration::updateValue('PS_QUICK_VIEW', (int)Tools::getValue('quick_view'));
 			Configuration::updateValue('PS_TC_ACTIVE', (int)Tools::getValue('live_conf'));
 			Configuration::updateValue('PS_GRID_PRODUCT', (int)Tools::getValue('grid_list'));
+			Configuration::updateValue('PS_SET_DISPLAY_SUBCATEGORIES', (int)Tools::getValue('sub_cat'));
 			foreach ($this->getConfigurableModules() as $module)
 			{
 				if (!isset($module['is_module']) || !$module['is_module'] || !Validate::isModuleName($module['name']) || !Tools::isSubmit($module['name']))
@@ -493,23 +541,23 @@ class ThemeConfigurator extends Module
 	{
 		$title = Tools::getValue('item_title');
 		$content = Tools::getValue('item_html');
-		if (!Validate::isCleanHtml($title, (int)Configuration::get('PS_ALLOW_HTML_IFRAME')) || !Validate::isCleanHtml($content, (int)Configuration::get('PS_ALLOW_HTML_IFRAME')))
+
+		if (!Validate::isCleanHtml($title, (int)Configuration::get('PS_ALLOW_HTML_IFRAME'))
+			|| !Validate::isCleanHtml($content, (int)Configuration::get('PS_ALLOW_HTML_IFRAME')))
 		{
 			$this->context->smarty->assign('error', $this->l('Invalid content'));
-
 			return false;
 		}
 
 		if (!$current_order = (int)Db::getInstance()->getValue('
 			SELECT item_order + 1
-			FROM `'._DB_PREFIX_.'themeconfigurator` 
-			WHERE 
-					id_shop = '.(int)$this->context->shop->id.' 
-					AND id_lang = '.(int)Tools::getValue('id_lang').'
-					AND hook = \''.pSQL(Tools::getValue('item_hook')).'\' 
-					ORDER BY item_order DESC'
-		)
-		)
+			FROM `'._DB_PREFIX_.'themeconfigurator`
+			WHERE
+				id_shop = '.(int)$this->context->shop->id.'
+				AND id_lang = '.(int)Tools::getValue('id_lang').'
+				AND hook = \''.pSQL(Tools::getValue('item_hook')).'\'
+				ORDER BY item_order DESC'
+		))
 			$current_order = 1;
 
 		$image_w = is_numeric(Tools::getValue('item_img_w')) ? (int)Tools::getValue('item_img_w') : '';
@@ -528,9 +576,9 @@ class ThemeConfigurator extends Module
 		}
 
 		if (!Db::getInstance()->Execute('
-			INSERT INTO `'._DB_PREFIX_.'themeconfigurator` ( 
+			INSERT INTO `'._DB_PREFIX_.'themeconfigurator` (
 					`id_shop`, `id_lang`, `item_order`, `title`, `title_use`, `hook`, `url`, `target`, `image`, `image_w`, `image_h`, `html`, `active`
-			) VALUES ( 
+			) VALUES (
 					\''.(int)$this->context->shop->id.'\',
 					\''.(int)Tools::getValue('id_lang').'\',
 					\''.(int)$current_order.'\',
@@ -542,30 +590,29 @@ class ThemeConfigurator extends Module
 					\''.pSQL($image).'\',
 					\''.pSQL($image_w).'\',
 					\''.pSQL($image_h).'\',
-					\''.pSQL($content, true).'\',
-					1)
-			')
-		)
+					\''.pSQL(Tools::purifyHTML($content), true).'\',
+					1)'
+		))
 		{
 			if (!Tools::isEmpty($image))
 				$this->deleteImage($image);
 
 			$this->context->smarty->assign('error', $this->l('An error occurred while saving data.'));
-
 			return false;
 		}
 
 		$this->context->smarty->assign('confirmation', $this->l('New item successfully added.'));
-
 		return true;
 	}
 
 	public function renderConfigurationForm()
 	{
 		$inputs = array();
+
 		foreach ($this->getConfigurableModules() as $module)
 		{
 			$desc = '';
+
 			if (isset($module['is_module']) && $module['is_module'])
 			{
 				$module_instance = Module::getInstanceByName($module['name']);
@@ -661,16 +708,17 @@ class ThemeConfigurator extends Module
 
 			foreach ($hooks[$language['id_lang']] as $hook)
 				$items[$language['id_lang']][$hook] = Db::getInstance()->ExecuteS('
-					SELECT * FROM `'._DB_PREFIX_.'themeconfigurator` 
-					WHERE id_shop = '.(int)$id_shop.' 
-					AND id_lang = '.(int)$language['id_lang'].' 
-					AND hook = \''.pSQL($hook).'\' 
+					SELECT * FROM `'._DB_PREFIX_.'themeconfigurator`
+					WHERE id_shop = '.(int)$id_shop.'
+					AND id_lang = '.(int)$language['id_lang'].'
+					AND hook = \''.pSQL($hook).'\'
 					ORDER BY item_order ASC'
 				);
 		}
 
 		$this->context->smarty->assign('htmlitems', array(
 			'items' => $items,
+			'theme_url' => $this->context->link->getAdminLink('AdminThemeConfigurator'),
 			'lang' => array(
 				'default' => $this->default_language,
 				'all' => $this->languages,
@@ -681,6 +729,7 @@ class ThemeConfigurator extends Module
 			'id_shop' => $id_shop
 		));
 
+		$this->context->controller->addJqueryUI('ui.sortable');
 		return $this->display(__FILE__, 'views/templates/admin/admin.tpl');
 	}
 
@@ -689,14 +738,13 @@ class ThemeConfigurator extends Module
 		// Construct the description for the 'Enable Live Configurator' switch
 		if ($this->context->shop->getBaseURL())
 		{
-			$url = $this->context->shop->getBaseURL()
-				.((Configuration::get('PS_REWRITING_SETTINGS') && count(Language::getLanguages(true)) > 1) ? Language::getIsoById($this->context->employee->id_lang).'/' : '')
-				.(Configuration::get('PS_REWRITING_SETTINGS') ? '' : 'index.php')
-				.'?live_configurator_token='.$this->getLiveConfiguratorToken()
-				.'&id_employee='.(int)$this->context->employee->id
-				.'&id_shop='.(int)$this->context->shop->id
-				.(Configuration::get('PS_TC_THEME') != '' ? '&theme='.Configuration::get('PS_TC_THEME') : '')
-				.(Configuration::get('PS_TC_FONT') != '' ? '&theme_font='.Configuration::get('PS_TC_FONT') : '');
+			$request =
+			'live_configurator_token='.$this->getLiveConfiguratorToken()
+			.'&id_employee='.(int)$this->context->employee->id
+			.'&id_shop='.(int)$this->context->shop->id
+			.(Configuration::get('PS_TC_THEME') != '' ? '&theme='.Configuration::get('PS_TC_THEME') : '')
+			.(Configuration::get('PS_TC_FONT') != '' ? '&theme_font='.Configuration::get('PS_TC_FONT') : '');
+			$url = $this->context->link->getPageLink('index', null, $id_lang = null, $request);
 
 			$desc = '<a class="btn btn-default" href="'.$url.'" onclick="return !window.open($(this).attr(\'href\'));" id="live_conf_button">'
 				.$this->l('View').' <i class="icon-external-link"></i></a><br />'
@@ -742,9 +790,10 @@ class ThemeConfigurator extends Module
 				'value' => (int)Tools::getValue('PS_QUICK_VIEW', Configuration::get('PS_QUICK_VIEW'))
 			),
 			array(
-				'label' => $this->l('Display product categories in a list'),
+				'label' => $this->l('Display categories as a list of products instead of the default grid-based display'),
 				'name' => 'grid_list',
-				'value' => (int)Configuration::get('PS_GRID_PRODUCT')
+				'value' => (int)Configuration::get('PS_GRID_PRODUCT'),
+				'desc' => 'Works only for first-time users. This setting is overridden by the user\'s choice as soon as the user cookie is set.'
 			),
 			array(
 				'label' => $this->l('Display top banner'),
@@ -764,6 +813,11 @@ class ThemeConfigurator extends Module
 				'value' => (int)Tools::getValue('PS_TC_ACTIVE', Configuration::get('PS_TC_ACTIVE')),
 				'hint' => $this->l('This customization tool allows you to make color and font changes in your theme.'),
 				'desc' => $desc
+			),
+			array(
+				'label' => $this->l('Display subcategories'),
+				'name' => 'sub_cat',
+				'value' => (int)Tools::getValue('PS_SET_DISPLAY_SUBCATEGORIES', Configuration::get('PS_SET_DISPLAY_SUBCATEGORIES')),
 			)
 		);
 	}

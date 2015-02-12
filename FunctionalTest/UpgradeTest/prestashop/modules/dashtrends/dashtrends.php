@@ -38,16 +38,15 @@ class Dashtrends extends Module
 	public function __construct()
 	{
 		$this->name = 'dashtrends';
-		$this->displayName = 'Dashboard Trends';
-		$this->description = 'Dashboard Trends';
 		$this->tab = 'dashboard';
-		$this->version = '0.6';
+		$this->version = '0.7.2';
 		$this->author = 'PrestaShop';
 
 		$this->push_filename = _PS_CACHE_DIR_.'push/trends';
 		$this->allow_push = true;
 
 		parent::__construct();
+		$this->displayName = $this->l('Dashboard Trends');
 		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
 	}
 
@@ -122,8 +121,6 @@ class Dashtrends extends Module
 		);
 
 		$from = strtotime($date_from.' 00:00:00');
-		if (!Configuration::get('PS_DASHBOARD_SIMULATION'))
-			$from = max(strtotime(_PS_CREATION_DATE_.' 00:00:00'), $from);
 		$to = min(time(), strtotime($date_to.' 23:59:59'));
 		for ($date = $from; $date <= $to; $date = strtotime('+1 day', $date))
 		{
@@ -147,7 +144,6 @@ class Dashtrends extends Module
 			if (isset($gross_data['total_expenses'][$date]))
 				$refined_data['net_profits'][$date] -= $gross_data['total_expenses'][$date];
 		}
-
 		return $refined_data;
 	}
 
@@ -193,7 +189,7 @@ class Dashtrends extends Module
 			),
 			'conversion_rate_score_trends' => array(
 				'way' => ($data1['conversion_rate'] == $data2['conversion_rate'] ? 'right' : ($data1['conversion_rate'] > $data2['conversion_rate'] ? 'up' : 'down')),
-				'value' => ($data1['conversion_rate'] > $data2['conversion_rate'] ? '+' : '').($data2['conversion_rate'] ? round(100 * ($data1['conversion_rate'] - $data2['conversion_rate']), 2).$this->l('pts') : '&infin;')
+				'value' => ($data1['conversion_rate'] > $data2['conversion_rate'] ? '+' : '') . ($data2['conversion_rate'] ? sprintf($this->l('%s points'), round(100 * ($data1['conversion_rate'] - $data2['conversion_rate']), 2)) : '&infin;')
 			),
 			'net_profits_score_trends' => array(
 				'way' => ($data1['net_profits'] == $data2['net_profits'] ? 'right' : ($data1['net_profits'] > $data2['net_profits'] ? 'up' : 'down')),
@@ -308,7 +304,7 @@ class Dashtrends extends Module
 		$gfx_color_compare = array('#A5CEE4','#B1E086','#FD9997','#FFC068','#CAB1D7','#D2A689');
 
 		$i = 0;
-		$data = array('chart_type' => 'line_chart_trends', 'data' => array());
+		$data = array('chart_type' => 'line_chart_trends', 'date_format' => $this->context->language->date_format_lite, 'data' => array());
 		foreach ($charts as $key => $title)
 		{
 			$data['data'][] = array(

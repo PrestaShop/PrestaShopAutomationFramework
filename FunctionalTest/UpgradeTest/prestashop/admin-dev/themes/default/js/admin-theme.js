@@ -17,7 +17,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -94,7 +94,7 @@ function scroll_if_anchor(href) {
 		if($target.length) {
 			$('html, body').animate({ scrollTop: $target.offset().top - fromTop });
 			if(history && "pushState" in history) {
-				history.pushState({}, document.title, window.location.pathname + href);
+				history.pushState({}, document.title, window.location.href + href);
 				return false;
 			}
 		}

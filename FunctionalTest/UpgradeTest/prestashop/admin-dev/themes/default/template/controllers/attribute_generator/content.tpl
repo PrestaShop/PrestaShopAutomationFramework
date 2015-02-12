@@ -1,5 +1,5 @@
 {*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -101,7 +101,7 @@
 				{foreach $attribute_groups as $k => $attribute_group}
 					{if isset($attribute_js[$attribute_group['id_attribute_group']])}
 					<div class="row">
-						<table class="table" style="display: none;">
+						<table class="table" style="display:none">
 							<thead>
 								<tr>
 									<th id="tab_h1" class="fixed-width-md"><span class="title_box">{$attribute_group['name']|escape:'html':'UTF-8'}</span></th>
@@ -112,7 +112,6 @@
 							<tbody id="table_{$attribute_group['id_attribute_group']}" name="result_table">
 							</tbody>
 						</table>
-						<hr />
 					</div>
 						{if isset($attributes[$attribute_group['id_attribute_group']])}
 							{foreach $attributes[$attribute_group['id_attribute_group']] AS $k => $attribute}

@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -229,11 +229,11 @@ class WebserviceRequestCore
 		$headers = self::getallheaders();
 		if (isset($headers['Io-Format']))
 		   $type = $headers['Io-Format'];
-		else if (isset($headers['Output-Format']))
+		elseif (isset($headers['Output-Format']))
 		     $type = $headers['Output-Format'];
-		else if (isset($_GET['output_format']))
+		elseif (isset($_GET['output_format']))
 		     $type = $_GET['output_format'];
-		else if (isset($_GET['io_format']))
+		elseif (isset($_GET['io_format']))
 		   $type = $_GET['io_format'];
 		$this->outputFormat = $type;
 		switch ($type)
@@ -312,12 +312,14 @@ class WebserviceRequestCore
 			'supply_order_states' => array('description' => 'Supply Order Statuses', 'class' => 'SupplyOrderState', 'forbidden_method' => array('PUT', 'POST', 'DELETE')),
 			'supply_order_histories' => array('description' => 'Supply Order Histories', 'class' => 'SupplyOrderHistory', 'forbidden_method' => array('PUT', 'POST', 'DELETE')),
 			'supply_order_receipt_histories' => array('description' => 'Supply Order Receipt Histories', 'class' => 'SupplyOrderReceiptHistory', 'forbidden_method' => array('PUT', 'POST', 'DELETE')),
-			'product_suppliers' => array('description' => 'Product Suppliers', 'class' => 'ProductSupplier', 'forbidden_method' => array('PUT', 'POST', 'DELETE')),
+			'product_suppliers' => array('description' => 'Product Suppliers', 'class' => 'ProductSupplier'),
 			'tax_rules' => array('description' => 'Tax rules entity', 'class' => 'TaxRule'),
 			'tax_rule_groups' => array('description' => 'Tax rule groups', 'class' => 'TaxRulesGroup'),
 			'specific_prices' => array('description' => 'Specific price management', 'class' => 'SpecificPrice'),
 			'specific_price_rules' => array('description' => 'Specific price management', 'class' => 'SpecificPriceRule'),
 			'shop_urls' => array('description' => 'Shop URLs from multi-shop feature', 'class' => 'ShopUrl'),
+			'product_customization_fields' => array('description' => 'Customization Field', 'class' => 'CustomizationField'),
+			'customizations' => array('description' => 'Customization values', 'class' => 'Customization'),
 		);
 		ksort($resources);
 		return $resources;
@@ -441,8 +443,6 @@ class WebserviceRequestCore
 		// set the output object which manage the content and header structure and informations
 		$this->objOutput = new WebserviceOutputBuilder($this->wsUrl);
 
-
-
 		$this->_key = trim($key);
 
 		$this->outputFormat = isset($params['output_format']) ? $params['output_format'] : $this->outputFormat;
@@ -453,7 +453,7 @@ class WebserviceRequestCore
 		if ($this->webserviceChecks())
 		{
 			if ($bad_class_name)
-				$this->setError(500, 'Bad override class name for this key. Please update class_name field', 126);
+				$this->setError(500, 'Class "'.html_special_chars($bad_class_name).'" not found. Please update the class_name field in the webservice_account table.', 126);
 			// parse request url
 			$this->method = $method;
 			$this->urlSegment = explode('/', $url);
@@ -461,12 +461,11 @@ class WebserviceRequestCore
 			$this->_inputXml = $inputXml;
 			$this->depth = isset($this->urlFragments['depth']) ? (int)$this->urlFragments['depth'] : $this->depth;
 
-
 			try {
 				// Method below set a particular fonction to use on the price field for products entity
 				// @see WebserviceRequest::getPriceForProduct() method
 				// @see WebserviceOutputBuilder::setSpecificField() method
-				$this->objOutput->setSpecificField($this, 'getPriceForProduct', 'price', 'products');
+				//$this->objOutput->setSpecificField($this, 'getPriceForProduct', 'price', 'products');
 				if (isset($this->urlFragments['price']))
 				{
 					$this->objOutput->setVirtualField($this, 'specificPriceForCombination', 'combinations', $this->urlFragments['price']);
@@ -739,33 +738,18 @@ class WebserviceRequestCore
 			else
 			{
 				if (empty($this->_key))
-				{
 					$this->setError(401, 'Authentication key is empty', 17);
-				}
 				elseif (strlen($this->_key) != '32')
-				{
 					$this->setError(401, 'Invalid authentication key format', 18);
-				}
 				else
 				{
-					$keyValidation = WebserviceKey::isKeyActive($this->_key);
-					if (is_null($keyValidation))
-					{
-						$this->setError(401, 'Authentification key does not exist', 19);
-					}
-					elseif($keyValidation === true)
-					{
+					if (WebserviceKey::isKeyActive($this->_key))
 						$this->keyPermissions = WebserviceKey::getPermissionForAccount($this->_key);
-					}
 					else
-					{
 						$this->setError(401, 'Authentification key is not active', 20);
-					}
 
 					if (!$this->keyPermissions)
-					{
 						$this->setError(401, 'No permission for this authentication key', 21);
-					}
 				}
 			}
 			if ($this->hasErrors())
@@ -830,7 +814,7 @@ class WebserviceRequestCore
 				self::$shopIDs[] = (int)$params['id_shop'];
 				return true;
 			}
-			else if ($params['id_shop'] == 'all')
+			elseif ($params['id_shop'] == 'all')
 			{
 				Shop::setContext(Shop::CONTEXT_ALL);
 				self::$shopIDs = Shop::getShops(true, null, true);
@@ -1719,7 +1703,7 @@ class WebserviceRequestCore
 						$arr_languages[] = $i;
 				}
 			}
-			else if (preg_match('#\[(\d)+\]#Ui', $this->urlFragments['language'], $match_lang))
+			elseif (preg_match('#\[(\d)+\]#Ui', $this->urlFragments['language'], $match_lang))
 			{
 				$arr_languages[] = $match_lang[1];
 			}

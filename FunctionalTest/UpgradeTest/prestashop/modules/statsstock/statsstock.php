@@ -35,7 +35,7 @@ class StatsStock extends Module
 	{
 		$this->name = 'statsstock';
 		$this->tab = 'analytics_stats';
-		$this->version = '1.3';
+		$this->version = '1.4.1';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -87,7 +87,7 @@ class StatsStock extends Module
 		<div class="panel-heading">'
 			.$this->l('Evaluation of available quantities for sale').
 		'</div>
-		<form action="'.$ru.'" method="post" class="form-horizontal">
+		<form action="'.Tools::safeOutput($ru).'" method="post" class="form-horizontal">
 			<div class="row row-margin-bottom">
 				<label class="control-label col-lg-3">'.$this->l('Category').'</label>
 				<div class="col-lg-6">

@@ -23,7 +23,10 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{capture name=path}{l s='Check payment' mod='cheque'}{/capture}
+{capture name=path}
+	<a href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html':'UTF-8'}" title="{l s='Go back to the Checkout' mod='cheque'}">{l s='Checkout' mod='cheque'}</a><span class="navigation-pipe">{$navigationPipe}</span>{l s='Check payment' mod='cheque'}
+{/capture}
+
 {include file="$tpl_dir./breadcrumb.tpl"}
 
 <h2>{l s='Order summary' mod='cheque'}</h2>
@@ -69,7 +72,7 @@
 	<p>
 		{l s='Check owner and address information will be displayed on the next page.' mod='cheque'}
 		<br /><br />
-		<b>{l s='Please confirm your order by clicking \'I confirm my order\'' mod='cheque'}.</b>
+		<b>{l s='Please confirm your order by clicking \'I confirm my order\'.' mod='cheque'}</b>
 	</p>
 	<p class="cart_navigation" id="cart_navigation">
 		<input type="submit" value="{l s='I confirm my order' mod='cheque'}" class="exclusive_large"/>

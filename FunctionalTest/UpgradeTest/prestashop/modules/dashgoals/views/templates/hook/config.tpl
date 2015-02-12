@@ -22,10 +22,9 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
-
 <section id="dashgoals_config" class="dash_config hide">
 	<header><i class="icon-wrench"></i> {l s='Configuration' mod='dashgoals'}</header>
-	<form class="defaultForm form-horizontal" method="post" action="{$link->getAdminLink('AdminDashboard')}">
+	<form class="defaultForm form-horizontal" method="post" action="{$link->getAdminLink('AdminDashboard')|escape:'html':'UTF-8'}">
 		<table class="table table-condensed table-striped table-bordered">
 			<thead>
 				<tr>

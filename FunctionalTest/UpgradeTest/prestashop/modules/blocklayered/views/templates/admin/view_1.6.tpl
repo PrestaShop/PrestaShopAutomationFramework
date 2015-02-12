@@ -80,7 +80,7 @@
 						{if empty($limit_warning)}
 						<div class="btn-group-action">
 							<div class="btn-group pull-right">
-								<a href="{$current_url}&edit_filters_template=1&id_layered_filter={(int)$template['id_layered_filter']}" class="btn btn-default">
+								<a href="{$current_url}&amp;edit_filters_template=1&amp;id_layered_filter={(int)$template['id_layered_filter']}" class="btn btn-default">
 									<i class="icon-pencil"></i> {l s='Edit' mod='blocklayered'}
 								</a> 
 								<button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
@@ -88,7 +88,7 @@
 								</button>
 								<ul class="dropdown-menu">
 									<li>
-										<a href="{$current_url}&deleteFilterTemplate=1&id_layered_filter={(int)$template['id_layered_filter']}"
+										<a href="{$current_url}&amp;deleteFilterTemplate=1&amp;id_layered_filter={(int)$template['id_layered_filter']}"
 						onclick="return confirm('{l s='Do you really want to delete this filter template' mod='blocklayered'}');">
 											<i class="icon-trash"></i> {l s='Delete' mod='blocklayered'}
 										</a>
@@ -109,7 +109,7 @@
 	{/if}
 	{if empty($limit_warning)}
 	<div class="panel-footer">
-		<a class="btn btn-default pull-right" href="{$current_url}&add_new_filters_template=1"><i class="process-icon-plus"></i> {l s='Add new template' mod='blocklayered'}</a>
+		<a class="btn btn-default pull-right" href="{$current_url}&amp;add_new_filters_template=1"><i class="process-icon-plus"></i> {l s='Add new template' mod='blocklayered'}</a>
 	</div>
 	{/if}
 </div>

@@ -36,7 +36,7 @@ class StatsCarrier extends ModuleGraph
 	{
 		$this->name = 'statscarrier';
 		$this->tab = 'analytics_stats';
-		$this->version = '1.2';
+		$this->version = '1.3.1';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -95,7 +95,7 @@ class StatsCarrier extends ModuleGraph
 				)).'
 					</div>
 					<div class="col-lg-4">
-						<a href="'.Tools::safeOutput($_SERVER['REQUEST_URI']).'&export=1&exportType=language" class="btn btn-default">
+						<a href="'.Tools::safeOutput($_SERVER['REQUEST_URI'].'&export=1&exportType=language').'" class="btn btn-default">
 							<i class="icon-cloud-upload"></i> '.$this->l('CSV Export').'
 						</a>' : $this->l('No valid orders have been received for this period.')).'
 					</div>

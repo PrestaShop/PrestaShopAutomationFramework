@@ -1,5 +1,5 @@
 /*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -229,6 +229,21 @@ function validateSteps(fromStep, toStep)
 	var is_ok = true;
 	if ((multistore_enable && fromStep == 3) || (!multistore_enable && fromStep == 2))
 	{
+		if (toStep > fromStep && !$('#is_free_on').attr('checked'))
+		{
+			is_ok = false;
+			$('.input_zone').each(function () {
+				if ($(this).prop('checked'))
+					is_ok = true;
+			});
+
+			if (!is_ok)
+			{
+				displayError([select_at_least_one_zone], fromStep);
+				return;
+			}
+		}
+		
 		if (toStep > fromStep && !$('#is_free_on').attr('checked') && !validateRange(2))
 			is_ok = false;
 	}
@@ -268,7 +283,7 @@ function validateSteps(fromStep, toStep)
 }
 
 function displayError(errors, step_number)
-{
+{	
 	$('#carrier_wizard .actionBar a.btn').removeClass('disabled');
 	$('.wizard_error').remove();
 	str_error = '<div class="error wizard_error" style="display:none"><ul>';
@@ -579,9 +594,9 @@ function add_new_range()
 	
 	last_sup_val = $('tr.range_sup td:last input').val();
 	//add new rand sup input
-	$('tr.range_sup td:last').after('<td class="range_data"><div class="input-group fixed-width-md"><span class="input-group-addon weight_unit" style="display: none;">'+PS_WEIGHT_UNIT+'</span><span class="input-group-addon price_unit" style="display: none;">'+currency_sign+'</span><input class="form-control" name="range_sup[]" type="text" /></div></td>');
+	$('tr.range_sup td:last').after('<td class="range_data"><div class="input-group fixed-width-md"><span class="input-group-addon weight_unit" style="display: none;">'+PS_WEIGHT_UNIT+'</span><span class="input-group-addon price_unit" style="display: none;">'+currency_sign+'</span><input class="form-control" name="range_sup[]" type="text" autocomplete="off" /></div></td>');
 	//add new rand inf input
-	$('tr.range_inf td:last').after('<td class="border_bottom"><div class="input-group fixed-width-md"><span class="input-group-addon weight_unit" style="display: none;">'+PS_WEIGHT_UNIT+'</span><span class="input-group-addon price_unit" style="display: none;">'+currency_sign+'</span><input class="form-control" name="range_inf[]" type="text" value="'+last_sup_val+'" /></div></td>');
+	$('tr.range_inf td:last').after('<td class="border_bottom"><div class="input-group fixed-width-md"><span class="input-group-addon weight_unit" style="display: none;">'+PS_WEIGHT_UNIT+'</span><span class="input-group-addon price_unit" style="display: none;">'+currency_sign+'</span><input class="form-control" name="range_inf[]" type="text" value="'+last_sup_val+'" autocomplete="off" /></div></td>');
 	$('tr.fees_all td:last').after('<td class="border_top border_bottom"><div class="input-group fixed-width-md"><span class="input-group-addon currency_sign" style="display:none" >'+currency_sign+'</span><input class="form-control" style="display:none" type="text" /></div></td>');
 
 	$('tr.fees').each(function () {

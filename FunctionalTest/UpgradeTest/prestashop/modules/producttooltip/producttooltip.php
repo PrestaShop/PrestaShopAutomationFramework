@@ -33,7 +33,7 @@ class ProductToolTip extends Module
 	{
 		$this->name = 'producttooltip';
 		$this->tab = 'front_office_features';
-		$this->version = '1.2';
+		$this->version = '1.3.1';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -164,7 +164,7 @@ class ProductToolTip extends Module
 					array(
 						'type' => 'switch',
 						'label' => $this->l('Number of visitors'),
-						'desc' => $this->l('Display the number of visitors who are currently watching this product?').'<br>'.
+						'desc' => $this->l('Display the number of visitors who are currently watching this product.').'<br>'.
 							$this->l('If you activate the option above, you must activate the first option ("Save page views for each customer") of the "Data mining for statistics" (StatsData) module.'),
 						'name' => 'PS_PTOOLTIP_PEOPLE',
 						'values' => array(
@@ -184,7 +184,7 @@ class ProductToolTip extends Module
 						'type' => 'text',
 						'label' => $this->l('Period length'),
 						'desc' => $this->l('Set the reference period length.').'<br>'.
-							$this->l('For instance, if set to 30 minutes, display the number of visitors in the last 30 minutes.'),
+							$this->l('For instance, if set to 30 minutes, the module will display the number of visitors in the last 30 minutes.'),
 						'name' => 'PS_PTOOLTIP_LIFETIME',
 						'suffix' => $this->l('minutes'),
 						'values' => array(
@@ -203,7 +203,7 @@ class ProductToolTip extends Module
 					array(
 						'type' => 'switch',
 						'label' => $this->l('Last order date'),
-						'desc' => $this->l('Display the last time the product has been ordered?'),
+						'desc' => $this->l('Display the last time the product has been ordered.'),
 						'name' => 'PS_PTOOLTIP_DATE_ORDER',
 						'values' => array(
 							array(
@@ -221,7 +221,7 @@ class ProductToolTip extends Module
 					array(
 						'type' => 'switch',
 						'label' => $this->l('Added to a cart'),
-						'desc' => $this->l('If the product has not been ordered yet, display the last time the product has been added to a cart?'),
+						'desc' => $this->l('If the product has not been ordered yet, display the last time it was added to a cart.'),
 						'name' => 'PS_PTOOLTIP_DATE_CART',
 						'values' => array(
 							array(

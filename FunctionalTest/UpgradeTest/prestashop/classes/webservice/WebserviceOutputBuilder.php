@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -285,7 +285,7 @@ class WebserviceOutputBuilderCore
 		if (is_null($this->wsResource))
 			throw new WebserviceException ('You must set web service resource for get the resources list.', array(82, 500));
 		$output = '';
-		$more_attr = array('shop_name' => htmlspecialchars(Configuration::get('PS_SHOP_NAME')));
+		$more_attr = array('shopName' => htmlspecialchars(Configuration::get('PS_SHOP_NAME')));
 		$output .= $this->objectRender->renderNodeHeader('api', array(), $more_attr);
 		foreach ($this->wsResource as $resourceName => $resource)
 		{
@@ -666,9 +666,18 @@ class WebserviceOutputBuilderCore
 		if (isset($this->wsResource[$assoc_name]) && is_null($this->schemaToDisplay))
 		{
 			if ($assoc_name == 'images')
-				$more_attr['xlink_resource'] = $this->wsUrl.$assoc_name.'/'.$parent_details['entities_name'].'/'.$parent_details['object_id'].'/'.$object_assoc['id'];
+			{
+				if ($parent_details['entities_name'] == 'combinations')
+				{
+					$more_attr['xlink_resource'] = $this->wsUrl.$assoc_name.'/products/'.$object->id_product.'/'.$object_assoc['id'];
+				}
+				else
+					$more_attr['xlink_resource'] = $this->wsUrl.$assoc_name.'/'.$parent_details['entities_name'].'/'.$parent_details['object_id'].'/'.$object_assoc['id'];
+			}
 			else
+			{
 				$more_attr['xlink_resource'] = $this->wsUrl.$assoc_name.'/'.$object_assoc['id'];
+			}
 		}
 		$output .= $this->setIndent($depth-1).$this->objectRender->renderNodeHeader($resource_name, array(), $more_attr);
 

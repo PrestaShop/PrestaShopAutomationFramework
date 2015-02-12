@@ -28,9 +28,10 @@ class MenuTopLinks
 {
 	public static function gets($id_lang, $id_linksmenutop = null, $id_shop)
 	{
-		$sql = 'SELECT l.id_linksmenutop, l.new_window, ll.link, ll.label
+		$sql = 'SELECT l.id_linksmenutop, l.new_window, s.name, ll.link, ll.label
 				FROM '._DB_PREFIX_.'linksmenutop l
 				LEFT JOIN '._DB_PREFIX_.'linksmenutop_lang ll ON (l.id_linksmenutop = ll.id_linksmenutop AND ll.id_lang = '.(int)$id_lang.' AND ll.id_shop='.(int)$id_shop.')
+				LEFT JOIN '._DB_PREFIX_.'shop s ON l.id_shop = s.id_shop
 				WHERE 1 '.((!is_null($id_linksmenutop)) ? ' AND l.id_linksmenutop = "'.(int)$id_linksmenutop.'"' : '').'
 				AND l.id_shop IN (0, '.(int)$id_shop.')';
 
@@ -83,8 +84,10 @@ class MenuTopLinks
 		);
 		$id_linksmenutop = Db::getInstance()->Insert_ID();
 
+		$result = true;
+
 		foreach ($label as $id_lang=>$label)
-		Db::getInstance()->insert(
+		$result &= Db::getInstance()->insert(
 			'linksmenutop_lang',
 			array(
 				'id_linksmenutop'=>(int)$id_linksmenutop,
@@ -94,6 +97,8 @@ class MenuTopLinks
 				'link'=>pSQL($link[$id_lang])
 			)
 		);
+
+		return $result;
 	}
 
 	public static function update($link, $labels, $newWindow = 0, $id_shop, $id_link)
@@ -127,8 +132,11 @@ class MenuTopLinks
 
 	public static function remove($id_linksmenutop, $id_shop)
 	{
-		Db::getInstance()->delete('linksmenutop', 'id_linksmenutop = '.(int)$id_linksmenutop.' AND id_shop = '.(int)$id_shop);
-		Db::getInstance()->delete('linksmenutop_lang', 'id_linksmenutop = '.(int)$id_linksmenutop);
+		$result = true;
+		$result &= Db::getInstance()->delete('linksmenutop', 'id_linksmenutop = '.(int)$id_linksmenutop.' AND id_shop = '.(int)$id_shop);
+		$result &= Db::getInstance()->delete('linksmenutop_lang', 'id_linksmenutop = '.(int)$id_linksmenutop);
+		
+		return $result;
 	}
 
 }

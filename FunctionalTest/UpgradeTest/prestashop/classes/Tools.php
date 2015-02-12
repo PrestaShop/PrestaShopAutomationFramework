@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -31,6 +31,8 @@ class ToolsCore
 	protected static $_caching;
 	protected static $_user_plateform;
 	protected static $_user_browser;
+
+	public static $round_mode = null;
 
 	/**
 	* Random password generator
@@ -244,7 +246,9 @@ class ToolsCore
 	public static function getRemoteAddr()
 	{
 		// This condition is necessary when using CDN, don't remove it.
-		if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] && (!isset($_SERVER['REMOTE_ADDR']) || preg_match('/^127\..*/i', trim($_SERVER['REMOTE_ADDR'])) || preg_match('/^172\.16.*/i', trim($_SERVER['REMOTE_ADDR'])) || preg_match('/^192\.168\.*/i', trim($_SERVER['REMOTE_ADDR'])) || preg_match('/^10\..*/i', trim($_SERVER['REMOTE_ADDR']))))
+		if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] && (!isset($_SERVER['REMOTE_ADDR'])
+			|| preg_match('/^127\..*/i', trim($_SERVER['REMOTE_ADDR'])) || preg_match('/^172\.16.*/i', trim($_SERVER['REMOTE_ADDR']))
+			|| preg_match('/^192\.168\.*/i', trim($_SERVER['REMOTE_ADDR'])) || preg_match('/^10\..*/i', trim($_SERVER['REMOTE_ADDR']))))
 		{
 			if (strpos($_SERVER['HTTP_X_FORWARDED_FOR'], ','))
 			{
@@ -274,6 +278,8 @@ class ToolsCore
 			return in_array(Tools::strtolower($_SERVER['REDIRECT_HTTPS']), array(1, 'on'));
 		if (isset($_SERVER['HTTP_SSL']))
 			return in_array(Tools::strtolower($_SERVER['HTTP_SSL']), array(1, 'on'));
+		if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']))
+			return Tools::strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) == 'https';
 
 		return false;
 	}
@@ -316,11 +322,13 @@ class ToolsCore
 	{
 		if (!isset($key) || empty($key) || !is_string($key))
 			return false;
+
 		$ret = (isset($_POST[$key]) ? $_POST[$key] : (isset($_GET[$key]) ? $_GET[$key] : $default_value));
 
-		if (is_string($ret) === true)
-			$ret = urldecode(preg_replace('/((\%5C0+)|(\%00+))/i', '', urlencode($ret)));
-		return !is_string($ret)? $ret : stripslashes($ret);
+		if (is_string($ret))
+			return stripslashes(urldecode(preg_replace('/((\%5C0+)|(\%00+))/i', '', urlencode($ret))));
+
+		return $ret;
 	}
 
 	public static function getIsset($key)
@@ -347,12 +355,16 @@ class ToolsCore
 				$cookie->id_lang = null;
 		}
 
+		if (!Configuration::get('PS_DETECT_LANG'))
+			unset($cookie->detect_language);
+
 		/* Automatically detect language if not already defined, detect_language is set in Cookie::update */
-		if ((!$cookie->id_lang || isset($cookie->detect_language)) && isset($_SERVER['HTTP_ACCEPT_LANGUAGE']))
+		if (!Tools::getValue('isolang') && !Tools::getValue('id_lang') && (!$cookie->id_lang || isset($cookie->detect_language))
+			&& isset($_SERVER['HTTP_ACCEPT_LANGUAGE']))
 		{
 			$array  = explode(',', Tools::strtolower($_SERVER['HTTP_ACCEPT_LANGUAGE']));
 			$string = $array[0];
-			
+
 			if (Validate::isLanguageCode($string))
 			{
 				$lang = Language::getLanguageByIETFCode($string);
@@ -373,7 +385,7 @@ class ToolsCore
 
 		$iso = Language::getIsoById((int)$cookie->id_lang);
 		@include_once(_PS_THEME_DIR_.'lang/'.$iso.'.php');
-		
+
 		return $iso;
 	}
 
@@ -384,7 +396,7 @@ class ToolsCore
 	{
 		if (!$context)
 			$context = Context::getContext();
-		
+
 		// Install call the dispatcher and so the switchLanguage
 		// Stop this method by checking the cookie
 		if (!isset($context->cookie))
@@ -411,6 +423,22 @@ class ToolsCore
 		}
 	}
 
+	public static function getCountry($address = null)
+	{
+		if ($id_country = Tools::getValue('id_country'));
+		elseif (isset($address) && isset($address->id_country) && $address->id_country)
+			$id_country = $address->id_country;
+		elseif (Configuration::get('PS_DETECT_COUNTRY') && isset($_SERVER['HTTP_ACCEPT_LANGUAGE']))
+		{
+			preg_match('#(?<=-)\w\w|\w\w(?!-)#', $_SERVER['HTTP_ACCEPT_LANGUAGE'], $array);
+			if (is_array($array) && isset($array[0]) && Validate::isLanguageIsoCode($array[0]))
+				$id_country = Country::getByIso($array[0], true);
+		}
+		if (!isset($id_country) || !$id_country)
+			$id_country = Configuration::get('PS_COUNTRY_DEFAULT');
+		return (int)$id_country;
+	}
+
 	/**
 	 * Set cookie currency from POST or default currency
 	 *
@@ -418,14 +446,13 @@ class ToolsCore
 	 */
 	public static function setCurrency($cookie)
 	{
-		if (Tools::isSubmit('SubmitCurrency'))
-			if (isset($_POST['id_currency']) && is_numeric($_POST['id_currency']))
-			{
-				$currency = Currency::getCurrencyInstance($_POST['id_currency']);
-				if (is_object($currency) && $currency->id && !$currency->deleted && $currency->isAssociatedToShop())
-					$cookie->id_currency = (int)$currency->id;
-			}
-		
+		if (Tools::isSubmit('SubmitCurrency') && ($id_currency = Tools::getValue('id_currency')))
+		{
+			$currency = Currency::getCurrencyInstance((int)$id_currency);
+			if (is_object($currency) && $currency->id && !$currency->deleted && $currency->isAssociatedToShop())
+				$cookie->id_currency = (int)$currency->id;
+		}
+
 		$currency = null;
 		if ((int)$cookie->id_currency)
 			$currency = Currency::getCurrencyInstance((int)$cookie->id_currency);
@@ -445,7 +472,7 @@ class ToolsCore
 				return Currency::getCurrencyInstance((int)$cookie->id_currency);
 			}
 		}
-			
+
 		return $currency;
 	}
 
@@ -499,10 +526,8 @@ class ToolsCore
 		*
 		* TODO: This is not ideal, a currency format should probably be tied to a language, not to a currency.
 		*/
-		if(($c_format == 2) && ($context->language->is_rtl == 1))
-		{
+		if (($c_format == 2) && ($context->language->is_rtl == 1))
 			$c_format = 4;
-		}
 
 		switch ($c_format)
 		{
@@ -534,8 +559,9 @@ class ToolsCore
 		return $ret;
 	}
 
-	// Just to fix a bug
-	// Need real CLDR functions
+	/* Just to fix a bug
+	 * Need real CLDR functions
+	 */
 	public static function displayNumber($number, $currency)
 	{
 		if (is_array($currency))
@@ -550,7 +576,7 @@ class ToolsCore
 	{
 		if (array_key_exists('currency', $params))
 		{
-			$currency = Currency::getCurrencyInstance((int)($params['currency']));
+			$currency = Currency::getCurrencyInstance((int)$params['currency']);
 			if (Validate::isLoadedObject($currency))
 				return Tools::displayPrice($params['price'], $currency, false);
 		}
@@ -616,13 +642,13 @@ class ToolsCore
 			$amount *= $currency_to->conversion_rate;
 		else
 		{
-            $conversion_rate = ($currency_from->conversion_rate == 0 ? 1 : $currency_from->conversion_rate);
+			$conversion_rate = ($currency_from->conversion_rate == 0 ? 1 : $currency_from->conversion_rate);
 			// Convert amount to default currency (using the old currency rate)
-			$amount = Tools::ps_round($amount / $conversion_rate, 2);
+			$amount = $amount / $conversion_rate;
 			// Convert to new currency
 			$amount *= $currency_to->conversion_rate;
 		}
-		return Tools::ps_round($amount, 2);
+		return Tools::ps_round($amount, _PS_PRICE_COMPUTE_PRECISION_);
 	}
 
 	/**
@@ -651,8 +677,8 @@ class ToolsCore
 		if ($id_lang !== null)
 			Tools::displayParameterAsDeprecated('id_lang');
 		if ($separator !== null)
-			Tools::displayParameterAsDeprecated('separator');	
-			
+			Tools::displayParameterAsDeprecated('separator');
+
 		if (!$date || !($time = strtotime($date)))
 			return $date;
 
@@ -735,7 +761,7 @@ class ToolsCore
 						@chmod($dirname, 0777); // NT ?
                         return false;
 					}
-                return true;                    
+                return true;
 			}
         return false;
     }
@@ -757,7 +783,7 @@ class ToolsCore
 			unlink($file);
 		}
     }
-        
+
 	/**
 	* Clear XML cache folder
  	*/
@@ -826,10 +852,10 @@ class ToolsCore
 	public static function fd($object, $type = 'log')
 	{
 		$types = array('log', 'debug', 'info', 'warn', 'error', 'assert');
-		
-		if(!in_array($type, $types))
+
+		if (!in_array($type, $types))
 			$type = 'log';
-		
+
 		echo '
 			<script type="text/javascript">
 				console.'.$type.'('.Tools::jsonEncode($object).');
@@ -846,14 +872,14 @@ class ToolsCore
 	{
 		return (Tools::dieObject($object, $kill));
 	}
-	
+
 	public static function debug_backtrace($start = 0, $limit = null)
 	{
 		$backtrace = debug_backtrace();
 		array_shift($backtrace);
 		for ($i = 0; $i < $start; ++$i)
 			array_shift($backtrace);
-		
+
 		echo '
 		<div style="margin:10px;padding:10px;border:1px solid #666666">
 			<ul>';
@@ -1057,7 +1083,7 @@ class ToolsCore
 				foreach ($categories as $category)
 				{
 					$full_path .=
-					(($n < $n_categories || $link_on_the_item) ? '<a href="'.Tools::safeOutput($context->link->getCategoryLink((int)$category['id_category'], $category['link_rewrite'])).'" title="'.htmlentities($category['name'], ENT_NOQUOTES, 'UTF-8').'">' : '').
+					(($n < $n_categories || $link_on_the_item) ? '<a href="'.Tools::safeOutput($context->link->getCategoryLink((int)$category['id_category'], $category['link_rewrite'])).'" title="'.htmlentities($category['name'], ENT_NOQUOTES, 'UTF-8').'" data-gg="">' : '').
 					htmlentities($category['name'], ENT_NOQUOTES, 'UTF-8').
 					(($n < $n_categories || $link_on_the_item) ? '</a>' : '').
 					(($n++ != $n_categories || !empty($path)) ? '<span class="navigation-pipe">'.$pipe.'</span>' : '');
@@ -1066,7 +1092,7 @@ class ToolsCore
 				return $full_path.$path;
 			}
 		}
-		else if ($category_type === 'CMS')
+		elseif ($category_type === 'CMS')
 		{
 			$category = new CMSCategory($id_category, $context->language->id);
 			if (!Validate::isLoadedObject($category))
@@ -1074,9 +1100,9 @@ class ToolsCore
 			$category_link = $context->link->getCMSCategoryLink($category);
 
 			if ($path != $category->name)
-				$full_path .= '<a href="'.Tools::safeOutput($category_link).'">'.htmlentities($category->name, ENT_NOQUOTES, 'UTF-8').'</a><span class="navigation-pipe">'.$pipe.'</span>'.$path;
+				$full_path .= '<a href="'.Tools::safeOutput($category_link).'" data-gg="">'.htmlentities($category->name, ENT_NOQUOTES, 'UTF-8').'</a><span class="navigation-pipe">'.$pipe.'</span>'.$path;
 			else
-				$full_path = ($link_on_the_item ? '<a href="'.Tools::safeOutput($category_link).'">' : '').htmlentities($path, ENT_NOQUOTES, 'UTF-8').($link_on_the_item ? '</a>' : '');
+				$full_path = ($link_on_the_item ? '<a href="'.Tools::safeOutput($category_link).'" data-gg="">' : '').htmlentities($path, ENT_NOQUOTES, 'UTF-8').($link_on_the_item ? '</a>' : '');
 
 			return Tools::getPath($category->id_parent, $full_path, $link_on_the_item, $category_type);
 		}
@@ -1099,7 +1125,7 @@ class ToolsCore
 			$default_category = $context->shop->getCategory();
 			$category = new Category($id_category, $context->language->id);
 		}
-		else if ($type_cat === 'CMS')
+		elseif ($type_cat === 'CMS')
 		    $category = new CMSCategory($id_category, $context->language->id);
 
 		if (!Validate::isLoadedObject($category))
@@ -1138,6 +1164,9 @@ class ToolsCore
 		if ($allow_accented_chars === null)
 			$allow_accented_chars = Configuration::get('PS_ALLOW_ACCENTED_CHARS_URL');
 
+		if (!is_string($str))
+			return false;
+
 		$str = trim($str);
 
 		if (function_exists('mb_strtolower'))
@@ -1147,9 +1176,9 @@ class ToolsCore
 
 		// Remove all non-whitelist chars.
 		if ($allow_accented_chars)
-			$str = preg_replace('/[^a-zA-Z0-9\s\'\:\/\[\]-\pL]/u', '', $str);
+			$str = preg_replace('/[^a-zA-Z0-9\s\'\:\/\[\]\-\pL]/u', '', $str);
 		else
-			$str = preg_replace('/[^a-zA-Z0-9\s\'\:\/\[\]-]/','', $str);
+			$str = preg_replace('/[^a-zA-Z0-9\s\'\:\/\[\]\-]/','', $str);
 
 		$str = preg_replace('/[\s\'\:\/\[\]\-]+/', ' ', $str);
 		$str = str_replace(array(' ', '/'), '-', $str);
@@ -1178,30 +1207,30 @@ class ToolsCore
 		$patterns = array(
 
 			/* Lowercase */
-			/* a  */ '/[\x{00E0}\x{00E1}\x{00E2}\x{00E3}\x{00E4}\x{00E5}\x{0101}\x{0103}\x{0105}\x{0430}]/u',
+			/* a  */ '/[\x{00E0}\x{00E1}\x{00E2}\x{00E3}\x{00E4}\x{00E5}\x{0101}\x{0103}\x{0105}\x{0430}\x{00C0}-\x{00C3}\x{1EA0}-\x{1EB7}]/u',
 			/* b  */ '/[\x{0431}]/u',
 			/* c  */ '/[\x{00E7}\x{0107}\x{0109}\x{010D}\x{0446}]/u',
-			/* d  */ '/[\x{010F}\x{0111}\x{0434}]/u',
-			/* e  */ '/[\x{00E8}\x{00E9}\x{00EA}\x{00EB}\x{0113}\x{0115}\x{0117}\x{0119}\x{011B}\x{0435}\x{044D}]/u',
+			/* d  */ '/[\x{010F}\x{0111}\x{0434}\x{0110}]/u',
+			/* e  */ '/[\x{00E8}\x{00E9}\x{00EA}\x{00EB}\x{0113}\x{0115}\x{0117}\x{0119}\x{011B}\x{0435}\x{044D}\x{00C8}-\x{00CA}\x{1EB8}-\x{1EC7}]/u',
 			/* f  */ '/[\x{0444}]/u',
 			/* g  */ '/[\x{011F}\x{0121}\x{0123}\x{0433}\x{0491}]/u',
 			/* h  */ '/[\x{0125}\x{0127}]/u',
-			/* i  */ '/[\x{00EC}\x{00ED}\x{00EE}\x{00EF}\x{0129}\x{012B}\x{012D}\x{012F}\x{0131}\x{0438}\x{0456}]/u',
+			/* i  */ '/[\x{00EC}\x{00ED}\x{00EE}\x{00EF}\x{0129}\x{012B}\x{012D}\x{012F}\x{0131}\x{0438}\x{0456}\x{00CC}\x{00CD}\x{1EC8}-\x{1ECB}\x{0128}]/u',
 			/* j  */ '/[\x{0135}\x{0439}]/u',
 			/* k  */ '/[\x{0137}\x{0138}\x{043A}]/u',
 			/* l  */ '/[\x{013A}\x{013C}\x{013E}\x{0140}\x{0142}\x{043B}]/u',
 			/* m  */ '/[\x{043C}]/u',
 			/* n  */ '/[\x{00F1}\x{0144}\x{0146}\x{0148}\x{0149}\x{014B}\x{043D}]/u',
-			/* o  */ '/[\x{00F2}\x{00F3}\x{00F4}\x{00F5}\x{00F6}\x{00F8}\x{014D}\x{014F}\x{0151}\x{043E}]/u',
+			/* o  */ '/[\x{00F2}\x{00F3}\x{00F4}\x{00F5}\x{00F6}\x{00F8}\x{014D}\x{014F}\x{0151}\x{043E}\x{00D2}-\x{00D5}\x{01A0}\x{01A1}\x{1ECC}-\x{1EE3}]/u',
 			/* p  */ '/[\x{043F}]/u',
 			/* r  */ '/[\x{0155}\x{0157}\x{0159}\x{0440}]/u',
 			/* s  */ '/[\x{015B}\x{015D}\x{015F}\x{0161}\x{0441}]/u',
 			/* ss */ '/[\x{00DF}]/u',
 			/* t  */ '/[\x{0163}\x{0165}\x{0167}\x{0442}]/u',
-			/* u  */ '/[\x{00F9}\x{00FA}\x{00FB}\x{00FC}\x{0169}\x{016B}\x{016D}\x{016F}\x{0171}\x{0173}\x{0443}]/u',
+			/* u  */ '/[\x{00F9}\x{00FA}\x{00FB}\x{00FC}\x{0169}\x{016B}\x{016D}\x{016F}\x{0171}\x{0173}\x{0443}\x{00D9}-\x{00DA}\x{0168}\x{01AF}\x{01B0}\x{1EE4}-\x{1EF1}]/u',
 			/* v  */ '/[\x{0432}]/u',
 			/* w  */ '/[\x{0175}]/u',
-			/* y  */ '/[\x{00FF}\x{0177}\x{00FD}\x{044B}]/u',
+			/* y  */ '/[\x{00FF}\x{0177}\x{00FD}\x{044B}\x{1EF2}-\x{1EF9}\x{00DD}]/u',
 			/* z  */ '/[\x{017A}\x{017C}\x{017E}\x{0437}]/u',
 			/* ae */ '/[\x{00E6}]/u',
 			/* ch */ '/[\x{0447}]/u',
@@ -1253,7 +1282,7 @@ class ToolsCore
 			/* YO */ '/[\x{0401}]/u',
 			/* YU */ '/[\x{042E}]/u',
 			/* ZH */ '/[\x{0416}]/u');
-			
+
 			// ö to oe
 			// å to aa
 			// ä to ae
@@ -1296,7 +1325,7 @@ class ToolsCore
 
 		if ($html)
 		{
-			if (Tools::strlen(preg_replace('/<.*?>/', '', $text)) <= $length) 
+			if (Tools::strlen(preg_replace('/<.*?>/', '', $text)) <= $length)
 				return $text;
 
 			$totalLength = Tools::strlen(strip_tags($ellipsis));
@@ -1531,7 +1560,7 @@ class ToolsCore
 		if (function_exists('mb_strrpos'))
 			return mb_strrpos($str, $find, $offset, $encoding);
 		return strrpos($str, $find, $offset);
-	}	
+	}
 
 	public static function ucfirst($str)
 	{
@@ -1549,6 +1578,9 @@ class ToolsCore
 	{
 		foreach ($array as &$row)
 			$row['price_tmp'] = Product::getPriceStatic($row['id_product'], true, ((isset($row['id_product_attribute']) && !empty($row['id_product_attribute'])) ? (int)$row['id_product_attribute'] : null), 2);
+
+		unset($row);
+
 		if (Tools::strtolower($order_way) == 'desc')
 			uasort($array, 'cmpPriceDesc');
 		else
@@ -1580,16 +1612,104 @@ class ToolsCore
 	 */
 	public static function ps_round($value, $precision = 0)
 	{
-		static $method = null;
+		if (Tools::$round_mode == null)
+			Tools::$round_mode = (int)Configuration::get('PS_PRICE_ROUND_MODE');
 
-		if ($method == null)
-			$method = (int)Configuration::get('PS_PRICE_ROUND_MODE');
+		switch (Tools::$round_mode)
+		{
+			case PS_ROUND_UP:
+				return Tools::ceilf($value, $precision);
+			case PS_ROUND_DOWN:
+				return Tools::floorf($value, $precision);
+			case PS_ROUND_HALF_DOWN:
+			case PS_ROUND_HALF_EVEN:
+			case PS_ROUND_HALF_ODD:
+				return Tools::math_round($value, $precision, Tools::$round_mode);
+			case PS_ROUND_HALF_UP:
+			default:
+				return Tools::math_round($value, $precision, PS_ROUND_HALF_UP);
+		}
+	}
 
-		if ($method == PS_ROUND_UP)
-			return Tools::ceilf($value, $precision);
-		elseif ($method == PS_ROUND_DOWN)
-			return Tools::floorf($value, $precision);
-		return round($value, $precision);
+	public static function math_round($value, $places, $mode = PS_ROUND_HALF_UP)
+	{
+		//If PHP_ROUND_HALF_UP exist (PHP 5.3) use it and pass correct mode value (PrestaShop define - 1)
+		if (defined('PHP_ROUND_HALF_UP'))
+			return round($value, $places, $mode-1);
+
+		$precision_places = 14 - floor(log10(abs($value)));
+		$f1 = pow(10.0, (double)abs($places));
+
+		/* If the decimal precision guaranteed by FP arithmetic is higher than
+		* the requested places BUT is small enough to make sure a non-zero value
+		* is returned, pre-round the result to the precision */
+		if ($precision_places > $places && $precision_places - $places < 15)
+		{
+			$f2 = pow(10.0, (double)abs($precision_places));
+
+			if ($precision_places >= 0)
+				$tmp_value = $value * $f2;
+			else
+				$tmp_value = $value / $f2;
+
+			/* preround the result (tmp_value will always be something * 1e14,
+			* thus never larger than 1e15 here) */
+			$tmp_value = Tools::round_helper($tmp_value, $mode);
+			/* now correctly move the decimal point */
+			$f2 = pow(10.0, (double)abs($places - $precision_places));
+			/* because places < precision_places */
+			$tmp_value = $tmp_value / $f2;
+		}
+		else
+		{
+			/* adjust the value */
+			if ($places >= 0)
+				$tmp_value = $value * $f1;
+			else
+				$tmp_value = $value / $f1;
+
+			/* This value is beyond our precision, so rounding it is pointless */
+			if (abs($tmp_value) >= 1e15)
+				return $value;
+		}
+
+		/* round the temp value */
+		$tmp_value = Tools::round_helper($tmp_value, $mode);
+
+		/* see if it makes sense to use simple division to round the value */
+		if (abs($places) < 23)
+		{
+			if ($places > 0)
+				$tmp_value /= $f1;
+			else
+				$tmp_value *= $f1;
+		}
+
+		return $tmp_value;
+	}
+
+	public static function round_helper($value, $mode)
+	{
+		if ($value >= 0.0)
+		{
+			$tmp_value = floor($value + 0.5);
+
+			if (($mode == PS_ROUND_HALF_DOWN && $value == (-0.5 + $tmp_value )) ||
+				($mode == PS_ROUND_HALF_EVEN && $value == (0.5 + 2 * floor($tmp_value /2.0))) ||
+				($mode == PS_ROUND_HALF_ODD  && $value == (0.5 + 2 * floor($tmp_value /2.0) - 1.0)))
+				$tmp_value  = $tmp_value  - 1.0;
+		}
+		else
+		{
+			$tmp_value  = ceil($value - 0.5);
+
+			if (($mode == PS_ROUND_HALF_DOWN && $value == (0.5 + $tmp_value )) ||
+				($mode == PS_ROUND_HALF_EVEN && $value == (-0.5 + 2 * ceil($tmp_value /2.0))) ||
+				($mode == PS_ROUND_HALF_ODD  && $value == (-0.5 + 2 * ceil($tmp_value /2.0) + 1.0)))
+				$tmp_value  = $tmp_value  + 1.0;
+		}
+
+		return $tmp_value;
 	}
 
 	/**
@@ -1695,7 +1815,7 @@ class ToolsCore
 	{
 		return @simplexml_load_string(Tools::file_get_contents($url), $class_name);
 	}
-	
+
 	public static function copy($source, $destination, $stream_context = null)
 	{
 		if (is_null($stream_context) && !preg_match('/^https?:\/\//', $source))
@@ -1787,8 +1907,8 @@ class ToolsCore
 	{
 		if (strlen($sql) > 0)
 		{
-			require_once(_PS_TOOL_DIR_.'parser_sql/php-sql-parser.php');
-			$parser = new parserSql($sql);
+			require_once(_PS_TOOL_DIR_.'parser_sql/PHPSQLParser.php');
+			$parser = new PHPSQLParser($sql);
 			return $parser->parsed;
 		}
 		return false;
@@ -1813,7 +1933,7 @@ class ToolsCore
 			{
 				$tmp = dirname($current_css_file).'/'.$matches[2];
 				return $matches[1].$protocol_link.Tools::getMediaServer($tmp).$tmp;
-			} 
+			}
 			else
 				return $matches[0];
 		}
@@ -1938,10 +2058,10 @@ class ToolsCore
 				'virtual' =>	$shop_url->virtual_uri,
 				'id_shop' =>	$shop_url->id_shop
 			);
-			
+
 			if ($shop_url->domain == $shop_url->domain_ssl)
 				continue;
-			
+
 			if (!isset($domains[$shop_url->domain_ssl]))
 				$domains[$shop_url->domain_ssl] = array();
 
@@ -1973,10 +2093,10 @@ class ToolsCore
 			fwrite($write_fd, "\n# Disable Multiviews\nOptions -Multiviews\n\n");
 
 		fwrite($write_fd, "RewriteEngine on\n");
-	
+
 		if (!$medias && defined('_MEDIA_SERVER_1_') && defined('_MEDIA_SERVER_2_') && defined('_MEDIA_SERVER_3_'))
 			$medias = array(_MEDIA_SERVER_1_, _MEDIA_SERVER_2_, _MEDIA_SERVER_3_);
-		
+
 		$media_domains = '';
 		if ($medias[0] != '')
 			$media_domains = 'RewriteCond %{HTTP_HOST} ^'.$medias[0].'$ [OR]'."\n";
@@ -1996,7 +2116,7 @@ class ToolsCore
 				if (Shop::isFeatureActive())
 					fwrite($write_fd, 'RewriteCond %{HTTP_HOST} ^'.$domain.'$'."\n");
 				fwrite($write_fd, 'RewriteRule . - [E=REWRITEBASE:'.$uri['physical'].']'."\n");
-				
+
 				// Webservice
 				fwrite($write_fd, 'RewriteRule ^api/?(.*)$ %{ENV:REWRITEBASE}webservice/dispatcher.php?url=$1 [QSA,L]'."\n\n");
 
@@ -2025,7 +2145,7 @@ class ToolsCore
 					if (Shop::isFeatureActive())
 						fwrite($write_fd, $domain_rewrite_cond);
 					fwrite($write_fd, 'RewriteRule ^'.ltrim($uri['virtual'], '/').'(.*) '.$uri['physical']."$1 [L]\n\n");
-				}			
+				}
 
 				if ($rewrite_settings)
 				{
@@ -2067,7 +2187,7 @@ class ToolsCore
 						fwrite($write_fd, $domain_rewrite_cond);
 					fwrite($write_fd, 'RewriteRule ^c/([a-zA-Z_-]+)(-[0-9]+)?/.+\.jpg$ %{ENV:REWRITEBASE}img/c/$1$2.jpg [L]'."\n");
 				}
-				
+
 				fwrite($write_fd, "# AlphaImageLoader for IE and fancybox\n");
 				if (Shop::isFeatureActive())
 					fwrite($write_fd, $domain_rewrite_cond);
@@ -2121,7 +2241,10 @@ class ToolsCore
 	ExpiresByType application/x-font-otf \"access plus 1 year\"
 </IfModule>
 
-FileETag INode MTime Size
+<IfModule mod_headers.c>
+	Header unset Etag
+</IfModule>
+FileETag none
 <IfModule mod_deflate.c>
 	<IfModule mod_filter.c>
 		AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript application/x-javascript
@@ -2142,7 +2265,7 @@ FileETag INode MTime Size
 		if ($specific_after)
 			fwrite($write_fd, "\n\n".trim($specific_after));
 		fclose($write_fd);
-		
+
 		if (!defined('PS_INSTALLATION_IN_PROGRESS'))
 			Hook::exec('actionHtaccessCreate');
 
@@ -2155,7 +2278,7 @@ FileETag INode MTime Size
 			PrestaShopAutoload::getInstance()->_include_override_path = false;
 		PrestaShopAutoload::getInstance()->generateIndex();
 	}
-	
+
 	public static function getDefaultIndexContent()
 	{
 		return '<?php
@@ -2269,7 +2392,7 @@ exit;
 		$error = 'File <b>'.$callee['file'].'</b> is deprecated<br />';
 		$message = 'The file '.$callee['file'].' is deprecated and will be removed in the next major version.';
 		$class = isset($callee['class']) ? $callee['class'] : null;
-		
+
 		Tools::throwDeprecated($error, $message, $class);
 	}
 
@@ -2622,11 +2745,11 @@ exit;
 
 	public static function clearColorListCache($id_product = false)
 	{
-
 		// Change template dir if called from the BackOffice
 		$current_template_dir = Context::getContext()->smarty->getTemplateDir();
 		Context::getContext()->smarty->setTemplateDir(_PS_THEME_DIR_);
-		Tools::clearCache(null, 'product-list-colors.tpl', ($id_product ? 'productlist_colors|'.(int)$id_product.'|'.(int)Context::getContext()->shop->id : 'productlist_colors'));
+		Tools::clearCache(null, 'product-list-colors.tpl',
+			($id_product ? 'productlist_colors|'.(int)$id_product.'|'.(int)Context::getContext()->shop->id : 'productlist_colors'));
 		Context::getContext()->smarty->setTemplateDir($current_template_dir);
 	}
 
@@ -2846,7 +2969,7 @@ exit;
 			$len = $len1 - $len2;
 			$str = &$v2;
 		}
-		else if ($len2 > $len1)
+		elseif ($len2 > $len1)
 		{
 			$len = $len2 - $len1;
 			$str = &$v1;
@@ -2872,9 +2995,9 @@ exit;
 
 		return false;
 	}
-	
+
 	/**
-	 * Reproduce array_unique working before php version 5.2.9 
+	 * Reproduce array_unique working before php version 5.2.9
 	 * @param array $array
 	 * @return array
 	 */
@@ -2895,7 +3018,7 @@ exit;
 	{
 		if (!defined('PREG_BAD_UTF8_OFFSET'))
 			return $pattern;
-		return preg_replace('/\\\[px]\{[a-z]\}{1,2}|(\/[a-z]*)u([a-z]*)$/i', "$1$2", $pattern);
+		return preg_replace('/\\\[px]\{[a-z]{1,2}\}|(\/[a-z]*)u([a-z]*)$/i', "$1$2", $pattern);
 	}
 
 	protected static $is_addons_up = true;
@@ -2904,7 +3027,7 @@ exit;
 		if (!self::$is_addons_up)
 			return false;
 
-		$postData = http_build_query(array(
+		$post_data = http_build_query(array(
 			'version' => isset($params['version']) ? $params['version'] : _PS_VERSION_,
 			'iso_lang' => Tools::strtolower(isset($params['iso_lang']) ? $params['iso_lang'] : Context::getContext()->language->iso_code),
 			'iso_code' => Tools::strtolower(isset($params['iso_country']) ? $params['iso_country'] : Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'))),
@@ -2913,46 +3036,57 @@ exit;
 		));
 
 		$protocols = array('https');
+		$end_point = 'api.addons.prestashop.com';
+
 		switch ($request)
 		{
 			case 'native':
 				$protocols[] = 'http';
-				$postData .= '&method=listing&action=native';
+				$post_data .= '&method=listing&action=native';
 				break;
 			case 'native_all':
 				$protocols[] = 'http';
-				$postData .= '&method=listing&action=native&iso_code=all';
+				$post_data .= '&method=listing&action=native&iso_code=all';
 				break;
 			case 'must-have':
 				$protocols[] = 'http';
-				$postData .= '&method=listing&action=must-have';
+				$post_data .= '&method=listing&action=must-have';
 				break;
 			case 'must-have-themes':
 				$protocols[] = 'http';
-				$postData .= '&method=listing&action=must-have-themes';
+				$post_data .= '&method=listing&action=must-have-themes';
 				break;
 			case 'customer':
-				$postData .= '&method=listing&action=customer&username='.urlencode(trim(Context::getContext()->cookie->username_addons)).'&password='.urlencode(trim(Context::getContext()->cookie->password_addons));
+				$post_data .= '&method=listing&action=customer&username='.urlencode(trim(Context::getContext()->cookie->username_addons))
+					.'&password='.urlencode(trim(Context::getContext()->cookie->password_addons));
 				break;
 			case 'customer_themes':
-				$postData .= '&method=listing&action=customer-themes&username='.urlencode(trim(Context::getContext()->cookie->username_addons)).'&password='.urlencode(trim(Context::getContext()->cookie->password_addons));
+				$post_data .= '&method=listing&action=customer-themes&username='.urlencode(trim(Context::getContext()->cookie->username_addons))
+					.'&password='.urlencode(trim(Context::getContext()->cookie->password_addons));
 				break;
 			case 'check_customer':
-				$postData .= '&method=check_customer&username='.urlencode($params['username_addons']).'&password='.urlencode($params['password_addons']);
+				$post_data .= '&method=check_customer&username='.urlencode($params['username_addons']).'&password='.urlencode($params['password_addons']);
 				break;
 			case 'check_module':
-				$postData .= '&method=check&module_name='.urlencode($params['module_name']).'&module_key='.urlencode($params['module_key']);
+				$post_data .= '&method=check&module_name='.urlencode($params['module_name']).'&module_key='.urlencode($params['module_key']);
 				break;
 			case 'module':
-				$postData .= '&method=module&id_module='.urlencode($params['id_module']);
+				$post_data .= '&method=module&id_module='.urlencode($params['id_module']);
 				if (isset($params['username_addons']) && isset($params['password_addons']))
-					$postData .= '&username='.urlencode($params['username_addons']).'&password='.urlencode($params['password_addons']);
+					$post_data .= '&username='.urlencode($params['username_addons']).'&password='.urlencode($params['password_addons']);
 				else
 					$protocols[] = 'http';
 				break;
+			case 'hosted_module':
+				$post_data .= '&method=module&id_module='.urlencode((int)$params['id_module']).'&username='.urlencode($params['hosted_email'])
+					.'&password='.urlencode($params['password_addons'])
+					.'&shop_url='.urlencode(isset($params['shop_url']) ? $params['shop_url'] : Tools::getShopDomain())
+					.'&mail='.urlencode(isset($params['email']) ? $params['email'] : Configuration::get('PS_SHOP_EMAIL'));
+				$protocols[] = 'https';
+				break;
 			case 'install-modules':
 				$protocols[] = 'http';
-				$postData .= '&method=listing&action=install-modules';
+				$post_data .= '&method=listing&action=install-modules';
 				break;
 			default:
 				return false;
@@ -2960,15 +3094,15 @@ exit;
 
 		$context = stream_context_create(array(
 			'http' => array(
-				'method'=> 'POST',
-				'content' => $postData,
+				'method'  => 'POST',
+				'content' => $post_data,
 				'header'  => 'Content-type: application/x-www-form-urlencoded',
 				'timeout' => 5,
 			)
 		));
-		
+
 		foreach ($protocols as $protocol)
-			if ($content = Tools::file_get_contents($protocol.'://api.addons.prestashop.com', false, $context))
+			if ($content = Tools::file_get_contents($protocol.'://'.$end_point, false, $context))
 				return $content;
 
 		self::$is_addons_up = false;
@@ -2977,24 +3111,24 @@ exit;
 
 	public static function fileAttachment($input = 'fileUpload')
 	{
-		$fileAttachment = null;
+		$file_attachment = null;
 		if (isset($_FILES[$input]['name']) && !empty($_FILES[$input]['name']) && !empty($_FILES[$input]['tmp_name']))
 		{
-			$fileAttachment['rename'] = uniqid(). Tools::strtolower(substr($_FILES[$input]['name'], -5));	
-			$fileAttachment['content'] = file_get_contents($_FILES[$input]['tmp_name']);
-			$fileAttachment['tmp_name'] = $_FILES[$input]['tmp_name'];
-			$fileAttachment['name'] = $_FILES[$input]['name'];
-			$fileAttachment['mime'] = $_FILES[$input]['type'];
-			$fileAttachment['error'] = $_FILES[$input]['error'];
+			$file_attachment['rename'] = uniqid().Tools::strtolower(substr($_FILES[$input]['name'], -5));
+			$file_attachment['content'] = file_get_contents($_FILES[$input]['tmp_name']);
+			$file_attachment['tmp_name'] = $_FILES[$input]['tmp_name'];
+			$file_attachment['name'] = $_FILES[$input]['name'];
+			$file_attachment['mime'] = $_FILES[$input]['type'];
+			$file_attachment['error'] = $_FILES[$input]['error'];
 		}
-		return $fileAttachment;
+		return $file_attachment;
 	}
-	
+
 	public static function changeFileMTime($file_name)
 	{
 		touch($file_name);
 	}
-	
+
 	public static function waitUntilFileIsModified($file_name, $timeout = 180)
 	{
 		@ini_set('max_execution_time', $timeout);
@@ -3005,7 +3139,7 @@ exit;
 		$start_time = microtime(true);
 		$last_modified = @filemtime($file_name);
 
-		while(true)
+		while (true)
 		{
 			if (((microtime(true) - $start_time) > $time_limit) || @filemtime($file_name) > $last_modified)
 				break;
@@ -3013,7 +3147,7 @@ exit;
 			usleep(300);
 		}
 	}
-	
+
 	/**
 	 * Delete a substring from another one starting from the right
 	 * @param string $str
@@ -3079,17 +3213,17 @@ exit;
 		$user_agent = $_SERVER['HTTP_USER_AGENT'];
 		self::$_user_browser = 'unknown';
 
-		if(preg_match('/MSIE/i',$user_agent) && !preg_match('/Opera/i',$user_agent))
+		if (preg_match('/MSIE/i',$user_agent) && !preg_match('/Opera/i',$user_agent))
 			self::$_user_browser = 'Internet Explorer';
-		elseif(preg_match('/Firefox/i',$user_agent))
+		elseif (preg_match('/Firefox/i',$user_agent))
 			self::$_user_browser = 'Mozilla Firefox';
-		elseif(preg_match('/Chrome/i',$user_agent))
+		elseif (preg_match('/Chrome/i',$user_agent))
 			self::$_user_browser = 'Google Chrome';
-		elseif(preg_match('/Safari/i',$user_agent))
+		elseif (preg_match('/Safari/i',$user_agent))
 			self::$_user_browser = 'Apple Safari';
-		elseif(preg_match('/Opera/i',$user_agent))
+		elseif (preg_match('/Opera/i',$user_agent))
 			self::$_user_browser = 'Opera';
-		elseif(preg_match('/Netscape/i',$user_agent))
+		elseif (preg_match('/Netscape/i',$user_agent))
 			self::$_user_browser = 'Netscape';
 
 		return self::$_user_browser;
@@ -3124,6 +3258,7 @@ exit;
 				$config->set('Attr.EnableID', true);
 				$config->set('HTML.Trusted', true);
 				$config->set('Cache.SerializerPath', _PS_CACHE_DIR_.'purifier');
+				$config->set('Attr.AllowedFrameTargets', array('_blank', '_self', '_parent', '_top'));
 
 				if (Configuration::get('PS_ALLOW_HTML_IFRAME'))
 				{

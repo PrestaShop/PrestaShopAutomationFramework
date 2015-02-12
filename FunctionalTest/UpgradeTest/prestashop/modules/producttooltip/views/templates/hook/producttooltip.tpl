@@ -25,15 +25,15 @@
 <script type="text/javascript">
     $(document).ready(function () {ldelim}
         {if isset($nb_people)}
-        $.growl({ldelim}title: '', message: '{if $nb_people == 1}{l s='%d person is currently watching this product' sprintf=$nb_people mod='producttooltip' js=1}{else}{l s='%d people are currently watching this product' sprintf=$nb_people mod='producttooltip' js=1}{/if}'{rdelim});
+        $.growl({ldelim}title: '', message: '{if $nb_people == 1}{l s='%d person is currently watching this product.' sprintf=$nb_people mod='producttooltip' js=1}{else}{l s='%d people are currently watching this product.' sprintf=$nb_people mod='producttooltip' js=1}{/if}'{rdelim});
         {/if}
 
         {if isset($date_last_order)}
-        $.growl({ldelim}title: '', message: '{l s='This product was bought last' mod='producttooltip' js=1} {dateFormat date=$date_last_order full=1}'{rdelim});
+        $.growl({ldelim}title: '', message: '{l s='Last time this product was bought: ' mod='producttooltip' js=1} {dateFormat date=$date_last_order full=1}'{rdelim});
         {/if}
 
         {if isset($date_last_cart)}
-        $.growl({ldelim}title: '', message: '{l s='This product was added to cart last' mod='producttooltip' js=1} {dateFormat date=$date_last_cart full=1}'{rdelim});
+        $.growl({ldelim}title: '', message: '{l s='Last time this product was added to a cart: ' mod='producttooltip' js=1} {dateFormat date=$date_last_cart full=1}'{rdelim});
         {/if}
 
         {rdelim});

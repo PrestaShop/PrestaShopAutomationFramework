@@ -1,5 +1,5 @@
 {*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -45,15 +45,15 @@
 		{if $input.type == 'select' && $input.name == 'id_category'}
 			<script type="text/javascript">
 				$(document).ready(function(){
-					$("#id_category").change(function(){
+					$('#id_category').change(function(){
 						doAdminAjax(
 							{
-							ajax:"1",
+							ajax: '1',
 							id_category : $(this).val(),
 							use_shop_context : 0,
-							action : "getCategoriesFromRootCategory",
-							controller: "AdminShop",
-							token : "{$token|escape:'html':'UTF-8'}",
+							action : 'getCategoriesFromRootCategory',
+							controller: 'AdminShop',
+							token : '{$token|escape:'html':'UTF-8'}',
 							},
 							function(res)
 							{
@@ -61,6 +61,7 @@
 							}
 						);
 					});
+					$('#id_category').trigger('change');
 				});
 			</script>
 		{/if}

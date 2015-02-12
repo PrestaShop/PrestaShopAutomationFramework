@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -124,24 +124,10 @@ class AdminAdminPreferencesControllerCore extends AdminController
 				),
 				'submit' => array('title' => $this->l('Save'))
 			),
-			'help' => array(
-				'title' =>	$this->l('Help'),
-				'icon' =>	'icon-question-sign',
-				'fields' =>	array(
-					'PS_HELPBOX' => array(
-						'title' => $this->l('Back Office help boxes'),
-						'hint' => $this->l('Allow yellow help boxes to be displayed under the form fields in the Back Office.'),
-						'validation' => 'isBool',
-						'cast' => 'intval',
-						'type' => 'bool',
-						'visibility' => Shop::CONTEXT_ALL
-					),
-				),
-				'submit' => array('title' => $this->l('Save'))
-			),
 			'notifications' => array(
 				'title' =>	$this->l('Notifications'),
 				'icon' =>	'icon-list-alt',
+				'description' => $this->l('Notifications are numbered bubbles displayed at the very top of your back-office, right next to the shop\'s name. They display the number of new items since you last clicked on them.'),
 				'fields' =>	array(
 					'PS_SHOW_NEW_ORDERS' => array(
 						'title' => $this->l('Show notifications for new orders'),

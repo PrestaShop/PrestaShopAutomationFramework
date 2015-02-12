@@ -35,7 +35,7 @@ class StatsLive extends Module
 	{
 		$this->name = 'statslive';
 		$this->tab = 'analytics_stats';
-		$this->version = '1.2.1';
+		$this->version = '1.2.2';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -72,7 +72,7 @@ class StatsLive extends Module
 					INNER JOIN `'._DB_PREFIX_.'customer` u ON u.id_customer = g.id_customer
 					WHERE cp.`time_end` IS NULL
 						'.Shop::addSqlRestriction(false, 'c').'
-						AND TIME_TO_SEC(TIMEDIFF(NOW(), cp.`time_start`)) < 900
+						AND TIME_TO_SEC(TIMEDIFF(\''.pSQL(date('Y-m-d H:i:00', time())).'\', cp.`time_start`)) < 900
 					'.($maintenance_ips ? 'AND c.ip_address NOT IN ('.preg_replace('/[^,0-9]/', '', $maintenance_ips).')' : '').'
 					GROUP BY u.id_customer
 					ORDER BY u.firstname, u.lastname';
@@ -83,7 +83,7 @@ class StatsLive extends Module
 					FROM `'._DB_PREFIX_.'connections` c
 					INNER JOIN `'._DB_PREFIX_.'guest` g ON c.id_guest = g.id_guest
 					INNER JOIN `'._DB_PREFIX_.'customer` u ON u.id_customer = g.id_customer
-					WHERE TIME_TO_SEC(TIMEDIFF(NOW(), c.`date_add`)) < 900
+					WHERE TIME_TO_SEC(TIMEDIFF(\''.pSQL(date('Y-m-d H:i:00', time())).'\', c.`date_add`)) < 900
 						'.Shop::addSqlRestriction(false, 'c').'
 					'.($maintenance_ips ? 'AND c.ip_address NOT IN ('.preg_replace('/[^,0-9]/', '', $maintenance_ips).')' : '').'
 					GROUP BY u.id_customer
@@ -115,7 +115,7 @@ class StatsLive extends Module
 					WHERE (g.id_customer IS NULL OR g.id_customer = 0)
 						'.Shop::addSqlRestriction(false, 'c').'
 						AND cp.`time_end` IS NULL
-					AND TIME_TO_SEC(TIMEDIFF(NOW(), cp.`time_start`)) < 900
+					AND TIME_TO_SEC(TIMEDIFF(\''.pSQL(date('Y-m-d H:i:00', time())).'\', cp.`time_start`)) < 900
 					'.($maintenance_ips ? 'AND c.ip_address NOT IN ('.preg_replace('/[^,0-9]/', '', $maintenance_ips).')' : '').'
 					GROUP BY c.id_connections
 					ORDER BY c.date_add DESC';
@@ -127,7 +127,7 @@ class StatsLive extends Module
 					INNER JOIN `'._DB_PREFIX_.'guest` g ON c.id_guest = g.id_guest
 					WHERE (g.id_customer IS NULL OR g.id_customer = 0)
 						'.Shop::addSqlRestriction(false, 'c').'
-						AND TIME_TO_SEC(TIMEDIFF(NOW(), c.`date_add`)) < 900
+						AND TIME_TO_SEC(TIMEDIFF(\''.pSQL(date('Y-m-d H:i:00', time())).'\', c.`date_add`)) < 900
 					'.($maintenance_ips ? 'AND c.ip_address NOT IN ('.preg_replace('/[^,0-9]/', '', $maintenance_ips).')' : '').'
 					ORDER BY c.date_add DESC';
 		}
@@ -143,7 +143,7 @@ class StatsLive extends Module
 		list($visitors, $total_visitors) = $this->getVisitorsOnline();
 		$irow = 0;
 
-		$this->html .= '<script type="text/javascript" language="javascript">
+		$this->html .= '<script type="text/javascript">
 			$("#calendar").remove();
 		</script>';
 		if (!Configuration::get('PS_STATSDATA_CUSTOMER_PAGESVIEWS'))
@@ -173,7 +173,7 @@ class StatsLive extends Module
 						<td class="center">'.$customer['firstname'].' '.$customer['lastname'].'</td>
 						<td class="center">'.$customer['page'].'</td>
 						<td class="center">
-							<a href="index.php?tab=AdminCustomers&id_customer='.$customer['id_customer'].'&viewcustomer&token='.Tools::getAdminToken('AdminCustomers'.(int)Tab::getIdFromClassName('AdminCustomers').(int)$this->context->employee->id).'"
+							<a href="'.Tools::safeOutput('index.php?tab=AdminCustomers&id_customer='.$customer['id_customer'].'&viewcustomer&token='.Tools::getAdminToken('AdminCustomers'.(int)Tab::getIdFromClassName('AdminCustomers').(int)$this->context->employee->id)).'"
 								target="_blank">
 								<img src="../modules/'.$this->name.'/logo.gif" />
 							</a>
@@ -220,7 +220,7 @@ class StatsLive extends Module
 		$this->html .= '
 			<h4>'.$this->l('Notice').'</h4>
 			<p class="alert alert-info">'.$this->l('Maintenance IPs are excluded from the online visitors.').'</p>
-			<a class="btn btn-default" href="index.php?controller=AdminMaintenance&token='.Tools::getAdminTokenLite('AdminMaintenance').'">
+			<a class="btn btn-default" href="'.Tools::safeOutput('index.php?controller=AdminMaintenance&token='.Tools::getAdminTokenLite('AdminMaintenance')).'">
 				<i class="icon-share-alt"></i> '.$this->l('Add or remove an IP address.').'
 			</a>
 		';

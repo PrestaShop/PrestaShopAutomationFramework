@@ -73,10 +73,10 @@ function bar_chart_goals(widget_name, chart_details)
 						return '<div class="tooltip-panel"><div class="tooltip-panel-heading">' + graph.series.title + '</div><strong>' + graph.series.zone_text + '</strong><br />(' + graph.point.goal + '%)</div>';
 				} else if (key == 'conversion_more')
 					return '<div class="tooltip-panel"><div class="tooltip-panel-heading">' + graph.series.title + '</div><strong>' + graph.series.zone_text + '</strong><br /><span class="dash_trend dash_trend_up">+' + graph.point.goal_diff + '%</span></div>';
-				
+
 			});
 
-		chart.yAxis.tickFormat(d3.format('%'));
+		chart.yAxis.tickFormat(d3.format('.1f'));
 		dashgoals_chart = chart;
 
 		d3.select('#dash_goals_chart1 svg')

@@ -28,19 +28,23 @@
 if (!defined('_PS_VERSION_'))
 	exit;
 
-include_once _PS_MODULE_DIR_.'blockcmsinfo/infoClass.php';
+require_once _PS_MODULE_DIR_.'blockcmsinfo/classes/InfoBlock.php';
 
 class Blockcmsinfo extends Module
 {
+	public $html = '';
+
 	public function __construct()
 	{
 		$this->name = 'blockcmsinfo';
 		$this->tab = 'front_office_features';
-		$this->version = '1.5.1';
+		$this->version = '1.5.2';
 		$this->author = 'PrestaShop';
 		$this->bootstrap = true;
 		$this->need_instance = 0;
+
 		parent::__construct();
+
 		$this->displayName = $this->l('Custom CMS information block');
 		$this->description = $this->l('Adds custom information blocks in your store.');
 		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
@@ -48,11 +52,11 @@ class Blockcmsinfo extends Module
 
 	public function install()
 	{
-		return parent::install() &&
-		$this->installDB() &&
-		Configuration::updateValue('BLOCKCMSINFO_NBBLOCKS', 2) &&
-		$this->registerHook('home') && $this->installFixtures() &&
-		$this->disableDevice(Context::DEVICE_TABLET | Context::DEVICE_MOBILE);
+		return 	parent::install() &&
+				$this->installDB() &&
+				$this->registerHook('home') &&
+				$this->installFixtures() &&
+				$this->disableDevice(Context::DEVICE_TABLET | Context::DEVICE_MOBILE);
 	}
 
 	public function installDB()
@@ -61,14 +65,14 @@ class Blockcmsinfo extends Module
 		$return &= Db::getInstance()->execute('
 				CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'info` (
 				`id_info` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-				`id_shop` int(10) unsigned NOT NULL ,
+				`id_shop` int(10) unsigned DEFAULT NULL,
 				PRIMARY KEY (`id_info`)
 			) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8 ;'
 		);
 
 		$return &= Db::getInstance()->execute('
 				CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'info_lang` (
-				`id_info` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+				`id_info` INT UNSIGNED NOT NULL,
 				`id_lang` int(10) unsigned NOT NULL ,
 				`text` text NOT NULL,
 				PRIMARY KEY (`id_info`, `id_lang`)
@@ -80,143 +84,111 @@ class Blockcmsinfo extends Module
 
 	public function uninstall()
 	{
-		// Delete configuration
-		return Configuration::deleteByName('BLOCKCMSINFO_NBBLOCKS') &&
-		$this->uninstallDB() &&
-		parent::uninstall();
+		return parent::uninstall() && $this->uninstallDB();
 	}
 
-	public function uninstallDB()
+	public function uninstallDB($drop_table = true)
 	{
-		return Db::getInstance()->execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.'info`') && Db::getInstance()->execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.'info_lang`');
-	}
+		$ret = true;
+		if($drop_table)
+			$ret &=  Db::getInstance()->execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.'info`') && Db::getInstance()->execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.'info_lang`');
 
-	public function addToDB()
-	{
-		if (isset($_POST['nbblocks']))
-		{
-			for ($i = 1; $i <= (int)$_POST['nbblocks']; $i++)
-				Db::getInstance()->execute('
-					INSERT INTO `'._DB_PREFIX_.'info` (`text`)
-					VALUES ("'.((isset($_POST['info'.$i.'_text']) && $_POST['info'.$i.'_text'] != '') ? pSQL($_POST['info'.$i.'_text']) : '').'")'
-				);
-
-			return true;
-		}
-
-		return false;
-	}
-
-	public function removeFromDB()
-	{
-		return Db::getInstance()->execute('DELETE FROM `'._DB_PREFIX_.'info`');
+		return $ret;
 	}
 
 	public function getContent()
 	{
-		$html = '';
 		$id_info = (int)Tools::getValue('id_info');
 
 		if (Tools::isSubmit('saveblockcmsinfo'))
 		{
-			if (Shop::isFeatureActive())
-				$shops = Tools::getValue('checkBoxShopAsso_configuration');
+			if ($this->processSaveCmsInfo())
+				return $this->html . $this->renderList();
 			else
-				$shops = array($this->context->shop->id);
-
-			foreach ($shops as $shop)
-			{
-				if ($id_info = Tools::getValue('id_info'))
-					$info = new infoClass((int)$id_info);
-				else
-					$info = new infoClass();
-				$info->copyFromPost();
-				$info->id_shop = (int)$shop;
-
-				if ($info->validateFields(false) && $info->validateFieldsLang(false))
-				{
-					$info->save();
-					$this->_clearCache('blockcmsinfo.tpl');
-				}
-				else
-					$html .= '<div class="conf error">'.$this->l('An error occurred while attempting to save.').'</div>';
-			}
+				return $this->html . $this->renderForm();
 		}
-
-		if (Tools::isSubmit('updateblockcmsinfo') || Tools::isSubmit('addblockcmsinfo'))
+		elseif (Tools::isSubmit('updateblockcmsinfo') || Tools::isSubmit('addblockcmsinfo'))
 		{
-			$helper = $this->initForm();
-			foreach (Language::getLanguages(false) as $lang)
-				if ($id_info)
-				{
-					$info = new infoClass((int)$id_info);
-					$helper->fields_value['text'][(int)$lang['id_lang']] = $info->text[(int)$lang['id_lang']];
-				}
-				else
-					$helper->fields_value['text'][(int)$lang['id_lang']] = Tools::getValue('text_'.(int)$lang['id_lang'], '');
-			if ($id_info = Tools::getValue('id_info'))
-			{
-				$this->fields_form[0]['form']['input'][] = array('type' => 'hidden', 'name' => 'id_info');
-				$helper->fields_value['id_info'] = (int)$id_info;
-			}
-
-			return $html.$helper->generateForm($this->fields_form);
+			$this->html .= $this->renderForm();
+			return $this->html;
 		}
 		else if (Tools::isSubmit('deleteblockcmsinfo'))
 		{
-			$info = new infoClass((int)$id_info);
+			$info = new InfoBlock((int)$id_info);
 			$info->delete();
 			$this->_clearCache('blockcmsinfo.tpl');
 			Tools::redirectAdmin(AdminController::$currentIndex.'&configure='.$this->name.'&token='.Tools::getAdminTokenLite('AdminModules'));
 		}
 		else
 		{
-			$helper = $this->initList();
-
-			$content = $this->getListContent((int)Configuration::get('PS_LANG_DEFAULT'));
-			foreach ($content as $key => $value)
-				$content[$key]['text'] = substr(strip_tags($value['text']), 0, 200);
-
-			return $html.$helper->generateList($content, $this->fields_list);
+			$this->html .= $this->renderList();
+			return $this->html;
 		}
 
-		if (isset($_POST['submitModule']))
+	}
+
+	public function processSaveCmsInfo()
+	{
+		if ($id_info = Tools::getValue('id_info'))
+			$info = new InfoBlock((int)$id_info);
+		else
 		{
-			Configuration::updateValue('BLOCKCMSINFO_NBBLOCKS', ((isset($_POST['nbblocks']) && $_POST['nbblocks'] != '') ? (int)$_POST['nbblocks'] : ''));
-			if ($this->removeFromDB() && $this->addToDB())
+			$info = new InfoBlock();
+			if (Shop::isFeatureActive())
 			{
-				$this->_clearCache('blockcmsinfo.tpl');
-				$output = '<div class="conf confirm">'.$this->l('The block configuration has been updated.').'</div>';
+				$shop_ids = Tools::getValue('checkBoxShopAsso_configuration');
+				if (!$shop_ids)
+				{
+					$this->html .= '<div class="alert alert-danger conf error">'.$this->l('You have to select at least one shop.').'</div>';
+					return false;
+				}
 			}
 			else
-				$output = '<div class="conf error">
-					<img src="../img/admin/disabled.gif"/>'.$this->l('An error occurred while attempting to save.').'</div>';
+				$info->id_shop = Shop::getContextShopID();
 		}
+
+		$languages = Language::getLanguages(false);
+		$text = array();
+		foreach ($languages AS $lang)
+			$text[$lang['id_lang']] = Tools::getValue('text_'.$lang['id_lang']);
+		$info->text = $text;
+
+		if (Shop::isFeatureActive() && !$info->id_shop)
+		{
+			$saved = true;
+			foreach ($shop_ids as $id_shop)
+			{
+				$info->id_shop = $id_shop;
+				$saved &= $info->add();
+			}
+		}
+		else
+			$saved = $info->save();
+
+		if ($saved)
+			$this->_clearCache('blockcmsinfo.tpl');
+		else
+			$this->html .= '<div class="alert alert-danger conf error">'.$this->l('An error occurred while attempting to save.').'</div>';
+
+		return $saved;
 	}
 
-	protected function getListContent($id_lang, $id_shop = null)
-	{
-		$content = Db::getInstance()->executeS('
-			SELECT r.`id_info`, r.`id_shop`, rl.`text`
-			FROM `'._DB_PREFIX_.'info` r
-			LEFT JOIN `'._DB_PREFIX_.'info_lang` rl ON (r.`id_info` = rl.`id_info`)
-			WHERE `id_lang` = '.(int)$id_lang.($id_shop ? ' AND id_shop='.bqSQL((int)$id_shop) : '').
-			(Tools::getIsset('blockcmsinfoOrderby') && Tools::getIsset('blockcmsinfoOrderway') ? ' 
-			ORDER BY `'.bqSQL(Tools::getValue('blockcmsinfoOrderby')).'` `'.bqSQL(Tools::getValue('blockcmsinfoOrderway')).'`' : ''));
 
-		return $content;
-	}
-
-	protected function initForm()
+	protected function renderForm()
 	{
 		$default_lang = (int)Configuration::get('PS_LANG_DEFAULT');
-		$this->fields_form[0]['form'] = array(
+
+		$fields_form = array(
 			'tinymce' => true,
 			'legend' => array(
 				'title' => $this->l('New custom CMS block'),
 			),
 			'input' => array(
-				array(
+				'id_info' => array(
+					'type' => 'hidden',
+					'name' => 'id_info'
+				),
+				'content' => array(
 					'type' => 'textarea',
 					'label' => $this->l('Text'),
 					'lang' => true,
@@ -225,8 +197,7 @@ class Blockcmsinfo extends Module
 					'rows' => 10,
 					'class' => 'rte',
 					'autoload_rte' => true,
-
-				)
+				),
 			),
 			'submit' => array(
 				'title' => $this->l('Save'),
@@ -239,6 +210,16 @@ class Blockcmsinfo extends Module
 				)
 			)
 		);
+
+		if (Shop::isFeatureActive() && Tools::getValue('id_info') == false)
+		{
+			$fields_form['input'][] = array(
+				'type' => 'shop',
+				'label' => $this->l('Shop association'),
+				'name' => 'checkBoxShopAsso_theme'
+			);
+		}
+
 
 		$helper = new HelperForm();
 		$helper->module = $this;
@@ -259,46 +240,35 @@ class Blockcmsinfo extends Module
 		$helper->toolbar_scroll = true;
 		$helper->title = $this->displayName;
 		$helper->submit_action = 'saveblockcmsinfo';
-		$helper->toolbar_btn = array(
-			'save' =>
-				array(
-					'desc' => $this->l('Save'),
-					'href' => AdminController::$currentIndex.'&configure='.$this->name.'&save'.$this->name.'&token='.Tools::getAdminTokenLite('AdminModules'),
-				),
-			'back' =>
-				array(
-					'href' => AdminController::$currentIndex.'&configure='.$this->name.'&token='.Tools::getAdminTokenLite('AdminModules'),
-					'desc' => $this->l('Back to list')
-				)
-		);
 
-		return $helper;
+		$helper->fields_value = $this->getFormValues();
+
+		return $helper->generateForm(array(array('form' => $fields_form)));
 	}
 
-	protected function initList()
+	protected function renderList()
 	{
-		$this->fields_list = array(
-			'id_info' => array(
+		$this->fields_list = array();
+		$this->fields_list['id_info'] = array(
 				'title' => $this->l('Block ID'),
 				'type' => 'text',
 				'search' => false,
 				'orderby' => false,
-			),
-			'text' => array(
+			);
+
+		if (Shop::isFeatureActive() && Shop::getContext() != Shop::CONTEXT_SHOP)
+			$this->fields_list['shop_name'] = array(
+					'title' => $this->l('Shop'),
+					'type' => 'text',
+					'search' => false,
+					'orderby' => false,
+				);
+
+		$this->fields_list['text'] = array(
 				'title' => $this->l('Block text'),
 				'type' => 'text',
 				'search' => false,
 				'orderby' => false,
-			),
-		);
-
-		if (Shop::isFeatureActive())
-			$this->fields_list['id_shop'] = array(
-				'title' => $this->l('Shop ID'),
-				'align' => 'center',
-				'width' => 25,
-				'type' => 'int',
-				'search' => false
 			);
 
 		$helper = new HelperList();
@@ -318,7 +288,53 @@ class Blockcmsinfo extends Module
 		$helper->token = Tools::getAdminTokenLite('AdminModules');
 		$helper->currentIndex = AdminController::$currentIndex.'&configure='.$this->name;
 
-		return $helper;
+		$content = $this->getListContent($this->context->language->id);
+
+		return $helper->generateList($content, $this->fields_list);
+	}
+
+	protected function getListContent($id_lang = null)
+	{
+		if (is_null($id_lang))
+			$id_lang = (int)Configuration::get('PS_LANG_DEFAULT');
+
+		$sql = 'SELECT r.`id_info`, rl.`text`, s.`name` as shop_name
+			FROM `'._DB_PREFIX_.'info` r
+			LEFT JOIN `'._DB_PREFIX_.'info_lang` rl ON (r.`id_info` = rl.`id_info`)
+			LEFT JOIN `'._DB_PREFIX_.'shop` s ON (r.`id_shop` = s.`id_shop`)
+			WHERE `id_lang` = '.(int)$id_lang.' AND (';
+
+		if ($shop_ids = Shop::getContextListShopID())
+			foreach ($shop_ids as $id_shop)
+				$sql .= ' r.`id_shop` = '.(int)$id_shop.' OR ';
+
+		$sql .= ' r.`id_shop` = 0 )';
+
+		$content = Db::getInstance()->executeS($sql);
+
+		foreach ($content as $key => $value)
+			$content[$key]['text'] = substr(strip_tags($value['text']), 0, 200);
+
+		return $content;
+	}
+
+	public function getFormValues()
+	{
+		$fields_value = array();
+		$id_info = (int)Tools::getValue('id_info');
+
+		foreach (Language::getLanguages(false) as $lang)
+			if ($id_info)
+			{
+				$info = new InfoBlock((int)$id_info);
+				$fields_value['text'][(int)$lang['id_lang']] = $info->text[(int)$lang['id_lang']];
+			}
+			else
+				$fields_value['text'][(int)$lang['id_lang']] = Tools::getValue('text_'.(int)$lang['id_lang'], '');
+
+		$fields_value['id_info'] = $id_info;
+
+		return $fields_value;
 	}
 
 	public function hookHome($params)
@@ -326,11 +342,21 @@ class Blockcmsinfo extends Module
 		$this->context->controller->addCSS($this->_path.'style.css', 'all');
 		if (!$this->isCached('blockcmsinfo.tpl', $this->getCacheId()))
 		{
-			$infos = $this->getListContent($this->context->language->id, $this->context->shop->id);
+			$infos = $this->getInfos($this->context->language->id, $this->context->shop->id);
 			$this->context->smarty->assign(array('infos' => $infos, 'nbblocks' => count($infos)));
 		}
 
 		return $this->display(__FILE__, 'blockcmsinfo.tpl', $this->getCacheId());
+	}
+
+	public function getInfos($id_lang, $id_shop)
+	{
+		$sql = 'SELECT r.`id_info`, r.`id_shop`, rl.`text`
+			FROM `'._DB_PREFIX_.'info` r
+			LEFT JOIN `'._DB_PREFIX_.'info_lang` rl ON (r.`id_info` = rl.`id_info`)
+			WHERE `id_lang` = '.(int)$id_lang.' AND  `id_shop` = '.(int)$id_shop;
+
+		return Db::getInstance()->executeS($sql);
 	}
 
 	public function installFixtures()
@@ -365,13 +391,19 @@ class Blockcmsinfo extends Module
 <p>Sit amet conse ctetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit.</p>'
 			),
 		);
+
+		$shops_ids = Shop::getShops(true, null, true);
+		$return = true;
 		foreach ($tab_texts as $tab)
 		{
-			$info = new infoClass();
+			$info = new InfoBlock();
 			foreach (Language::getLanguages(false) as $lang)
 				$info->text[$lang['id_lang']] = $tab['text'];
-			$info->id_shop = $this->context->shop->id;
-			$return &= $info->save();
+			foreach ($shops_ids as $id_shop)
+			{
+				$info->id_shop = $id_shop;
+				$return &= $info->add();
+			}
 		}
 
 		return $return;

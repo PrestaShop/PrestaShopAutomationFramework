@@ -52,23 +52,21 @@ class Blocktopmenu extends Module
 	{
 		$this->name = 'blocktopmenu';
 		$this->tab = 'front_office_features';
-		$this->version = '1.13';
+		$this->version = '2.0.9';
 		$this->author = 'PrestaShop';
 
 		$this->bootstrap = true;
-		parent::__construct();	
+		parent::__construct();
 
 		$this->displayName = $this->l('Top horizontal menu');
 		$this->description = $this->l('Adds a new horizontal menu to the top of your e-commerce website.');
 		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
 	}
 
-	public function install()
+	public function install($delete_params = true)
 	{
 		if (!parent::install() ||
 			!$this->registerHook('displayTop') ||
-			!Configuration::updateGlobalValue('MOD_BLOCKTOPMENU_ITEMS', 'CAT3,CAT26') ||
-			!Configuration::updateGlobalValue('MOD_BLOCKTOPMENU_SEARCH', '1') ||
 			!$this->registerHook('actionObjectCategoryUpdateAfter') ||
 			!$this->registerHook('actionObjectCategoryDeleteAfter') ||
 			!$this->registerHook('actionObjectCategoryAddAfter') ||
@@ -85,9 +83,15 @@ class Blocktopmenu extends Module
 			!$this->registerHook('actionObjectProductDeleteAfter') ||
 			!$this->registerHook('actionObjectProductAddAfter') ||
 			!$this->registerHook('categoryUpdate') ||
-			!$this->registerHook('actionShopDataDuplication') ||
-			!$this->installDB())
+			!$this->registerHook('actionShopDataDuplication'))
 			return false;
+
+		$this->clearMenuCache();
+
+		if ($delete_params)
+			if (!$this->installDb() || !Configuration::updateGlobalValue('MOD_BLOCKTOPMENU_ITEMS', 'CAT3,CAT26') || !Configuration::updateGlobalValue('MOD_BLOCKTOPMENU_SEARCH', '1'))
+				return false;
+
 		return true;
 	}
 
@@ -111,13 +115,17 @@ class Blocktopmenu extends Module
 		) ENGINE = '._MYSQL_ENGINE_.' CHARACTER SET utf8 COLLATE utf8_general_ci;'));
 	}
 
-	public function uninstall()
+	public function uninstall($delete_params = true)
 	{
-		if (!parent::uninstall() ||
-			!Configuration::deleteByName('MOD_BLOCKTOPMENU_ITEMS') ||
-			!Configuration::deleteByName('MOD_BLOCKTOPMENU_SEARCH') ||
-			!$this->uninstallDB())
+		if (!parent::uninstall())
 			return false;
+
+		$this->clearMenuCache();
+
+		if ($delete_params)
+			if (!$this->uninstallDB() || !Configuration::deleteByName('MOD_BLOCKTOPMENU_ITEMS') || !Configuration::deleteByName('MOD_BLOCKTOPMENU_SEARCH'))
+				return false;
+
 		return true;
 	}
 
@@ -128,10 +136,20 @@ class Blocktopmenu extends Module
 		return true;
 	}
 
+	public function reset()
+	{
+		if (!$this->uninstall(false))
+			return false;
+		if (!$this->install(false))
+			return false;
+
+		return true;
+	}
+
 	public function getContent()
 	{
 		$this->context->controller->addjQueryPlugin('hoverIntent');
-		
+
 		$id_lang = (int)Context::getContext()->language->id;
 		$languages = $this->context->controller->getLanguages();
 		$default_language = (int)Configuration::get('PS_LANG_DEFAULT');
@@ -145,28 +163,54 @@ class Blocktopmenu extends Module
 
 		if (Tools::isSubmit('submitBlocktopmenu'))
 		{
+			$errors_update_shops = array();
 			$items = Tools::getValue('items');
-			if (is_array($items) && count($items))
- 				$updated = Configuration::updateValue('MOD_BLOCKTOPMENU_ITEMS', (string)implode(',', $items));
- 			else
- 				$updated = Configuration::updateValue('MOD_BLOCKTOPMENU_ITEMS', '');
- 			if ($updated)
+			$shops = Shop::getContextListShopID();
+
+
+			foreach ($shops as $shop_id)
+			{
+				$shop_group_id = Shop::getGroupFromShop($shop_id);
+				$updated = true;
+
+				if (count($shops) == 1)
+				{
+					if (is_array($items) && count($items))
+		 				$updated = Configuration::updateValue('MOD_BLOCKTOPMENU_ITEMS', (string)implode(',', $items), false, (int)$shop_group_id, (int)$shop_id);
+		 			else
+		 				$updated = Configuration::updateValue('MOD_BLOCKTOPMENU_ITEMS', '', false, (int)$shop_group_id, (int)$shop_id);
+		 		}
+
+		 		$updated &= Configuration::updateValue('MOD_BLOCKTOPMENU_SEARCH', (bool)Tools::getValue('search'), false, (int)$shop_group_id, (int)$shop_id);
+
+	 			if (!$updated)
+	 			{
+	 				$shop = new Shop($shop_id);
+	 				$errors_update_shops[] =  $shop->name;
+	 			}
+
+			}
+
+ 			if (!count($errors_update_shops))
 				$this->_html .= $this->displayConfirmation($this->l('The settings have been updated.'));
 			else
-				$this->_html .= $this->displayError($this->l('Unable to update settings.'));
-			Configuration::updateValue('MOD_BLOCKTOPMENU_SEARCH', (bool)Tools::getValue('search'));
+				$this->_html .= $this->displayError(sprintf($this->l('Unable to update settings for the following shop(s): %s'), implode(', ', $errors_update_shops)));
+
 			$update_cache = true;
 		}
 		else if (Tools::isSubmit('submitBlocktopmenuLinks'))
 		{
+			$errors_add_link = array();
+
 			foreach ($languages as $key => $val)
 			{
 				$links_label[$val['id_lang']] = Tools::getValue('link_'.(int)$val['id_lang']);
 				$labels[$val['id_lang']] = Tools::getValue('label_'.(int)$val['id_lang']);
 			}
-			
+
 			$count_links_label = count($links_label);
 			$count_label = count($labels);
+
 			if ($count_links_label || $count_label)
 			{
 				if (!$count_links_label)
@@ -177,18 +221,53 @@ class Blocktopmenu extends Module
 					$this->_html .= $this->displayError($this->l('Please add a label for your default language.'));
 				else
 				{
-					MenuTopLinks::add($links_label, $labels,  Tools::getValue('new_window', 0), (int)Shop::getContextShopID());
-					$this->_html .= $this->displayConfirmation($this->l('The link has been added.'));
+					$shops = Shop::getContextListShopID();
+
+					foreach ($shops as $shop_id)
+					{
+						$added = MenuTopLinks::add($links_label, $labels,  Tools::getValue('new_window', 0), (int)$shop_id);
+
+						if (!$added)
+						{
+							$shop = new Shop($shop_id);
+ 							$errors_add_link[] =  $shop->name;
+						}
+
+					}
+
+					if (!count($errors_add_link))
+						$this->_html .= $this->displayConfirmation($this->l('The link has been added.'));
+					else
+						$this->_html .= $this->displayError(sprintf($this->l('Unable to add link for the following shop(s): %s'), implode(', ', $errors_add_link)));
 				}
 			}
 			$update_cache = true;
+
 		}
 		elseif (Tools::isSubmit('deletelinksmenutop'))
 		{
+			$errors_delete_link = array();
 			$id_linksmenutop = Tools::getValue('id_linksmenutop', 0);
-			MenuTopLinks::remove($id_linksmenutop, (int)Shop::getContextShopID());
-			Configuration::updateValue('MOD_BLOCKTOPMENU_ITEMS', str_replace(array('LNK'.$id_linksmenutop.',', 'LNK'.$id_linksmenutop), '', Configuration::get('MOD_BLOCKTOPMENU_ITEMS')));
-			$this->_html .= $this->displayConfirmation($this->l('The link has been removed.'));
+			$shops = Shop::getContextListShopID();
+
+			foreach ($shops as $shop_id)
+			{
+				$deleted = MenuTopLinks::remove($id_linksmenutop, (int)$shop_id);
+				Configuration::updateValue('MOD_BLOCKTOPMENU_ITEMS', str_replace(array('LNK'.$id_linksmenutop.',', 'LNK'.$id_linksmenutop), '', Configuration::get('MOD_BLOCKTOPMENU_ITEMS')));
+
+				if (!$deleted)
+				{
+					$shop = new Shop($shop_id);
+					$errors_delete_link[] =  $shop->name;
+				}
+
+			}
+
+			if (!count($errors_delete_link))
+				$this->_html .= $this->displayConfirmation($this->l('The link has been removed.'));
+			else
+				$this->_html .= $this->displayError(sprintf($this->l('Unable to remove link for the following shop(s): %s'), implode(', ', $errors_delete_link)));
+
 			$update_cache = true;
 		}
 		elseif (Tools::isSubmit('updatelinksmenutop'))
@@ -201,7 +280,7 @@ class Blocktopmenu extends Module
 				$link = array();
 				$label = array();
 				$new_window = (int)Tools::getValue('new_window', 0);
-				
+
 				foreach (Language::getLanguages(false) as $lang)
 				{
 					$link[$lang['id_lang']] = Tools::getValue('link_'.(int)$lang['id_lang']);
@@ -216,16 +295,50 @@ class Blocktopmenu extends Module
 
 		if ($update_cache)
 			$this->clearMenuCache();
-		
+
+
+		$shops = Shop::getContextListShopID();
+		$links = array();
+
+		if (count($shops) > 1)
+			$this->_html .= $this->getWarningMultishopHtml();
+
+		if (Shop::isFeatureActive())
+			$this->_html .= $this->getCurrentShopInfoMsg();
+
 		$this->_html .= $this->renderForm().$this->renderAddForm();
 
-		$links = MenuTopLinks::gets((int)$id_lang, null, (int)Shop::getContextShopID());
+		foreach ($shops as $shop_id)
+			$links = array_merge($links, MenuTopLinks::gets((int)$id_lang, null, (int)$shop_id));
 
 		if (!count($links))
 			return $this->_html;
 
 		$this->_html .= $this->renderList();
 		return $this->_html;
+	}
+
+	private function getWarningMultishopHtml()
+	{
+		return '<p class="alert alert-warning">'.
+					$this->l('You cannot manage top menu items from a "All Shops" or a "Group Shop" context, select directly the shop you want to edit').
+				'</p>';
+	}
+
+	private function getCurrentShopInfoMsg()
+	{
+		$shop_info = null;
+
+		if (Shop::getContext() == Shop::CONTEXT_SHOP)
+			$shop_info = $this->l(sprintf('The modifications will be applied to shop: %s', $this->context->shop->name));
+		else if (Shop::getContext() == Shop::CONTEXT_GROUP)
+			$shop_info = $this->l(sprintf('The modifications will be applied to this group: %s', Shop::getContextShopGroup()->name));
+		else
+			$shop_info = $this->l('The modifications will be applied to all shops');
+
+		return '<div class="alert alert-info">'.
+					$shop_info.
+				'</div>';
 	}
 
 	private function getMenuItems()
@@ -235,9 +348,26 @@ class Blocktopmenu extends Module
 			return $items;
 		else
 		{
-			$conf = Configuration::get('MOD_BLOCKTOPMENU_ITEMS');
+			$shops = Shop::getContextListShopID();
+			$conf = null;
+
+			if (count($shops) > 1)
+			{
+				foreach ($shops as $key => $shop_id)
+				{
+					$shop_group_id = Shop::getGroupFromShop($shop_id);
+					$conf .= (string)($key > 1 ? ',' : '').Configuration::get('MOD_BLOCKTOPMENU_ITEMS', null, $shop_group_id, $shop_id);
+				}
+			}
+			else
+			{
+				$shop_id = (int)$shops[0];
+				$shop_group_id = Shop::getGroupFromShop($shop_id);
+				$conf = Configuration::get('MOD_BLOCKTOPMENU_ITEMS', null, $shop_group_id, $shop_id);
+			}
+
 			if (strlen($conf))
-				return explode(',', Configuration::get('MOD_BLOCKTOPMENU_ITEMS'));
+				return explode(',', $conf);
 			else
 				return array();
 		}
@@ -245,10 +375,11 @@ class Blocktopmenu extends Module
 
 	private function makeMenuOption()
 	{
-		$menu_item = $this->getMenuItems();
-
-		$id_lang = (int)$this->context->language->id;
 		$id_shop = (int)Shop::getContextShopID();
+
+		$menu_item = $this->getMenuItems();
+		$id_lang = (int)$this->context->language->id;
+
 		$html = '<select multiple="multiple" name="items[]" id="items" style="width: 300px; height: 160px;">';
 		foreach ($menu_item as $item)
 		{
@@ -449,7 +580,7 @@ class Blocktopmenu extends Module
 
 		foreach ($categories as $key => $category)
 		{
-			if (isset($items_to_skip) && !in_array('CAT'.(int)$category['id_category'], $items_to_skip))
+			if (isset($items_to_skip) /*&& !in_array('CAT'.(int)$category['id_category'], $items_to_skip)*/)
 			{
 				$shop = (object) Shop::getShop((int)$category['id_shop']);
 				$html .= '<option value="CAT'.(int)$category['id_category'].'">'
@@ -463,7 +594,7 @@ class Blocktopmenu extends Module
 		return $html;
 	}
 
-	private function generateCategoriesMenu($categories)
+	private function generateCategoriesMenu($categories, $is_children = 0)
 	{
 		$html = '';
 
@@ -484,18 +615,18 @@ class Blocktopmenu extends Module
 			if (isset($category['children']) && !empty($category['children']))
 			{
 				$html .= '<ul>';
-				$html .= $this->generateCategoriesMenu($category['children']);
+				$html .= $this->generateCategoriesMenu($category['children'], 1);
 
-				if ((int)$category['level_depth'] == 2)
+				if ((int)$category['level_depth'] > 1 && !$is_children)
 				{
 					$files = scandir(_PS_CAT_IMG_DIR_);
 
 					if (count($files) > 0)
 					{
-						$html .= '<li id="category-thumbnail">';
+						$html .= '<li class="category-thumbnail">';
 
 						foreach ($files as $file)
-							if (preg_match('/'.$category['id_category'].'-([0-9])?_thumb.jpg/i', $file) === 1)
+							if (preg_match('/^'.$category['id_category'].'-([0-9])?_thumb.jpg/i', $file) === 1)
 								$html .= '<div><img src="'.$this->context->link->getMediaLink(_THEME_CAT_DIR_.$file)
 								.'" alt="'.Tools::SafeOutput($category['name']).'" title="'
 								.Tools::SafeOutput($category['name']).'" class="imgm" /></div>';
@@ -530,7 +661,7 @@ class Blocktopmenu extends Module
 			foreach ($categories as $category)
 			{
 				$cat = new CMSCategory((int)$category['id_cms_category'], (int)$id_lang);
-				
+
 				$this->_menu .= '<li>';
 				$this->_menu .= '<a href="'.Tools::HtmlEntitiesUTF8($cat->getLink()).'">'.$category['name'].'</a>';
 				$this->getCMSMenuItems($category['id_cms_category'], (int)$depth + 1);
@@ -555,7 +686,7 @@ class Blocktopmenu extends Module
 	private function getCMSOptions($parent = 0, $depth = 1, $id_lang = false, $items_to_skip = null)
 	{
 		$html = '';
-		$id_lang = $id_lang ? (int)$id_lang : (int)Context::getContext()->language->id;		
+		$id_lang = $id_lang ? (int)$id_lang : (int)Context::getContext()->language->id;
 		$categories = $this->getCMSCategories(false, (int)$parent, (int)$id_lang);
 		$pages = $this->getCMSPages((int)$parent, false, (int)$id_lang);
 
@@ -574,12 +705,11 @@ class Blocktopmenu extends Module
 
 		return $html;
 	}
-	
+
 	protected function getCacheId($name = null)
 	{
-		parent::getCacheId($name);
 		$page_name = in_array($this->page_name, array('category', 'supplier', 'manufacturer', 'cms', 'product')) ? $this->page_name : 'index';
-		return 'blocktopmenu|'.(int)Tools::usingSecureMode().'|'.$page_name.'|'.(int)$this->context->shop->id.'|'.implode(', ',$this->user_groups).'|'.(int)$this->context->language->id.'|'.(int)Tools::getValue('id_category').'|'.(int)Tools::getValue('id_manufacturer').'|'.(int)Tools::getValue('id_supplier').'|'.(int)Tools::getValue('id_cms').'|'.(int)Tools::getValue('id_product');
+		return parent::getCacheId().'|'.$page_name.($page_name != 'index' ? '|'.(int)Tools::getValue('id_'.$page_name) : '');
 	}
 
 	public function hookDisplayTop($param)
@@ -590,7 +720,11 @@ class Blocktopmenu extends Module
 		{
 			if (Tools::isEmpty($this->_menu))
 				$this->makeMenu();
-			$this->smarty->assign('MENU_SEARCH', Configuration::get('MOD_BLOCKTOPMENU_SEARCH'));
+
+			$shop_id = (int)$this->context->shop->id;
+			$shop_group_id = Shop::getGroupFromShop($shop_id);
+
+			$this->smarty->assign('MENU_SEARCH', Configuration::get('MOD_BLOCKTOPMENU_SEARCH', null, $shop_group_id, $shop_id));
 			$this->smarty->assign('MENU', $this->_menu);
 			$this->smarty->assign('this_path', $this->_path);
 		}
@@ -604,7 +738,7 @@ class Blocktopmenu extends Module
 		$html = $this->display(__FILE__, 'blocktopmenu.tpl', $this->getCacheId());
 		return $html;
 	}
-	
+
 	public function hookDisplayNav($params)
 	{
 		return $this->hookDisplayTop($params);
@@ -677,37 +811,37 @@ class Blocktopmenu extends Module
 	{
 		$this->clearMenuCache();
 	}
-	
+
 	public function hookActionObjectCategoryDeleteAfter($params)
 	{
 		$this->clearMenuCache();
 	}
-	
+
 	public function hookActionObjectCmsUpdateAfter($params)
 	{
 		$this->clearMenuCache();
 	}
-	
+
 	public function hookActionObjectCmsDeleteAfter($params)
 	{
 		$this->clearMenuCache();
 	}
-	
+
 	public function hookActionObjectCmsAddAfter($params)
 	{
 		$this->clearMenuCache();
 	}
-	
+
 	public function hookActionObjectSupplierUpdateAfter($params)
 	{
 		$this->clearMenuCache();
 	}
-	
+
 	public function hookActionObjectSupplierDeleteAfter($params)
 	{
 		$this->clearMenuCache();
 	}
-	
+
 	public function hookActionObjectSupplierAddAfter($params)
 	{
 		$this->clearMenuCache();
@@ -717,117 +851,151 @@ class Blocktopmenu extends Module
 	{
 		$this->clearMenuCache();
 	}
-	
+
 	public function hookActionObjectManufacturerDeleteAfter($params)
 	{
 		$this->clearMenuCache();
 	}
-	
+
 	public function hookActionObjectManufacturerAddAfter($params)
 	{
 		$this->clearMenuCache();
 	}
-	
+
 	public function hookActionObjectProductUpdateAfter($params)
 	{
 		$this->clearMenuCache();
 	}
-	
+
 	public function hookActionObjectProductDeleteAfter($params)
 	{
 		$this->clearMenuCache();
 	}
-	
+
 	public function hookActionObjectProductAddAfter($params)
 	{
 		$this->clearMenuCache();
 	}
-	
+
 	public function hookCategoryUpdate($params)
 	{
 		$this->clearMenuCache();
 	}
-	
+
 	private function clearMenuCache()
 	{
 		$this->_clearCache('blocktopmenu.tpl');
 	}
-	
+
 	public function hookActionShopDataDuplication($params)
 	{
 		$linksmenutop = Db::getInstance()->executeS('
 			SELECT *
-			FROM '._DB_PREFIX_.'linksmenutop 
+			FROM '._DB_PREFIX_.'linksmenutop
 			WHERE id_shop = '.(int)$params['old_id_shop']
 			);
 
 		foreach($linksmenutop as $id => $link)
 		{
 			Db::getInstance()->execute('
-				INSERT IGNORE INTO '._DB_PREFIX_.'linksmenutop (id_linksmenutop, id_shop, new_window) 
+				INSERT IGNORE INTO '._DB_PREFIX_.'linksmenutop (id_linksmenutop, id_shop, new_window)
 				VALUES (null, '.(int)$params['new_id_shop'].', '.(int)$link['new_window'].')');
-			
+
 			$linksmenutop[$id]['new_id_linksmenutop'] = Db::getInstance()->Insert_ID();
 		}
-		
+
 		foreach($linksmenutop as $id => $link)
 		{
 			$lang = Db::getInstance()->executeS('
-					SELECT id_lang, '.(int)$params['new_id_shop'].', label, link 
-					FROM '._DB_PREFIX_.'linksmenutop_lang 
+					SELECT id_lang, '.(int)$params['new_id_shop'].', label, link
+					FROM '._DB_PREFIX_.'linksmenutop_lang
 					WHERE id_linksmenutop = '.(int)$link['id_linksmenutop'].' AND id_shop = '.(int)$params['old_id_shop']);
-			
+
 			foreach($lang as $l)
 				Db::getInstance()->execute('
-					INSERT IGNORE INTO '._DB_PREFIX_.'linksmenutop_lang (id_linksmenutop, id_lang, id_shop, label, link) 
+					INSERT IGNORE INTO '._DB_PREFIX_.'linksmenutop_lang (id_linksmenutop, id_lang, id_shop, label, link)
 					VALUES ('.(int)$link['new_id_linksmenutop'].', '.(int)$l['id_lang'].', '.(int)$params['new_id_shop'].', '.(int)$l['label'].', '.(int)$l['link'].' )');
 		}
 	}
-	
+
 	public function renderForm()
 	{
-		$fields_form = array(
-			'form' => array(
-				'legend' => array(
-					'title' => $this->l('Menu Top Link'),
-					'icon' => 'icon-link'
-				),
-				'input' => array(
-					array(
-						'type' => 'link_choice',
-						'label' => '',
-						'name' => 'link',
-						'lang' => true,
+		$shops = Shop::getContextListShopID();
+
+		if (count($shops) == 1)
+			$fields_form = array(
+				'form' => array(
+					'legend' => array(
+						'title' => $this->l('Menu Top Link'),
+						'icon' => 'icon-link'
 					),
-					array(
-						'type' => 'switch',
-						'label' => $this->l('Search bar'),
-						'name' => 'search',
-						'is_bool' => true,
-						'values' => array(
-							array(
-								'id' => 'active_on',
-								'value' => 1,
-								'label' => $this->l('Enabled')
-							),
-							array(
-								'id' => 'active_off',
-								'value' => 0,
-								'label' => $this->l('Disabled')
-							)
+					'input' => array(
+						array(
+							'type' => 'link_choice',
+							'label' => '',
+							'name' => 'link',
+							'lang' => true,
 						),
-					)		
+						array(
+							'type' => 'switch',
+							'label' => $this->l('Search bar'),
+							'name' => 'search',
+							'is_bool' => true,
+							'values' => array(
+								array(
+									'id' => 'active_on',
+									'value' => 1,
+									'label' => $this->l('Enabled')
+								),
+								array(
+									'id' => 'active_off',
+									'value' => 0,
+									'label' => $this->l('Disabled')
+								)
+							),
+						)
+					),
+					'submit' => array(
+						'name' => 'submitBlocktopmenu',
+						'title' => $this->l('Save')
+					)
 				),
-				'submit' => array(
-					'name' => 'submitBlocktopmenu',
-					'title' => $this->l('Save')
-				)
-			),
-		);
-		
-		if (Shop::isFeatureActive())
-			$fields_form['form']['description'] = $this->l('The modifications will be applied to').' '.(Shop::getContext() == Shop::CONTEXT_SHOP ? $this->l('shop').' '.$this->context->shop->name : $this->l('all shops'));
-		
+			);
+		else
+			$fields_form = array(
+				'form' => array(
+					'legend' => array(
+						'title' => $this->l('Menu Top Link'),
+						'icon' => 'icon-link'
+					),
+					'info' => '<div class="alert alert-warning">' .$this->l('All active products combinations quantities will be changed').'</div>',
+					'input' => array(
+						array(
+							'type' => 'switch',
+							'label' => $this->l('Search bar'),
+							'name' => 'search',
+							'is_bool' => true,
+							'values' => array(
+								array(
+									'id' => 'active_on',
+									'value' => 1,
+									'label' => $this->l('Enabled')
+								),
+								array(
+									'id' => 'active_off',
+									'value' => 0,
+									'label' => $this->l('Disabled')
+								)
+							),
+						)
+					),
+					'submit' => array(
+						'name' => 'submitBlocktopmenu',
+						'title' => $this->l('Save')
+					)
+				),
+			);
+
 		$helper = new HelperForm();
 		$helper->show_toolbar = false;
 		$helper->table =  $this->table;
@@ -836,7 +1004,7 @@ class Blocktopmenu extends Module
 		$helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') ? Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') : 0;
 		$this->fields_form = array();
 		$helper->module = $this;
-		$helper->identifier = $this->identifier;		
+		$helper->identifier = $this->identifier;
 		$helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
 		$helper->token = Tools::getAdminTokenLite('AdminModules');
 		$helper->tpl_vars = array(
@@ -848,7 +1016,7 @@ class Blocktopmenu extends Module
 		);
 		return $helper->generateForm(array($fields_form));
 	}
-	
+
 	public function renderAddForm()
 	{
 		$fields_form = array(
@@ -887,7 +1055,7 @@ class Blocktopmenu extends Module
 								'label' => $this->l('Disabled')
 							)
 						),
-					)		
+					)
 				),
 				'submit' => array(
 					'name' => 'submitBlocktopmenuLinks',
@@ -913,12 +1081,12 @@ class Blocktopmenu extends Module
 			);
 
 		if (Tools::isSubmit('updatelinksmenutop'))
-		{			
+		{
 			$fields_form['form']['input'][] = array('type' => 'hidden', 'name' => 'updatelink');
-			$fields_form['form']['input'][] = array('type' => 'hidden', 'name' => 'id_linksmenutop');			
+			$fields_form['form']['input'][] = array('type' => 'hidden', 'name' => 'id_linksmenutop');
 			$helper->fields_value['updatelink'] = '';
 		}
-			
+
 		$helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
 		$helper->token = Tools::getAdminTokenLite('AdminModules');
 		$helper->languages =$this->context->controller->getLanguages();
@@ -931,6 +1099,7 @@ class Blocktopmenu extends Module
 	{
 		$spacer = str_repeat('&nbsp;', $this->spacer_size);
 		$items = $this->getMenuItems();
+
 
 		$html = '<select multiple="multiple" id="availableItems" style="width: 300px; height: 160px;">';
 		$html .= '<optgroup label="'.$this->l('CMS').'">';
@@ -959,9 +1128,12 @@ class Blocktopmenu extends Module
 
 		// BEGIN Categories
 		$shop = new Shop((int)Shop::getContextShopID());
-		$html .= '<optgroup label="'.$this->l('Categories').'">';	
-		$html .= $this->generateCategoriesOption(
-			Category::getNestedCategories(null, (int)$this->context->language->id, true), $items);
+		$html .= '<optgroup label="'.$this->l('Categories').'">';
+
+		$shops_to_get = Shop::getContextListShopID();
+
+		foreach ($shops_to_get as $shop_id)
+			$html .= $this->generateCategoriesOption($this->customGetNestedCategories($shop_id, null, (int)$this->context->language->id, true), $items);
 		$html .= '</optgroup>';
 
 		// BEGIN Shops
@@ -976,10 +1148,10 @@ class Blocktopmenu extends Module
 
 				if (!in_array('SHOP'.(int)$shop->id, $items))
 					$html .= '<option value="SHOP'.(int)$shop->id.'">'.$spacer.$shop->name.'</option>';
-			}	
+			}
 			$html .= '</optgroup>';
 		}
-		
+
 		// BEGIN Products
 		$html .= '<optgroup label="'.$this->l('Products').'">';
 		$html .= '<option value="PRODUCT" style="font-style:italic">'.$spacer.$this->l('Choose product ID').'</option>';
@@ -1004,14 +1176,75 @@ class Blocktopmenu extends Module
 		$html .= '</select>';
 		return $html;
 	}
-	
+
+
+	public function customGetNestedCategories($shop_id, $root_category = null, $id_lang = false, $active = true, $groups = null, $use_shop_restriction = true, $sql_filter = '', $sql_sort = '', $sql_limit = '')
+	{
+		if (isset($root_category) && !Validate::isInt($root_category))
+			die(Tools::displayError());
+
+		if (!Validate::isBool($active))
+			die(Tools::displayError());
+
+		if (isset($groups) && Group::isFeatureActive() && !is_array($groups))
+			$groups = (array)$groups;
+
+		$cache_id = 'Category::getNestedCategories_'.md5((int)$shop_id.(int)$root_category.(int)$id_lang.(int)$active.(int)$active
+			.(isset($groups) && Group::isFeatureActive() ? implode('', $groups) : ''));
+
+		if (!Cache::isStored($cache_id))
+		{
+			$result = Db::getInstance()->executeS('
+							SELECT c.*, cl.*
+				FROM `'._DB_PREFIX_.'category` c
+				INNER JOIN `'._DB_PREFIX_.'category_shop` category_shop ON (category_shop.`id_category` = c.`id_category` AND category_shop.`id_shop` = "'.(int)$shop_id.'")
+				LEFT JOIN `'._DB_PREFIX_.'category_lang` cl ON (c.`id_category` = cl.`id_category` AND cl.`id_shop` = "'.(int)$shop_id.'")
+				WHERE 1 '.$sql_filter.' '.($id_lang ? 'AND cl.`id_lang` = '.(int)$id_lang : '').'
+				'.($active ? ' AND (c.`active` = 1 OR c.`is_root_category` = 1)' : '').'
+				'.(isset($groups) && Group::isFeatureActive() ? ' AND cg.`id_group` IN ('.implode(',', $groups).')' : '').'
+				'.(!$id_lang || (isset($groups) && Group::isFeatureActive()) ? ' GROUP BY c.`id_category`' : '').'
+				'.($sql_sort != '' ? $sql_sort : ' ORDER BY c.`level_depth` ASC').'
+				'.($sql_sort == '' && $use_shop_restriction ? ', category_shop.`position` ASC' : '').'
+				'.($sql_limit != '' ? $sql_limit : '')
+			);
+
+			$categories = array();
+			$buff = array();
+
+			foreach ($result as $row)
+			{
+				$current = &$buff[$row['id_category']];
+				$current = $row;
+
+				if ($row['id_parent'] == 0)
+					$categories[$row['id_category']] = &$current;
+				else
+					$buff[$row['id_parent']]['children'][$row['id_category']] = &$current;
+			}
+
+			Cache::store($cache_id, $categories);
+		}
+
+		return Cache::retrieve($cache_id);
+	}
+
 	public function getConfigFieldsValues()
 	{
+		$shops = Shop::getContextListShopID();
+		$is_search_on = true;
+
+		foreach ($shops as $shop_id)
+		{
+			$shop_group_id = Shop::getGroupFromShop($shop_id);
+			$is_search_on &= (bool)Configuration::get('MOD_BLOCKTOPMENU_SEARCH', null, $shop_group_id, $shop_id);
+
+		}
+
 		return array(
-			'search' => Tools::getValue('search', Configuration::get('MOD_BLOCKTOPMENU_SEARCH'))
+			'search' => (int)$is_search_on
 		);
 	}
-	
+
 	public function getAddLinkFieldsValues()
 	{
 		$links_label_edit = '';
@@ -1021,11 +1254,15 @@ class Blocktopmenu extends Module
 		if (Tools::isSubmit('updatelinksmenutop'))
 		{
 			$link = MenuTopLinks::getLinkLang(Tools::getValue('id_linksmenutop'), (int)Shop::getContextShopID());
+
+			foreach ($link['link'] as $key => $label)
+				$link['link'][$key] = Tools::htmlentitiesDecodeUTF8($label);
+
 			$links_label_edit = $link['link'];
 			$labels_edit = $link['label'];
 			$new_window_edit = $link['new_window'];
-		}			
-		
+		}
+
 		$fields_values = array(
 			'new_window' => Tools::getValue('new_window', $new_window_edit),
 			'id_linksmenutop' => Tools::getValue('id_linksmenutop'),
@@ -1045,16 +1282,25 @@ class Blocktopmenu extends Module
 				$fields_values['label'][$lang['id_lang']] = Tools::getValue('label_'.(int)$lang['id_lang'], isset($labels_edit[$lang['id_lang']]) ? $labels_edit[$lang['id_lang']] : '');
 				$fields_values['link'][$lang['id_lang']] = Tools::getValue('link_'.(int)$lang['id_lang'], isset($links_label_edit[$lang['id_lang']]) ? $links_label_edit[$lang['id_lang']] : '');
 			}
-		
-		return $fields_values;	
+
+		return $fields_values;
 	}
-	
+
 	public function renderList()
 	{
-		$links = MenuTopLinks::gets((int)$this->context->language->id, null, (int)Shop::getContextShopID());
+		$shops = Shop::getContextListShopID();
+		$links = array();
+
+		foreach ($shops as $shop_id)
+			$links = array_merge($links,  MenuTopLinks::gets((int)$this->context->language->id, null, (int)$shop_id));
+
 		$fields_list = array(
 			'id_linksmenutop' => array(
 				'title' => $this->l('Link ID'),
+				'type' => 'text',
+			),
+			'name' => array(
+				'title' => $this->l('Shop name'),
 				'type' => 'text',
 			),
 			'label' => array(
@@ -1072,7 +1318,7 @@ class Blocktopmenu extends Module
 				'active' => 'status',
 			)
 		);
-		
+
 		$helper = new HelperList();
 		$helper->shopLinkType = '';
 		$helper->simple_header = true;
@@ -1081,10 +1327,10 @@ class Blocktopmenu extends Module
 		$helper->actions = array('edit', 'delete');
 		$helper->show_toolbar = false;
 		$helper->module = $this;
-		$helper->title = $this->l('Link list');	
+		$helper->title = $this->l('Link list');
 		$helper->token = Tools::getAdminTokenLite('AdminModules');
 		$helper->currentIndex = AdminController::$currentIndex.'&configure='.$this->name;
-				
+
 		return $helper->generateList($links, $fields_list);
 	}
 }

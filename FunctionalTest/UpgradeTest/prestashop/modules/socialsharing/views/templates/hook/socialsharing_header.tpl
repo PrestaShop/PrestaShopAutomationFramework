@@ -22,10 +22,11 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
-<meta property="og:title" content="" />
+<meta property="og:title" content="{$meta_title|escape:'html':'UTF-8'}" />
+<meta property="og:url" content="{$request}" />
 <meta property="og:type" content="product" />
-<meta property="og:site_name" content="" />
-<meta property="og:description" content="" />
+<meta property="og:site_name" content="{$shop_name}" />
+<meta property="og:description" content="{$meta_description|escape:'html':'UTF-8'}" />
 <meta property="og:email" content="" />
 <meta property="og:phone_number" content="" />
 <meta property="og:street-address" content="" />

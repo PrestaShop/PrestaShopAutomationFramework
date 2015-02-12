@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -43,6 +43,14 @@ class AdminLocalizationControllerCore extends AdminController
 						'identifier' => 'id_lang',
 						'list' => Language::getLanguages(false)
 					),
+					'PS_DETECT_LANG' => array(
+						'title' => $this->l('Set language from browser'),
+						'desc' => $this->l('Set browser language as default language'),
+						'validation' => 'isBool',
+						'cast' => 'intval',
+						'type' => 'bool',
+						'default' => '1'
+					),
 					'PS_COUNTRY_DEFAULT' => array(
 						'title' => $this->l('Default country'),
 						'hint' => $this->l('The default country used in your shop.'),
@@ -51,6 +59,14 @@ class AdminLocalizationControllerCore extends AdminController
 						'class' => 'chosen',
 						'identifier' => 'id_country',
 						'list' => Country::getCountries($this->context->language->id)
+					),
+					'PS_DETECT_COUNTRY' => array(
+						'title' => $this->l('Set default country from browser language'),
+						'desc' => $this->l('Set country corresponding to browser language'),
+						'validation' => 'isBool',
+						'cast' => 'intval',
+						'type' => 'bool',
+						'default' => '1'
 					),
 					'PS_CURRENCY_DEFAULT' => array(
 						'title' => $this->l('Default currency'),
@@ -148,6 +164,7 @@ class AdminLocalizationControllerCore extends AdminController
 				$this->errors[] = Tools::displayError('This functionality has been disabled.');
 				return;
 		}
+
 		if (Tools::isSubmit('submitLocalizationPack'))
 		{
 			$version = str_replace('.', '', _PS_VERSION_);
@@ -189,8 +206,7 @@ class AdminLocalizationControllerCore extends AdminController
 
 		// Remove the module list cache if the default country changed
 		if (Tools::isSubmit('submitOptionsconfiguration') && file_exists(Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST))
-			@unlink(Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST);			
-		
+			@unlink(Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST);
 		parent::postProcess();
 	}
 
@@ -386,11 +402,24 @@ class AdminLocalizationControllerCore extends AdminController
 
 	public function updateOptionPsCurrencyDefault($value)
 	{
+		if ($value == Configuration::get('PS_CURRENCY_DEFAULT'))
+			return;
 		Configuration::updateValue('PS_CURRENCY_DEFAULT', $value);
 
 		/* Set conversion rate of default currency to 1 */
 		ObjectModel::updateMultishopTable('Currency', array('conversion_rate' => 1), 'a.id_currency');
+		
+		$tmp_context = Shop::getContext();
+		if ($tmp_context == Shop::CONTEXT_GROUP)
+			$tmp_shop = Shop::getContextShopGroupID();
+		else
+			$tmp_shop = (int)Shop::getContextShopID();
 
-		Currency::refreshCurrencies();
+		foreach (Shop::getContextListShopID() as $id_shop)
+		{
+			Shop::setContext(Shop::CONTEXT_SHOP, (int)$id_shop);
+			Currency::refreshCurrencies();
+		}
+		Shop::setContext($tmp_context , $tmp_shop);
 	}
 }

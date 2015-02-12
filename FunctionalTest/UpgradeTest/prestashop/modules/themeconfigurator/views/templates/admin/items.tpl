@@ -23,10 +23,13 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
+<script>
+ 	theme_url='{$htmlitems.theme_url}'
+</script>
 <ul class="nav nav-tabs">
 	{foreach from=$htmlitems.lang.all item=lang}
 		<li id="lang-{$lang.id_lang|escape:'htmlall':'UTF-8'}" class="lang-flag{if $lang.id_lang == $htmlitems.lang.default.id_lang} active{/if}">
-			<a href="#items-{$lang.id_lang|escape:'htmlall':'UTF-8'}" data-toggle="tab">{$lang.name|escape:'htmlall':'UTF-8'}</a>
+			<a href="#items-{$lang.id_lang|escape:'htmlall':'UTF-8'}" onclick="setLanguage({$lang.id_lang|intval}, '{$lang.iso_code}');" data-toggle="tab">{$lang.name|escape:'htmlall':'UTF-8'}</a>
 		</li>
 	{/foreach}
 </ul>
@@ -50,7 +53,7 @@
 								</button>
 								<ul class="dropdown-menu">
 									<li>
-										<a href="{$htmlitems.postAction|escape:'htmlall':'UTF-8'}&removeItem&item_id={$hItem.id_item|escape:'htmlall':'UTF-8'}" name="removeItem" class="link-item-delete">
+										<a href="{$htmlitems.postAction|escape:'htmlall':'UTF-8'}&amp;removeItem&amp;item_id={$hItem.id_item|escape:'htmlall':'UTF-8'}" name="removeItem" class="link-item-delete">
 											<i class="icon-trash"></i> {l s='Delete item' mod='themeconfigurator'}
 										</a>
 									</li>
@@ -82,15 +85,25 @@
 										<input type="text" name="item_title" value="{$hItem.title|escape:'htmlall':'UTF-8'}" />
 									</div>
 								</div>
+								<div class="title_use item-field form-group">
+									<div class="col-lg-9 col-lg-offset-3">
+										<div class="checkbox">
+											<label class="control-label">
+												{l s='Use title in front' mod='themeconfigurator'}
+												<input type="checkbox" name="item_title_use" value="1"{if $hItem.title_use == 1} checked="checked"{/if} />
+											</label>
+										</div>
+									</div>
+								</div>
 								<div class="hook item-field form-group">
 									<label class="control-label col-lg-3">{l s='Hook to which the image should be attached' mod='themeconfigurator'}</label>
 									<div class="col-lg-7">
 										<select name="item_hook" default="home" class="fixed-width-lg">
-											<option value="home"{if $hItem.hook == 'home'} selected="selected"{/if}>home</option>  
+											<option value="home"{if $hItem.hook == 'home'} selected="selected"{/if}>home</option>
 											<option value="top"{if $hItem.hook == 'top'} selected="selected"{/if}>top</option>
 											<option value="left"{if $hItem.hook == 'left'} selected="selected"{/if}>left</option>
 											<option value="right"{if $hItem.hook == 'right'} selected="selected"{/if}>right</option>
-											<option value="footer"{if $hItem.hook == 'footer'} selected="selected"{/if}>footer</option>  
+											<option value="footer"{if $hItem.hook == 'footer'} selected="selected"{/if}>footer</option>
 										</select>
 									</div>
 								</div>
@@ -145,8 +158,7 @@
 										<button type="button" class="btn btn-default button-item-edit-cancel" >
 											<i class="icon-remove"></i> {l s='Cancel' mod='themeconfigurator'}
 										</button>
-										<input type="hidden" name="updateItem" value="" />
-										<button type="submit" value="updateItem" class="btn btn-success button-save pull-right" onClick="this.form.submit();">
+										<button type="submit" name="updateItem" class="btn btn-success button-save pull-right" >
 											<i class="icon-save"></i> {l s='Save' mod='themeconfigurator'}
 										</button>
 									</div>

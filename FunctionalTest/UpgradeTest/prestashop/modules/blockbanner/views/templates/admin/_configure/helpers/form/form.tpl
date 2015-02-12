@@ -81,6 +81,11 @@
 				});
 			</script>
 			{/foreach}
+			{if isset($input.desc) && !empty($input.desc)}
+				<p class="help-block">
+					{$input.desc}
+				</p>
+			{/if}
 		</div>
 	{else}		
 		{$smarty.block.parent}

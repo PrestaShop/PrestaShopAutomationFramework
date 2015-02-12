@@ -34,15 +34,15 @@ class Dashactivity extends Module
 	public function __construct()
 	{
 		$this->name = 'dashactivity';
-		$this->displayName = 'Dashboard Activity';
 		$this->tab = 'dashboard';
-		$this->version = '0.2';
+		$this->version = '0.4.6';
 		$this->author = 'PrestaShop';
 		$this->push_filename = _PS_CACHE_DIR_.'push/activity';
 		$this->allow_push = true;
 		$this->push_time_limit = 180;
 
 		parent::__construct();
+		$this->displayName = $this->l('Dashboard Activity');
 		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
 	}
 
@@ -97,7 +97,7 @@ class Dashactivity extends Module
 				'dashactivity_config_form' => $this->renderConfigForm(),
 				'date_subtitle' => $this->l('(from %s to %s)'),
 				'date_format' => $this->context->language->date_format_lite,
-				'link' => $this->context->link,
+				'link' => $this->context->link
 			)
 		);
 
@@ -168,13 +168,12 @@ class Dashactivity extends Module
 		}
 		else
 		{
-			$row = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow(
-				'
-							SELECT COUNT(*) as visits, COUNT(DISTINCT `id_guest`) as unique_visitors
-							FROM `'._DB_PREFIX_.'connections`
-			WHERE `date_add` BETWEEN "'.pSQL($params['date_from']).'" AND "'.pSQL($params['date_to']).'"
-			'.Shop::addSqlRestriction(false)
-			);
+			$row = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow('
+						SELECT COUNT(*) as visits, COUNT(DISTINCT `id_guest`) as unique_visitors
+						FROM `'._DB_PREFIX_.'connections`
+						WHERE `date_add` BETWEEN "'.pSQL($params['date_from']).'" AND "'.pSQL($params['date_to']).'"
+						'.Shop::addSqlRestriction(false)
+					);
 			extract($row);
 		}
 
@@ -184,99 +183,105 @@ class Dashactivity extends Module
 		if ($maintenance_ips = Configuration::get('PS_MAINTENANCE_IP'))
 			$maintenance_ips = implode(',', array_map('ip2long', array_map('trim', explode(',', $maintenance_ips))));
 		if (Configuration::get('PS_STATSDATA_CUSTOMER_PAGESVIEWS'))
-			$sql = 'SELECT COUNT(DISTINCT c.id_connections)
+		{
+			$sql = 'SELECT c.id_guest, c.ip_address, c.date_add, c.http_referer, pt.name as page
 					FROM `'._DB_PREFIX_.'connections` c
 					LEFT JOIN `'._DB_PREFIX_.'connections_page` cp ON c.id_connections = cp.id_connections
-					WHERE TIME_TO_SEC(TIMEDIFF(NOW(), cp.`time_start`)) < '.((int)Configuration::get('DASHACTIVITY_VISITOR_ONLINE') * 60).'
-					AND cp.`time_end` IS NULL
-					'.Shop::addSqlRestriction(false, 'c').'
-					'.($maintenance_ips ? 'AND c.ip_address NOT IN ('.preg_replace('/[^,0-9]/', '', $maintenance_ips).')' : '');
+					LEFT JOIN `'._DB_PREFIX_.'page` p ON p.id_page = cp.id_page
+					LEFT JOIN `'._DB_PREFIX_.'page_type` pt ON p.id_page_type = pt.id_page_type
+					INNER JOIN `'._DB_PREFIX_.'guest` g ON c.id_guest = g.id_guest
+					WHERE (g.id_customer IS NULL OR g.id_customer = 0)
+						'.Shop::addSqlRestriction(false, 'c').'
+						AND cp.`time_end` IS NULL
+					AND TIME_TO_SEC(TIMEDIFF(\''.pSQL(date('Y-m-d H:i:00', time())).'\', cp.`time_start`)) < 900
+					'.($maintenance_ips ? 'AND c.ip_address NOT IN ('.preg_replace('/[^,0-9]/', '', $maintenance_ips).')' : '').'
+					GROUP BY c.id_connections
+					ORDER BY c.date_add DESC';
+		}
 		else
-			$sql = 'SELECT COUNT(*)
-					FROM `'._DB_PREFIX_.'connections`
-					WHERE TIME_TO_SEC(TIMEDIFF(NOW(), `date_add`)) < '.((int)Configuration::get('DASHACTIVITY_VISITOR_ONLINE') * 60).'
-					'.Shop::addSqlRestriction(false).'
-					'.($maintenance_ips ? 'AND ip_address NOT IN ('.preg_replace('/[^,0-9]/', '', $maintenance_ips).')' : '');
-		$online_visitor = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
+		{
+			$sql = 'SELECT c.id_guest, c.ip_address, c.date_add, c.http_referer, "-" as page
+					FROM `'._DB_PREFIX_.'connections` c
+					INNER JOIN `'._DB_PREFIX_.'guest` g ON c.id_guest = g.id_guest
+					WHERE (g.id_customer IS NULL OR g.id_customer = 0)
+						'.Shop::addSqlRestriction(false, 'c').'
+						AND TIME_TO_SEC(TIMEDIFF(\''.pSQL(date('Y-m-d H:i:00', time())).'\', c.`date_add`)) < 900
+					'.($maintenance_ips ? 'AND c.ip_address NOT IN ('.preg_replace('/[^,0-9]/', '', $maintenance_ips).')' : '').'
+					ORDER BY c.date_add DESC';
+		}
 
-		$pending_orders = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
-			'
-					SELECT COUNT(*)
-					FROM `'._DB_PREFIX_.'orders` o
-		LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (o.current_state = os.id_order_state)
-		WHERE os.paid = 1 AND os.shipped = 0
-		'.Shop::addSqlRestriction(Shop::SHARE_ORDER)
+		$results = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+
+		$online_visitor = Db::getInstance()->NumRows();
+		$pending_orders = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+			SELECT COUNT(*)
+			FROM `'._DB_PREFIX_.'orders` o
+			LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (o.current_state = os.id_order_state)
+			WHERE os.paid = 1 AND os.shipped = 0
+			'.Shop::addSqlRestriction(Shop::SHARE_ORDER)
 		);
 
-		$abandoned_cart = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
-			'
-					SELECT COUNT(*)
-					FROM `'._DB_PREFIX_.'cart`
-		WHERE `date_upd` BETWEEN "'.pSQL(date('Y-m-d H:i:s', strtotime('-'.(int)Configuration::get('DASHACTIVITY_CART_ABANDONED_MAX').' MIN'))).'" AND "'.pSQL(date('Y-m-d H:i:s', strtotime('-'.(int)Configuration::get('DASHACTIVITY_CART_ABANDONED_MIN').' MIN'))).'"
-		AND id_cart NOT IN (SELECT id_cart FROM `'._DB_PREFIX_.'orders`)
-		'.Shop::addSqlRestriction(Shop::SHARE_ORDER)
+		$abandoned_cart = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+			SELECT COUNT(*)
+			FROM `'._DB_PREFIX_.'cart`
+			WHERE `date_upd` BETWEEN "'.pSQL(date('Y-m-d H:i:s', strtotime('-'.(int)Configuration::get('DASHACTIVITY_CART_ABANDONED_MAX').' MIN'))).'" AND "'.pSQL(date('Y-m-d H:i:s', strtotime('-'.(int)Configuration::get('DASHACTIVITY_CART_ABANDONED_MIN').' MIN'))).'"
+			AND id_cart NOT IN (SELECT id_cart FROM `'._DB_PREFIX_.'orders`)
+			'.Shop::addSqlRestriction(Shop::SHARE_ORDER)
 		);
 
-		$return_exchanges = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
-			'
-					SELECT COUNT(*)
-					FROM `'._DB_PREFIX_.'orders` o
-		LEFT JOIN `'._DB_PREFIX_.'order_return` or2 ON o.id_order = or2.id_order
-		WHERE or2.`date_add` BETWEEN "'.pSQL($params['date_from']).'" AND "'.pSQL($params['date_to']).'"
-		'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o')
+		$return_exchanges = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+			SELECT COUNT(*)
+			FROM `'._DB_PREFIX_.'orders` o
+			LEFT JOIN `'._DB_PREFIX_.'order_return` or2 ON o.id_order = or2.id_order
+			WHERE or2.`date_add` BETWEEN "'.pSQL($params['date_from']).'" AND "'.pSQL($params['date_to']).'"
+			'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o')
 		);
 
-		$products_out_of_stock = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
-			'
-					SELECT SUM(IF(IFNULL(stock.quantity, 0) > 0, 0, 1))
-					FROM `'._DB_PREFIX_.'product` p
-		'.Shop::addSqlAssociation('product', 'p').'
-		LEFT JOIN `'._DB_PREFIX_.'product_attribute` pa ON p.id_product = pa.id_product
-		'.Product::sqlStock('p', 'pa')
+		$products_out_of_stock = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+			SELECT SUM(IF(IFNULL(stock.quantity, 0) > 0, 0, 1))
+			FROM `'._DB_PREFIX_.'product` p
+			'.Shop::addSqlAssociation('product', 'p').'
+			LEFT JOIN `'._DB_PREFIX_.'product_attribute` pa ON p.id_product = pa.id_product
+			'.Product::sqlStock('p', 'pa')
 		);
 
 		$new_messages = AdminStatsController::getPendingMessages();
 
-		$active_shopping_cart = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
-			'
-					SELECT COUNT(*)
-					FROM `'._DB_PREFIX_.'cart`
-		WHERE date_upd > "'.pSQL(date('Y-m-d H:i:s', strtotime('-'.(int)Configuration::get('DASHACTIVITY_CART_ACTIVE').' MIN'))).'"
-		'.Shop::addSqlRestriction(Shop::SHARE_ORDER)
+		$active_shopping_cart = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+			SELECT COUNT(*)
+			FROM `'._DB_PREFIX_.'cart`
+			WHERE date_upd > "'.pSQL(date('Y-m-d H:i:s', strtotime('-'.(int)Configuration::get('DASHACTIVITY_CART_ACTIVE').' MIN'))).'"
+			'.Shop::addSqlRestriction(Shop::SHARE_ORDER)
 		);
 
-		$new_customers = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
-			'
-					SELECT COUNT(*)
-					FROM `'._DB_PREFIX_.'customer`
-		WHERE `date_add` BETWEEN "'.pSQL($params['date_from']).'" AND "'.pSQL($params['date_to']).'"
-		'.Shop::addSqlRestriction(Shop::SHARE_ORDER)
+		$new_customers = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+			SELECT COUNT(*)
+			FROM `'._DB_PREFIX_.'customer`
+			WHERE `date_add` BETWEEN "'.pSQL($params['date_from']).'" AND "'.pSQL($params['date_to']).'"
+			'.Shop::addSqlRestriction(Shop::SHARE_ORDER)
 		);
 
-		$new_registrations = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
-			'
-					SELECT COUNT(*)
-					FROM `'._DB_PREFIX_.'customer`
-		WHERE `newsletter_date_add` BETWEEN "'.pSQL($params['date_from']).'" AND "'.pSQL($params['date_to']).'"
-		AND newsletter = 1
-		'.Shop::addSqlRestriction(Shop::SHARE_ORDER)
+		$new_registrations = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+			SELECT COUNT(*)
+			FROM `'._DB_PREFIX_.'customer`
+			WHERE `newsletter_date_add` BETWEEN "'.pSQL($params['date_from']).'" AND "'.pSQL($params['date_to']).'"
+			AND newsletter = 1
+			'.Shop::addSqlRestriction(Shop::SHARE_ORDER)
 		);
-		$total_suscribers = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
-			'
-					SELECT COUNT(*)
-					FROM `'._DB_PREFIX_.'customer`
-		WHERE newsletter = 1
-		'.Shop::addSqlRestriction(Shop::SHARE_ORDER)
+		$total_suscribers = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+			SELECT COUNT(*)
+			FROM `'._DB_PREFIX_.'customer`
+			WHERE newsletter = 1
+			'.Shop::addSqlRestriction(Shop::SHARE_ORDER)
 		);
 		if (Module::isInstalled('blocknewsletter'))
 		{
-			$new_registrations += Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
-				'
-							SELECT COUNT(*)
-							FROM `'._DB_PREFIX_.'newsletter`
-			WHERE active = 1
-			AND `newsletter_date_add` BETWEEN "'.pSQL($params['date_from']).'" AND "'.pSQL($params['date_to']).'"
-			'.Shop::addSqlRestriction(Shop::SHARE_ORDER)
+			$new_registrations += Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+				SELECT COUNT(*)
+				FROM `'._DB_PREFIX_.'newsletter`
+				WHERE active = 1
+				AND `newsletter_date_add` BETWEEN "'.pSQL($params['date_from']).'" AND "'.pSQL($params['date_to']).'"
+				'.Shop::addSqlRestriction(Shop::SHARE_ORDER)
 			);
 			$total_suscribers += Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
 				'
@@ -290,15 +295,14 @@ class Dashactivity extends Module
 		$product_reviews = 0;
 		if (Module::isInstalled('productcomments'))
 		{
-			$product_reviews += Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
-				'
-							SELECT COUNT(*)
-							FROM `'._DB_PREFIX_.'product_comment` pc
-			LEFT JOIN `'._DB_PREFIX_.'product` p ON (pc.id_product = p.id_product)
-			'.Shop::addSqlAssociation('product', 'p').'
-			WHERE pc.deleted = 0
-			AND pc.`date_add` BETWEEN "'.pSQL($params['date_from']).'" AND "'.pSQL($params['date_to']).'"
-			'.Shop::addSqlRestriction(Shop::SHARE_ORDER)
+			$product_reviews += Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+				SELECT COUNT(*)
+				FROM `'._DB_PREFIX_.'product_comment` pc
+				LEFT JOIN `'._DB_PREFIX_.'product` p ON (pc.id_product = p.id_product)
+				'.Shop::addSqlAssociation('product', 'p').'
+				WHERE pc.deleted = 0
+				AND pc.`date_add` BETWEEN "'.pSQL($params['date_from']).'" AND "'.pSQL($params['date_to']).'"
+				'.Shop::addSqlRestriction(Shop::SHARE_ORDER)
 			);
 		}
 
@@ -367,13 +371,12 @@ class Dashactivity extends Module
 			$direct_link = $this->l('Direct link');
 			$websites = array($direct_link => 0);
 
-			$result = Db::getInstance()->ExecuteS(
-				'
-							SELECT http_referer
-							FROM '._DB_PREFIX_.'connections
-			WHERE date_add BETWEEN "'.$date_from.'" AND "'.$date_to.'"
-			'.Shop::addSqlRestriction().'
-			LIMIT '.(int)$limit
+			$result = Db::getInstance()->ExecuteS('
+				SELECT http_referer
+				FROM '._DB_PREFIX_.'connections
+				WHERE date_add BETWEEN "'.pSQL($date_from).'" AND "'.pSQL($date_to).'"
+				'.Shop::addSqlRestriction().'
+				LIMIT '.(int)$limit
 			);
 			foreach ($result as $row)
 			{

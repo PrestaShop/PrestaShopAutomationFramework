@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -50,7 +50,7 @@ class IdentityControllerCore extends FrontController
 			$email = trim(Tools::getValue('email'));
 
 			if (Tools::getValue('months') != '' && Tools::getValue('days') != '' && Tools::getValue('years') != '')
-				$this->customer->birthday = (int)(Tools::getValue('years')).'-'.(int)(Tools::getValue('months')).'-'.(int)(Tools::getValue('days'));
+				$this->customer->birthday = (int)Tools::getValue('years').'-'.(int)Tools::getValue('months').'-'.(int)Tools::getValue('days');
 			elseif (Tools::getValue('months') == '' && Tools::getValue('days') == '' && Tools::getValue('years') == '')
 				$this->customer->birthday = null;
 			else
@@ -58,7 +58,7 @@ class IdentityControllerCore extends FrontController
 
 			if (Tools::getIsset('old_passwd'))
 				$old_passwd = trim(Tools::getValue('old_passwd'));
-			
+
 			if (!Validate::isEmail($email))
 				$this->errors[] = Tools::displayError('This email address is not valid');
 			elseif ($this->customer->email != $email && Customer::customerExists($email, true))
@@ -137,8 +137,15 @@ class IdentityControllerCore extends FrontController
 				'genders' => Gender::getGenders(),
 			));
 
+		// Call a hook to display more information
+		$this->context->smarty->assign(array(
+			'HOOK_CUSTOMER_IDENTITY_FORM' => Hook::exec('displayCustomerIdentityForm'),
+		));
+
 		if (Module::isInstalled('blocknewsletter'))
 			$this->context->smarty->assign('newsletter', (int)Module::getInstanceByName('blocknewsletter')->active);
+
+		$this->context->smarty->assign('field_required', $this->context->customer->validateFieldsRequiredDatabase());
 
 		$this->setTemplate(_PS_THEME_DIR_.'identity.tpl');
 	}

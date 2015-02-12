@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -204,7 +204,6 @@ class AdminRequestSqlControllerCore extends AdminController
 			return;
 
 		$view = array();
-
 		if ($results = Db::getInstance()->executeS($obj->sql))
 		{
 			foreach (array_keys($results[0]) as $key)
@@ -236,7 +235,7 @@ class AdminRequestSqlControllerCore extends AdminController
 			$parser = $request_sql->parsingSql($sql);
 			$validate = $request_sql->validateParser($parser, false, $sql);
 
-			if (!$validate || !empty($request_sql->error_sql))
+			if (!$validate || count($request_sql->error_sql))
 				$this->displayError($request_sql->error_sql);
 		}
 	}
@@ -279,16 +278,16 @@ class AdminRequestSqlControllerCore extends AdminController
 
 			$this->content .= $this->renderForm();
 		}
-		else if ($this->display == 'view')
+		elseif ($this->display == 'view')
 		{
 			// Some controllers use the view action without an object
 			if ($this->className)
 				$this->loadObject(true);
 			$this->content .= $this->renderView();
 		}
-		else if ($this->display == 'export')
+		elseif ($this->display == 'export')
 			$this->generateExport();
-		else if (!$this->ajax)
+		elseif (!$this->ajax)
 		{
 			$this->content .= $this->renderList();
 			$this->content .= $this->renderOptions();
@@ -321,10 +320,11 @@ class AdminRequestSqlControllerCore extends AdminController
 	public function generateExport()
 	{
 		$id = Tools::getValue($this->identifier);
+		$export_dir = defined('_PS_HOST_MODE_') ? _PS_ROOT_DIR_.'/export/' : _PS_ADMIN_DIR_.'/export/';
 		if (!Validate::isFileName($id))
 			die(Tools::displayError());
 		$file = 'request_sql_'.$id.'.csv';
-		if ($csv = fopen(_PS_ADMIN_DIR_.'/export/'.$file, 'w'))
+		if ($csv = fopen($export_dir.$file, 'w'))
 		{
 			$sql = RequestSql::getRequestSqlById($id);
 
@@ -342,9 +342,9 @@ class AdminRequestSqlControllerCore extends AdminController
 					foreach ($tab_key as $name)
 						fputs($csv, '"'.strip_tags($result[$name]).'";');
 				}
-				if (file_exists(_PS_ADMIN_DIR_.'/export/'.$file))
+				if (file_exists($export_dir.$file))
 				{
-					$filesize = filesize(_PS_ADMIN_DIR_.'/export/'.$file);
+					$filesize = filesize($export_dir.$file);
 					$upload_max_filesize = Tools::convertBytes(ini_get('upload_max_filesize'));
 					if ($filesize < $upload_max_filesize)
 					{
@@ -357,7 +357,7 @@ class AdminRequestSqlControllerCore extends AdminController
 						header('Cache-Control: no-store, no-cache');
 						header('Content-Disposition: attachment; filename="'.$file.'"');
 						header('Content-Length: '.$filesize);
-						readfile(_PS_ADMIN_DIR_.'/export/'.$file);
+						readfile($export_dir.$file);
 						die();
 					}
 					else
@@ -381,55 +381,55 @@ class AdminRequestSqlControllerCore extends AdminController
 				case 'checkedFrom':
 					if (isset($e[$key]['table']))
 						$this->errors[] = sprintf(Tools::displayError('The "%s" table does not exist.'), $e[$key]['table']);
-					else if (isset($e[$key]['attribut']))
+					elseif (isset($e[$key]['attribut']))
 						$this->errors[] = sprintf(
 							Tools::displayError('The "%1$s" attribute does not exist in the "%2$s" table.'),
 							$e[$key]['attribut'][0],
 							$e[$key]['attribut'][1]
 						);
 					else
-						$this->errors[] = Tools::displayError('Error');
+						$this->errors[] = Tools::displayError('Undefined "checkedFrom" error');
 				break;
 
 				case 'checkedSelect':
 					if (isset($e[$key]['table']))
 						$this->errors[] = sprintf(Tools::displayError('The "%s" table does not exist.'), $e[$key]['table']);
-					else if (isset($e[$key]['attribut']))
+					elseif (isset($e[$key]['attribut']))
 						$this->errors[] = sprintf(
 							Tools::displayError('The "%1$s" attribute does not exist in the "%2$s" table.'),
 							$e[$key]['attribut'][0],
 							$e[$key]['attribut'][1]
 						);
-					else if (isset($e[$key]['*']))
+					elseif (isset($e[$key]['*']))
 						$this->errors[] = Tools::displayError('The "*" operator cannot be used in a nested query.');
 					else
-						$this->errors[] = Tools::displayError('Error.');
+						$this->errors[] = Tools::displayError('Undefined "checkedSelect" error');
 				break;
 
 				case 'checkedWhere':
 					if (isset($e[$key]['operator']))
 						$this->errors[] = sprintf(Tools::displayError('The operator "%s" is incorrect.'), $e[$key]['operator']);
-					else if (isset($e[$key]['attribut']))
+					elseif (isset($e[$key]['attribut']))
 						$this->errors[] = sprintf(
 							Tools::displayError('The "%1$s" attribute does not exist in the "%2$s" table.'),
 							$e[$key]['attribut'][0],
 							$e[$key]['attribut'][1]
 						);
 					else
-						$this->errors[] = Tools::displayError('Error.');
+						$this->errors[] = Tools::displayError('Undefined "checkedWhere" error');
 				break;
 
 				case 'checkedHaving':
 					if (isset($e[$key]['operator']))
 						$this->errors[] = sprintf(Tools::displayError('The "%s" operator is incorrect.'), $e[$key]['operator']);
-					else if (isset($e[$key]['attribut']))
+					elseif (isset($e[$key]['attribut']))
 						$this->errors[] = sprintf(
 							Tools::displayError('The "%1$s" attribute does not exist in the "%2$s" table.'),
 							$e[$key]['attribut'][0],
 							$e[$key]['attribut'][1]
 						);
 					else
-						$this->errors[] = Tools::displayError('Error');
+						$this->errors[] = Tools::displayError('Undefined "checkedHaving" error');
 				break;
 
 				case 'checkedOrder':
@@ -440,7 +440,7 @@ class AdminRequestSqlControllerCore extends AdminController
 							$e[$key]['attribut'][1]
 						);
 					else
-						$this->errors[] = Tools::displayError('Error');
+						$this->errors[] = Tools::displayError('Undefined "checkedOrder" error');
 				break;
 
 				case 'checkedGroupBy':
@@ -451,30 +451,30 @@ class AdminRequestSqlControllerCore extends AdminController
 							$e[$key]['attribut'][1]
 						);
 					else
-						$this->errors[] = Tools::displayError('Error');
+						$this->errors[] = Tools::displayError('Undefined "checkedGroupBy" error');
 				break;
 
 				case 'checkedLimit':
-						$this->errors[] = Tools::displayError('The LIMIT clause must contain numeric arguments.');
+					$this->errors[] = Tools::displayError('The LIMIT clause must contain numeric arguments.');
 				break;
 
 				case 'returnNameTable':
-						if (isset($e[$key]['reference']))
-							$this->errors[] = sprintf(
-								Tools::displayError('The "%1$s" reference does not exist in the "%2$s" table.'),
-								$e[$key]['reference'][0],
-								$e[$key]['attribut'][1]
-							);
-						else
-							$this->errors[] = Tools::displayError('When multiple tables are used, each attribute must refer back to a table.');
+					if (isset($e[$key]['reference']))
+						$this->errors[] = sprintf(
+							Tools::displayError('The "%1$s" reference does not exist in the "%2$s" table.'),
+							$e[$key]['reference'][0],
+							$e[$key]['attribut'][1]
+						);
+					else
+						$this->errors[] = Tools::displayError('When multiple tables are used, each attribute must refer back to a table.');
 				break;
 
 				case 'testedRequired':
-						$this->errors[] = sprintf(Tools::displayError('%s does not exist.'), $e[$key]);
-					break;
+					$this->errors[] = sprintf(Tools::displayError('%s does not exist.'), $e[$key]);
+				break;
 
 				case 'testedUnauthorized':
-						$this->errors[] = sprintf(Tools::displayError('Is an unauthorized keyword.'), $e[$key]);
+					$this->errors[] = sprintf(Tools::displayError('Is an unauthorized keyword.'), $e[$key]);
 				break;
 			}
 		}

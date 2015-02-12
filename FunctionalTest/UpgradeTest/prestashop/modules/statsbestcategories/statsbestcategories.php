@@ -41,7 +41,7 @@ class StatsBestCategories extends ModuleGrid
 	{
 		$this->name = 'statsbestcategories';
 		$this->tab = 'analytics_stats';
-		$this->version = '1.3';
+		$this->version = '1.4.1';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -109,7 +109,7 @@ class StatsBestCategories extends ModuleGrid
 				<i class="icon-sitemap"></i> '.$this->displayName.'
 			</div>
 			'.$this->engine($engine_params).'
-			<a class="btn btn-default export-csv" href="'.htmlentities($_SERVER['REQUEST_URI']).'&export=1">
+			<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI'].'&export=1').'">
 				<i class="icon-cloud-upload"></i> '.$this->l('CSV Export').'
 			</a>';
 
@@ -184,6 +184,7 @@ class StatsBestCategories extends ModuleGrid
 				FROM `'._DB_PREFIX_.'product` pr
 				LEFT OUTER JOIN `'._DB_PREFIX_.'order_detail` cp ON pr.`id_product` = cp.`product_id`
 				LEFT JOIN `'._DB_PREFIX_.'orders` o ON o.`id_order` = cp.`id_order`
+				'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
 				WHERE o.valid = 1
 				AND o.invoice_date BETWEEN '.$date_between.'
 				GROUP BY pr.`id_product`

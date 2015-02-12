@@ -41,7 +41,7 @@ class StatsBestCustomers extends ModuleGrid
 	{
 		$this->name = 'statsbestcustomers';
 		$this->tab = 'analytics_stats';
-		$this->version = '1.3';
+		$this->version = '1.4.1';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -125,7 +125,7 @@ class StatsBestCustomers extends ModuleGrid
 		<h4>'.$this->l('Guide').'</h4>
 			<div class="alert alert-warning">
 				<h4>'.$this->l('Develop clients\' loyalty').'</h4>
-				<p>
+				<div>
 					'.$this->l('Keeping a client can be more profitable than gaining a new one. That is one of the many reasons it is necessary to cultivate customer loyalty.').' <br />
 					'.$this->l('Word of mouth is also a means for getting new, satisfied clients. A dissatisfied customer can hurt your e-reputation and obstruct future sales goals.').'<br />
 					'.$this->l('In order to achieve this goal, you can organize:').'
@@ -134,10 +134,10 @@ class StatsBestCustomers extends ModuleGrid
 						<li>'.$this->l('Sustainable operations: loyalty points or cards, which not only justify communication between merchant and client, but also offer advantages to clients (private offers, discounts).').'</li>
 					</ul>
 					'.$this->l('These operations encourage clients to buy products and visit your online store more regularly.').'
-				</p>
+				</div>
 			</div>
 		'.$this->engine($engine_params).'
-		<a class="btn btn-default export-csv" href="'.htmlentities($_SERVER['REQUEST_URI']).'&export=1">
+		<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI'].'&export=').'1">
 			<i class="icon-cloud-upload"></i> '.$this->l('CSV Export').'
 		</a>';
 

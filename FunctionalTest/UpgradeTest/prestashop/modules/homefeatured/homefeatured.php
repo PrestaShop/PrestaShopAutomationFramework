@@ -35,7 +35,7 @@ class HomeFeatured extends Module
 	{
 		$this->name = 'homefeatured';
 		$this->tab = 'front_office_features';
-		$this->version = '1.5';
+		$this->version = '1.6.2';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -50,6 +50,8 @@ class HomeFeatured extends Module
 	{
 		$this->_clearCache('*');
 		Configuration::updateValue('HOME_FEATURED_NBR', 8);
+		Configuration::updateValue('HOME_FEATURED_CAT', (int)Context::getContext()->shop->getCategory());
+		Configuration::updateValue('HOME_FEATURED_RANDOMIZE', false);
 
 		if (!parent::install()
 			|| !$this->registerHook('header')
@@ -78,18 +80,27 @@ class HomeFeatured extends Module
 		$errors = array();
 		if (Tools::isSubmit('submitHomeFeatured'))
 		{
-			$nbr = (int)Tools::getValue('HOME_FEATURED_NBR');
-			if (!$nbr || $nbr <= 0 || !Validate::isInt($nbr))
-				$errors[] = $this->l('An invalid number of products has been specified.');
+			$nbr = Tools::getValue('HOME_FEATURED_NBR');
+			if (!Validate::isInt($nbr) || $nbr <= 0)
+			$errors[] = $this->l('The number of products is invalid. Please enter a positive number.');
+
+			$cat = Tools::getValue('HOME_FEATURED_CAT');
+			if (!Validate::isInt($cat) || $cat <= 0)
+				$errors[] = $this->l('The category ID is invalid. Please choose an existing category ID.');
+
+			$rand = Tools::getValue('HOME_FEATURED_RANDOMIZE');
+			if (!Validate::isBool($rand))
+				$errors[] = $this->l('Invalid value for the "randomize" flag.');
+			if (isset($errors) && count($errors))
+				$output = $this->displayError(implode('<br />', $errors));
 			else
 			{
-				Tools::clearCache(Context::getContext()->smarty, $this->getTemplatePath('homefeatured.tpl'));
 				Configuration::updateValue('HOME_FEATURED_NBR', (int)$nbr);
+				Configuration::updateValue('HOME_FEATURED_CAT', (int)$cat);
+				Configuration::updateValue('HOME_FEATURED_RANDOMIZE', (bool)$rand);
+				Tools::clearCache(Context::getContext()->smarty, $this->getTemplatePath('homefeatured.tpl'));
+				$output = $this->displayConfirmation($this->l('Your settings have been updated.'));
 			}
-			if (isset($errors) && count($errors))
-				$output .= $this->displayError(implode('<br />', $errors));
-			else
-				$output .= $this->displayConfirmation($this->l('Your settings have been updated.'));
 		}
 
 		return $output.$this->renderForm();
@@ -111,9 +122,12 @@ class HomeFeatured extends Module
 	{
 		if (!isset(HomeFeatured::$cache_products))
 		{
-			$category = new Category(Context::getContext()->shop->getCategory(), (int)Context::getContext()->language->id);
+			$category = new Category((int)Configuration::get('HOME_FEATURED_CAT'), (int)Context::getContext()->language->id);
 			$nb = (int)Configuration::get('HOME_FEATURED_NBR');
-			HomeFeatured::$cache_products = $category->getProducts((int)Context::getContext()->language->id, 1, ($nb ? $nb : 8), 'position');
+			if (Configuration::get('HOME_FEATURED_RANDOMIZE'))
+				HomeFeatured::$cache_products = $category->getProducts((int)Context::getContext()->language->id, 1, ($nb ? $nb : 8), null, null, false, true, true, ($nb ? $nb : 8));
+			else
+				HomeFeatured::$cache_products = $category->getProducts((int)Context::getContext()->language->id, 1, ($nb ? $nb : 8), 'position');
 		}
 
 		if (HomeFeatured::$cache_products === false || empty(HomeFeatured::$cache_products))
@@ -184,7 +198,7 @@ class HomeFeatured extends Module
 					'title' => $this->l('Settings'),
 					'icon' => 'icon-cogs'
 				),
-				'description' => $this->l('To add products to your homepage, simply add them to the root product category (default: "Home").'),
+				'description' => $this->l('To add products to your homepage, simply add them to the corresponding product category (default: "Home").'),
 				'input' => array(
 					array(
 						'type' => 'text',
@@ -192,6 +206,32 @@ class HomeFeatured extends Module
 						'name' => 'HOME_FEATURED_NBR',
 						'class' => 'fixed-width-xs',
 						'desc' => $this->l('Set the number of products that you would like to display on homepage (default: 8).'),
+					),
+					array(
+						'type' => 'text',
+						'label' => $this->l('Category from which to pick products to be displayed'),
+						'name' => 'HOME_FEATURED_CAT',
+						'class' => 'fixed-width-xs',
+						'desc' => $this->l('Choose the category ID of the products that you would like to display on homepage (default: 2 for "Home").'),
+					),
+					array(
+						'type' => 'switch',
+						'label' => $this->l('Randomly display featured products'),
+						'name' => 'HOME_FEATURED_RANDOMIZE',
+						'class' => 'fixed-width-xs',
+						'desc' => $this->l('Enable if you wish the products to be displayed randomly (default: no).'),
+						'values' => array(
+							array(
+								'id' => 'active_on',
+								'value' => 1,
+								'label' => $this->l('Yes')
+							),
+							array(
+								'id' => 'active_off',
+								'value' => 0,
+								'label' => $this->l('No')
+							)
+						),
 					),
 				),
 				'submit' => array(
@@ -224,7 +264,9 @@ class HomeFeatured extends Module
 	public function getConfigFieldsValues()
 	{
 		return array(
-			'HOME_FEATURED_NBR' => Tools::getValue('HOME_FEATURED_NBR', Configuration::get('HOME_FEATURED_NBR')),
+			'HOME_FEATURED_NBR' => Tools::getValue('HOME_FEATURED_NBR', (int)Configuration::get('HOME_FEATURED_NBR')),
+			'HOME_FEATURED_CAT' => Tools::getValue('HOME_FEATURED_CAT', (int)Configuration::get('HOME_FEATURED_CAT')),
+			'HOME_FEATURED_RANDOMIZE' => Tools::getValue('HOME_FEATURED_RANDOMIZE', (bool)Configuration::get('HOME_FEATURED_RANDOMIZE')),
 		);
 	}
 }

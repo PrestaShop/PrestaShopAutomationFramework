@@ -30,15 +30,19 @@ if (!defined('_CAN_LOAD_FILES_'))
 	
 class Blockcontactinfos extends Module
 {
+	protected static $contact_fields = array(
+		'BLOCKCONTACTINFOS_COMPANY',
+		'BLOCKCONTACTINFOS_ADDRESS',
+		'BLOCKCONTACTINFOS_PHONE',
+		'BLOCKCONTACTINFOS_EMAIL',
+	);
+
 	public function __construct()
 	{
 		$this->name = 'blockcontactinfos';
 		$this->author = 'PrestaShop';
-		if (version_compare(_PS_VERSION_, '1.4.0.0') >= 0)
-			$this->tab = 'front_office_features';
-		else
-			$this->tab = 'Blocks';
-		$this->version = '1.1.1';
+		$this->tab = 'front_office_features';
+		$this->version = '1.1.2';
 
 		$this->bootstrap = true;
 		parent::__construct();	
@@ -47,43 +51,38 @@ class Blockcontactinfos extends Module
 		$this->description = $this->l('This module will allow you to display your e-store\'s contact information in a customizable block.');
 		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
 	}
-	
+
 	public function install()
 	{
-		return (parent::install() 
-				&& Configuration::updateValue('BLOCKCONTACTINFOS_COMPANY', Configuration::get('PS_SHOP_NAME'))
-				&& Configuration::updateValue('BLOCKCONTACTINFOS_ADDRESS', '') && Configuration::updateValue('BLOCKCONTACTINFOS_PHONE', '')
-				&& Configuration::updateValue('BLOCKCONTACTINFOS_EMAIL', Configuration::get('PS_SHOP_EMAIL'))
-				&& $this->registerHook('header') && $this->registerHook('footer'));
+		Configuration::updateValue('BLOCKCONTACTINFOS_COMPANY', Configuration::get('PS_SHOP_NAME'));
+		Configuration::updateValue('BLOCKCONTACTINFOS_ADDRESS', trim(preg_replace('/ +/', ' ', Configuration::get('PS_SHOP_ADDR1').' '.Configuration::get('PS_SHOP_ADDR2')."\n".Configuration::get('PS_SHOP_CODE').' '.Configuration::get('PS_SHOP_CITY')."\n".Country::getNameById(Configuration::get('PS_LANG_DEFAULT'), Configuration::get('PS_SHOP_COUNTRY_ID')))));
+		Configuration::updateValue('BLOCKCONTACTINFOS_PHONE', Configuration::get('PS_SHOP_PHONE'));
+		Configuration::updateValue('BLOCKCONTACTINFOS_EMAIL', Configuration::get('PS_SHOP_EMAIL'));
+		$this->_clearCache('blockcontactinfos.tpl');
+		return (parent::install() && $this->registerHook('header') && $this->registerHook('footer'));
 	}
-	
+
 	public function uninstall()
 	{
-		//Delete configuration			
-		return (Configuration::deleteByName('BLOCKCONTACTINFOS_COMPANY')
-				&& Configuration::deleteByName('BLOCKCONTACTINFOS_ADDRESS') && Configuration::deleteByName('BLOCKCONTACTINFOS_PHONE')
-				&& Configuration::deleteByName('BLOCKCONTACTINFOS_EMAIL') && parent::uninstall());
+		foreach (Blockcontactinfos::$contact_fields as $field)
+			Configuration::deleteByName($field);
+		return (parent::uninstall());
 	}
-	
+
 	public function getContent()
 	{
 		$html = '';
-		// If we try to update the settings
 		if (Tools::isSubmit('submitModule'))
 		{	
-			Configuration::updateValue('BLOCKCONTACTINFOS_COMPANY', Tools::getValue('blockcontactinfos_company'));
-			Configuration::updateValue('BLOCKCONTACTINFOS_ADDRESS', Tools::getValue('blockcontactinfos_address'));
-			Configuration::updateValue('BLOCKCONTACTINFOS_PHONE', Tools::getValue('blockcontactinfos_phone'));
-			Configuration::updateValue('BLOCKCONTACTINFOS_EMAIL', Tools::getValue('blockcontactinfos_email'));
+			foreach (Blockcontactinfos::$contact_fields as $field)
+				Configuration::updateValue($field, Tools::getValue($field));
 			$this->_clearCache('blockcontactinfos.tpl');
-			$html .= $this->displayConfirmation($this->l('Configuration updated'));
+			$html = $this->displayConfirmation($this->l('Configuration updated'));
 		}
 
-		$html .= $this->renderForm();
-		
-		return $html;
+		return $html.$this->renderForm();
 	}
-	
+
 	public function hookHeader()
 	{
 		$this->context->controller->addCSS(($this->_path).'blockcontactinfos.css', 'all');
@@ -92,12 +91,8 @@ class Blockcontactinfos extends Module
 	public function hookFooter($params)
 	{	
 		if (!$this->isCached('blockcontactinfos.tpl', $this->getCacheId()))
-			$this->smarty->assign(array(
-				'blockcontactinfos_company' => Configuration::get('BLOCKCONTACTINFOS_COMPANY'),
-				'blockcontactinfos_address' => Configuration::get('BLOCKCONTACTINFOS_ADDRESS'),
-				'blockcontactinfos_phone' => Configuration::get('BLOCKCONTACTINFOS_PHONE'),
-				'blockcontactinfos_email' => Configuration::get('BLOCKCONTACTINFOS_EMAIL')
-			));
+			foreach (Blockcontactinfos::$contact_fields as $field)
+				$this->smarty->assign(strtolower($field), Configuration::get($field));
 		return $this->display(__FILE__, 'blockcontactinfos.tpl', $this->getCacheId());
 	}
 	
@@ -113,22 +108,22 @@ class Blockcontactinfos extends Module
 					array(
 						'type' => 'text',
 						'label' => $this->l('Company name'),
-						'name' => 'blockcontactinfos_company',
+						'name' => 'BLOCKCONTACTINFOS_COMPANY',
 					),
 					array(
 						'type' => 'textarea',
 						'label' => $this->l('Address'),
-						'name' => 'blockcontactinfos_address',
+						'name' => 'BLOCKCONTACTINFOS_ADDRESS',
 					),
 					array(
 						'type' => 'text',
 						'label' => $this->l('Phone number'),
-						'name' => 'blockcontactinfos_phone',
+						'name' => 'BLOCKCONTACTINFOS_PHONE',
 					),
 					array(
 						'type' => 'text',
 						'label' => $this->l('Email'),
-						'name' => 'blockcontactinfos_email',
+						'name' => 'BLOCKCONTACTINFOS_EMAIL',
 					),
 				),
 				'submit' => array(
@@ -150,21 +145,12 @@ class Blockcontactinfos extends Module
 		$helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
 		$helper->token = Tools::getAdminTokenLite('AdminModules');
 		$helper->tpl_vars = array(
-			'fields_value' => $this->getConfigFieldsValues(),
+			'fields_value' => array(),
 			'languages' => $this->context->controller->getLanguages(),
 			'id_language' => $this->context->language->id
 		);
-
+		foreach (Blockcontactinfos::$contact_fields as $field)
+			$helper->tpl_vars['fields_value'][$field] = Tools::getValue($field, Configuration::get($field));
 		return $helper->generateForm(array($fields_form));
-	}
-	
-	public function getConfigFieldsValues()
-	{
-		return array(
-			'blockcontactinfos_company' => Tools::getValue('blockcontactinfos_company', Configuration::get('BLOCKCONTACTINFOS_COMPANY')),
-			'blockcontactinfos_address' => Tools::getValue('blockcontactinfos_address', Configuration::get('BLOCKCONTACTINFOS_ADDRESS')),
-			'blockcontactinfos_phone' => Tools::getValue('blockcontactinfos_phone', Configuration::get('BLOCKCONTACTINFOS_PHONE')),
-			'blockcontactinfos_email' => Tools::getValue('blockcontactinfos_email', Configuration::get('BLOCKCONTACTINFOS_EMAIL')),
-		);
 	}
 }

@@ -38,7 +38,7 @@ class StatsProduct extends ModuleGraph
 	{
 		$this->name = 'statsproduct';
 		$this->tab = 'analytics_stats';
-		$this->version = '1.2';
+		$this->version = '1.3.1';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -172,14 +172,12 @@ class StatsProduct extends ModuleGraph
 			<h4>'.$this->l('Guide').'</h4>
 			<div class="alert alert-warning">
 				<h4>'.$this->l('Number of purchases compared to number of views').'</h4>
-				<p>
 					'.$this->l('After choosing a category and selecting a product, informational graphs will appear.').'
 					<ul>
 						<li class="bullet">'.$this->l('If you notice that a product is often purchased but viewed infrequently, you should display it more prominently in your Front Office.').'</li>
 						<li class="bullet">'.$this->l('On the other hand, if a product has many views but is not often purchased, we advise you to check or modify this product\'s information, description and photography again, see if you can find something better.').'
 						</li>
 					</ul>
-				</p>
 			</div>';
 		if ($id_product = (int)Tools::getValue('id_product'))
 		{
@@ -225,17 +223,16 @@ class StatsProduct extends ModuleGraph
 				</div>
 			</div>';
 			if ($has_attribute = $product->hasAttributes() && $total_bought)
-				$this->html .= '<h3 class="space">'.$this->l('Attribute sales distribution').'</h3><center>'.$this->engine(array(
-						'type' => 'pie',
-						'option' => '3-'.$id_product
-					)).'</center><br />
-			<a href="'.Tools::safeOutput($_SERVER['REQUEST_URI']).'&export=1&exportType=2"><img src="../img/admin/asterisk.gif" />'.$this->l('CSV Export').'</a>';
+				$this->html .= '
+				<h3 class="space">'.$this->l('Attribute sales distribution').'</h3>
+				<center>'.$this->engine(array('type' => 'pie', 'option' => '3-'.$id_product)).'</center><br />
+				<a href="'.Tools::safeOutput($_SERVER['REQUEST_URI']).'&export=1&exportType=2"><img src="../img/admin/asterisk.gif" alt=""/>'.$this->l('CSV Export').'</a>';
 			if ($total_bought)
 			{
 				$sales = $this->getSales($id_product);
 				$this->html .= '
 				<h4>'.$this->l('Sales').'</h4>
-				<div style="overflow-y: scroll; height: '.min(400, (count($sales) + 1) * 32).'px;">
+				<div style="overflow-y:scroll;height:'.min(400, (count($sales) + 1) * 32).'px">
 					<table class="table">
 						<thead>
 							<tr>
@@ -264,8 +261,8 @@ class StatsProduct extends ModuleGraph
 					$this->html .= '
 						<tr>
 							<td>'.Tools::displayDate($sale['date_add'], null, false).'</td>
-							<td align="center"><a href="?tab=AdminOrders&id_order='.$sale['id_order'].'&vieworder&token='.$token_order.'">'.(int)$sale['id_order'].'</a></td>
-							<td align="center"><a href="?tab=AdminCustomers&id_customer='.$sale['id_customer'].'&viewcustomer&token='.$token_customer.'">'.(int)$sale['id_customer'].'</a></td>
+							<td class="text-center"><a href="?tab=AdminOrders&id_order='.$sale['id_order'].'&vieworder&token='.$token_order.'">'.(int)$sale['id_order'].'</a></td>
+							<td class="text-center"><a href="?tab=AdminCustomers&id_customer='.$sale['id_customer'].'&viewcustomer&token='.$token_customer.'">'.(int)$sale['id_customer'].'</a></td>
 							'.($has_attribute ? '<td>'.$sale['product_name'].'</td>' : '').'
 							<td>'.(int)$sale['product_quantity'].'</td>
 							<td>'.Tools::displayprice($sale['total'], $currency).'</td>
@@ -280,19 +277,18 @@ class StatsProduct extends ModuleGraph
 				{
 					$this->html .= '
 					<h4>'.$this->l('Cross selling').'</h4>
-					<div style="overflow-y: scroll; height: 200px;">
-						<h4>'.$this->l('Cross selling').'</h4>
+					<div style="overflow-y:scroll;height:200px">
 						<table class="table">
 							<thead>
 								<tr>
 									<th>
-										<span class="title_box  active">'.$this->l('Product name').'</span>
+										<span class="title_box active">'.$this->l('Product name').'</span>
 									</th>
 									<th>
-										<span class="title_box  active">'.$this->l('Quantity sold').'</span>
+										<span class="title_box active">'.$this->l('Quantity sold').'</span>
 									</th>
 									<th>
-										<span class="title_box  active">'.$this->l('Average price').'</span>
+										<span class="title_box active">'.$this->l('Average price').'</span>
 									</th>
 								</tr>
 							</thead>
@@ -301,9 +297,9 @@ class StatsProduct extends ModuleGraph
 					foreach ($cross_selling as $selling)
 						$this->html .= '
 							<tr>
-								<td ><a href="?tab=AdminProducts&id_product='.(int)$selling['id_product'].'&addproduct&token='.$token_products.'">'.$selling['pname'].'</a></td>
-								<td align="center">'.(int)$selling['pqty'].'</td>
-								<td align="right">'.Tools::displayprice($selling['pprice'], $currency).'</td>
+								<td><a href="?tab=AdminProducts&id_product='.(int)$selling['id_product'].'&addproduct&token='.$token_products.'">'.$selling['pname'].'</a></td>
+								<td class="text-center">'.(int)$selling['pqty'].'</td>
+								<td class="text-right">'.Tools::displayprice($selling['pprice'], $currency).'</td>
 							</tr>';
 					$this->html .= '
 							</tbody>
@@ -316,9 +312,9 @@ class StatsProduct extends ModuleGraph
 		{
 			$categories = Category::getCategories((int)$this->context->language->id, true, false);
 			$this->html .= '
-			<form action="" method="post" id="categoriesForm" class="form-horizontal">
+			<form action="#" method="post" id="categoriesForm" class="form-horizontal">
 				<div class="row row-margin-bottom">
-					<label class="control-label col-lg-3" for="id_category">
+					<label class="control-label col-lg-3">
 						<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="'.$this->l('Click on a product to access its statistics!').'">
 							'.$this->l('Choose a category').'
 						</span>
@@ -334,7 +330,7 @@ class StatsProduct extends ModuleGraph
 				</div>
 			</form>
 			<h4>'.$this->l('Products available').'</h4>
-			<table class="table" border="0" cellspacing="0" cellspacing="0">
+			<table class="table" style="border: 0; cellspacing: 0;">
 				<thead>
 					<tr>
 						<th>
@@ -355,7 +351,7 @@ class StatsProduct extends ModuleGraph
 				<tr>
 					<td>'.$product['reference'].'</td>
 					<td>
-						<a href="'.AdminController::$currentIndex.'&token='.Tools::safeOutput(Tools::getValue('token')).'&module='.$this->name.'&id_product='.$product['id_product'].'">'.$product['name'].'</a>
+						<a href="'.Tools::safeOutput(AdminController::$currentIndex.'&token='.Tools::getValue('token').'&module='.$this->name.'&id_product='.$product['id_product']).'">'.$product['name'].'</a>
 					</td>
 					<td>'.$product['quantity'].'</td>
 				</tr>';
@@ -363,7 +359,7 @@ class StatsProduct extends ModuleGraph
 			$this->html .= '
 				</tbody>
 			</table>
-			<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI']).'&export=1">
+			<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI'].'&export=1').'">
 				<i class="icon-cloud-upload"></i> '.$this->l('CSV Export').'
 			</a>';
 		}
@@ -375,7 +371,7 @@ class StatsProduct extends ModuleGraph
 	{
 		$options = explode('-', $option);
 		if (count($options) === 2)
-			list($this->_option, $this->_id_product) = $options;
+			list($this->option, $this->id_product) = $options;
 		else
 			$this->option = $option;
 		$date_between = $this->getDate();

@@ -36,7 +36,7 @@ class StatsCatalog extends Module
 	{
 		$this->name = 'statscatalog';
 		$this->tab = 'analytics_stats';
-		$this->version = '1.2.2';
+		$this->version = '1.2.3';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -66,48 +66,43 @@ class StatsCatalog extends Module
 
 	public function getTotalPageViewed()
 	{
-		$sql = 'SELECT SUM(pv.`counter`) AS viewed
-				FROM `'._DB_PREFIX_.'product` p
-				'.Shop::addSqlAssociation('product', 'p').'
-				LEFT JOIN `'._DB_PREFIX_.'page` pa ON p.`id_product` = pa.`id_object`
-				LEFT JOIN `'._DB_PREFIX_.'page_type` pt ON (pt.`id_page_type` = pa.`id_page_type` AND pt.`name` = \'product.php\')
-				LEFT JOIN `'._DB_PREFIX_.'page_viewed` pv ON pv.`id_page` = pa.`id_page`
-				'.$this->join.'
-				WHERE product_shop.`active` = 1
-					'.$this->where;
-		$result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
-
-		return isset($result['viewed']) ? $result['viewed'] : 0;
+		return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+		SELECT SUM(pv.`counter`)
+		FROM `'._DB_PREFIX_.'product` p
+		'.Shop::addSqlAssociation('product', 'p').'
+		LEFT JOIN `'._DB_PREFIX_.'page` pa ON p.`id_product` = pa.`id_object`
+		LEFT JOIN `'._DB_PREFIX_.'page_type` pt ON (pt.`id_page_type` = pa.`id_page_type` AND pt.`name` IN ("product.php", "product"))
+		LEFT JOIN `'._DB_PREFIX_.'page_viewed` pv ON pv.`id_page` = pa.`id_page`
+		'.$this->join.'
+		WHERE product_shop.`active` = 1
+		'.$this->where);
 	}
 
 	public function getTotalProductViewed()
 	{
-		$sql = 'SELECT COUNT(DISTINCT pa.`id_object`)
-				FROM `'._DB_PREFIX_.'page_viewed` pv
-				LEFT JOIN `'._DB_PREFIX_.'page` pa ON pv.`id_page` = pa.`id_page`
-				LEFT JOIN `'._DB_PREFIX_.'page_type` pt ON pt.`id_page_type` = pa.`id_page_type`
-				LEFT JOIN `'._DB_PREFIX_.'product` p ON p.`id_product` = pa.`id_object`
-				'.Shop::addSqlAssociation('product', 'p').'
-				'.$this->join.'
-				WHERE pt.`name` = \'product.php\'
-					AND product_shop.`active` = 1
-					'.$this->where;
-
-		return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
+		return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+		SELECT COUNT(DISTINCT pa.`id_object`)
+		FROM `'._DB_PREFIX_.'page_viewed` pv
+		LEFT JOIN `'._DB_PREFIX_.'page` pa ON pv.`id_page` = pa.`id_page`
+		LEFT JOIN `'._DB_PREFIX_.'page_type` pt ON pt.`id_page_type` = pa.`id_page_type`
+		LEFT JOIN `'._DB_PREFIX_.'product` p ON p.`id_product` = pa.`id_object`
+		'.Shop::addSqlAssociation('product', 'p').'
+		'.$this->join.'
+		WHERE pt.`name` IN ("product.php", "product")
+		AND product_shop.`active` = 1
+		'.$this->where);
 	}
 
 	public function getTotalBought()
 	{
-		$sql = 'SELECT SUM(od.`product_quantity`) AS bought
-				FROM `'._DB_PREFIX_.'orders` o
-				LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON o.`id_order` = od.`id_order`
-				LEFT JOIN `'._DB_PREFIX_.'product` p ON p.`id_product` = od.`product_id`
-				'.$this->join.'
-				WHERE o.valid = 1
-					'.$this->where;
-		$result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
-
-		return isset($result['bought']) ? $result['bought'] : 0;
+		return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+		SELECT SUM(od.`product_quantity`)
+		FROM `'._DB_PREFIX_.'orders` o
+		LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON o.`id_order` = od.`id_order`
+		LEFT JOIN `'._DB_PREFIX_.'product` p ON p.`id_product` = od.`product_id`
+		'.$this->join.'
+		WHERE o.valid = 1
+		'.$this->where);
 	}
 
 	public function getProductsNB($id_lang)
@@ -176,11 +171,11 @@ class StatsCatalog extends Module
 		$total_nv = $total - $this->getTotalProductViewed();
 
 		$html = '
-		<script type="text/javascript" language="javascript">$(\'#calendar\').slideToggle();</script>
+		<script type="text/javascript">$(\'#calendar\').slideToggle();</script>
 			<div class="panel-heading">
 				'.$this->displayName.'
 			</div>
-			<form action="" method="post" id="categoriesForm" class="form-horizontal">
+			<form action="#" method="post" id="categoriesForm" class="form-horizontal">
 				<div class="row row-margin-bottom">
 					<label class="control-label col-lg-3">
 						'.$this->l('Choose a category').'
@@ -236,7 +231,7 @@ class StatsCatalog extends Module
 						<td>'.$product['name'].'</td>
 						<td class="left">
 							<div class="btn-group btn-group-action">
-								<a class="btn btn-default" href="index.php?tab=AdminProducts&id_product='.$product['id_product'].'&addproduct&token='.$product_token.'" target="_blank">
+								<a class="btn btn-default" href="'.Tools::safeOutput('index.php?tab=AdminProducts&id_product='.$product['id_product'].'&addproduct&token='.$product_token).'" target="_blank">
 									<i class="icon-edit"></i> '.$this->l('Edit').'
 								</a>
 								<button data-toggle="dropdown" class="btn btn-default dropdown-toggle" type="button">
@@ -244,7 +239,7 @@ class StatsCatalog extends Module
 								</button>
 								<ul class="dropdown-menu">
 									<li>
-										<a href="'.$this->context->link->getProductLink($product['id_product'], $product['link_rewrite']).'" target="_blank">
+										<a href="'.Tools::safeOutput($this->context->link->getProductLink($product['id_product'], $product['link_rewrite'])).'" target="_blank">
 											<i class="icon-eye-open"></i> '.$this->l('View').'
 										</a>
 									</li>
@@ -262,6 +257,6 @@ class StatsCatalog extends Module
 
 	private function returnLine($label, $data)
 	{
-		return '<tr><td>'.$label.'</td><td>'.$data.'</td></tr>';
+		return $label.$data;
 	}
 }

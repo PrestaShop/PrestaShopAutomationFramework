@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -38,7 +38,7 @@ class AdminTrackingControllerCore extends AdminController
 			$this->action = 'status';
 			$this->className = 'Product';
 		}
-		else if (Tools::getValue('id_category') && Tools::isSubmit('statuscategory'))
+		elseif (Tools::getValue('id_category') && Tools::isSubmit('statuscategory'))
 		{
 			$this->table = 'category';
 			$this->identifier = 'id_category';
@@ -96,8 +96,8 @@ class AdminTrackingControllerCore extends AdminController
 		$this->addRowAction('edit');
 		$this->addRowAction('view');
 		$this->addRowAction('delete');
-		$this->addRowActionSkipList('delete', array(Category::getTopCategory()->id));
-		$this->addRowActionSkipList('edit', array(Category::getTopCategory()->id));
+		$this->addRowActionSkipList('delete', array((int)Configuration::get('PS_ROOT_CATEGORY')));
+		$this->addRowActionSkipList('edit', array((int)Configuration::get('PS_ROOT_CATEGORY')));
 
 		$this->fields_list = (array(
 			'id_category' => array('title' => $this->l('ID'), 'class' => 'fixed-width-xs', 'align' => 'center'),
@@ -112,7 +112,7 @@ class AdminTrackingControllerCore extends AdminController
 			SELECT DISTINCT(cp.id_category)
 			FROM `'._DB_PREFIX_.'category_product` cp
 		)
-		AND a.`id_category` != '.(int)Category::getTopCategory()->id;
+		AND a.`id_category` != '.(int)Configuration::get('PS_ROOT_CATEGORY');
 		$this->toolbar_title = $this->l('List of empty categories:');
 		return $this->renderList();
 	}

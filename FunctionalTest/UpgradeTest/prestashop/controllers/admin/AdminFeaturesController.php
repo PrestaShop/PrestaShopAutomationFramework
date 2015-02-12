@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -257,7 +257,7 @@ class AdminFeaturesControllerCore extends AdminController
 					'desc' => $this->l('Back to the list')
 				);
 				break;
-			default:				
+			default:
 				parent::initToolbar();
 		}
 	}
@@ -287,7 +287,7 @@ class AdminFeaturesControllerCore extends AdminController
 					{
 						if (Validate::isLoadedObject($obj = new Feature((int)$id)))
 							$bread_extended[] = '<a href="'.Context::getContext()->link->getAdminLink('AdminFeatures').'&id_feature='.$id.'&viewfeature">'.$obj->name[$this->context->employee->id_lang].'</a>';
-						
+
 						if (Validate::isLoadedObject($obj = new FeatureValue((int)Tools::getValue('id_feature_value'))))
 							$bread_extended[] =  sprintf($this->l('Edit: %s'), $obj->value[$this->context->employee->id_lang]);
 					}
@@ -406,21 +406,21 @@ class AdminFeaturesControllerCore extends AdminController
 					return;
 				$this->content .= $this->renderForm();
 			}
-			else if ($this->display == 'view')
+			elseif ($this->display == 'view')
 			{
 				// Some controllers use the view action without an object
 				if ($this->className)
 					$this->loadObject(true);
 				$this->content .= $this->renderView();
 			}
-			else if ($this->display == 'editFeatureValue')
+			elseif ($this->display == 'editFeatureValue')
 			{
 				if (!$this->object = new FeatureValue((int)Tools::getValue('id_feature_value')))
 					return;
 
 				$this->content .= $this->initFormFeatureValue();
 			}
-			else if (!$this->ajax)
+			elseif (!$this->ajax)
 			{
 				// If a feature value was saved, we need to reset the values to display the list
 				$this->setTypeFeature();
@@ -520,7 +520,7 @@ class AdminFeaturesControllerCore extends AdminController
 
 		if (Tools::isSubmit('submitAdd'.$this->table.'AndStay') && !count($this->errors))
 			$this->redirect_after = self::$currentIndex.'&'.$this->identifier.'=&conf=3&update'.$this->table.'&token='.$this->token;
-		
+
 		return $object;
 	}
 
@@ -555,11 +555,11 @@ class AdminFeaturesControllerCore extends AdminController
 	 * AdminController::getList() override
 	 * @see AdminController::getList()
 	 */
-	public function getList($id_lang, $order_by = null, $order_way = null, $start = 0, $limit = false, $id_lang_shop = false)
+	public function getList($id_lang, $order_by = null, $order_way = null, $start = 0, $limit = null, $id_lang_shop = false)
 	{
 		if ($this->table == 'feature_value')
 			$this->_where .= ' AND (a.custom = 0 OR a.custom IS NULL)';
-		
+
 		parent::getList($id_lang, $order_by, $order_way, $start, $limit, $id_lang_shop);
 
 		if ($this->table == 'feature')

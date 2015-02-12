@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -45,8 +45,14 @@ class ModuleFrontControllerCore extends FrontController
 
 		parent::__construct();
 
-		$this->display_column_left = ((isset($this->page_name) && is_object(Context::getContext()->theme)) ? Context::getContext()->theme->hasLeftColumn($this->page_name) : true);
-		$this->display_column_right = ((isset($this->page_name) && is_object(Context::getContext()->theme)) ? Context::getContext()->theme->hasRightColumn($this->page_name) : true);
+		$in_base = isset($this->page_name) && is_object(Context::getContext()->theme) && Context::getContext()->theme->hasColumnsSettings($this->page_name);
+
+		$tmp = isset($this->display_column_left) ? (bool)$this->display_column_left : true;
+		$this->display_column_left =  $in_base ? Context::getContext()->theme->hasLeftColumn($this->page_name) : $tmp;
+
+		$tmp = isset($this->display_column_right) ? (bool)$this->display_column_right : true;
+		$this->display_column_right = $in_base ? Context::getContext()->theme->hasRightColumn($this->page_name) : $tmp;
+
 	}
 
 	/**

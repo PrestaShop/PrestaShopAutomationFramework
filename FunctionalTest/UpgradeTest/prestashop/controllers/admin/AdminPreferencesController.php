@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,14 +19,13 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
 class AdminPreferencesControllerCore extends AdminController
 {
-
 	public function __construct()
 	{
 		$this->bootstrap = true;
@@ -39,17 +38,29 @@ class AdminPreferencesControllerCore extends AdminController
 		{
 			$round_mode = array(
 				array(
+					'value' => PS_ROUND_HALF_UP,
+					'name' => $this->l('Round up away from zero, when it is half way there (recommended)')
+				),
+				array(
+					'value' => PS_ROUND_HALF_DOWN,
+					'name' => $this->l('Round down towards zero, when it is half way there')
+				),
+				array(
+					'value' => PS_ROUND_HALF_EVEN,
+					'name' => $this->l('Round towards the next even value')
+				),
+				array(
+					'value' => PS_ROUND_HALF_ODD,
+					'name' => $this->l('Round towards the next odd value')
+				),
+				array(
 					'value' => PS_ROUND_UP,
-					'name' => $this->l('superior')
+					'name' => $this->l('Round up to the nearest value')
 				),
 				array(
 					'value' => PS_ROUND_DOWN,
-					'name' => $this->l('inferior')
+					'name' => $this->l('Round down to the nearest value')
 				),
-				array(
-					'value' => PS_ROUND_HALF,
-					'name' => $this->l('classical')
-				)
 			);
 			$activities1 = array(
 				0 => $this->l('-- Please choose your main activity --'),
@@ -78,14 +89,29 @@ class AdminPreferencesControllerCore extends AdminController
 			foreach ($activities1 as $value => $name)
 				$activities2[] = array('value' => $value, 'name' => $name);
 
+			$disable_ssl = false;
+
+			if (defined('_PS_HOST_DOMAINS_') && defined('_PS_HOST_MODE_') && _PS_HOST_MODE_)
+			{
+				$host_mode_domains = explode(',', (string)_PS_HOST_DOMAINS_);
+				$domain_parts = array_reverse(explode('.', $this->context->shop->domain_ssl));
+
+				if (isset($host_mode_domains) && isset($domain_parts[1]) && isset($domain_parts[0])
+					&& !in_array($domain_parts[1].'.'.$domain_parts[0], $host_mode_domains))
+					$disable_ssl = true;
+			}
+
 			$fields = array(
 				'PS_SSL_ENABLED' => array(
 					'title' => $this->l('Enable SSL'),
-					'desc' => $this->l('If your hosting provider allows SSL, you can activate SSL encryption (https://) for customer account identification and order processing.'),
+					'desc' => $disable_ssl
+						? $this->l('It is not possible to enable SSL while you are using a custom domain name for your shop. SSL has thus been disabled.')
+						: $this->l('If your hosting provider allows SSL, you can activate SSL encryption (https://) for customer account identification and order processing.'),
 					'validation' => 'isBool',
 					'cast' => 'intval',
 					'type' => 'bool',
-					'default' => '0'
+					'default' => '0',
+					'disabled' => $disable_ssl
 				),
 			);
 
@@ -133,6 +159,34 @@ class AdminPreferencesControllerCore extends AdminController
 					'type' => 'select',
 					'list' => $round_mode,
 					'identifier' => 'value'
+				),
+				'PS_ROUND_TYPE' => array(
+					'title' => $this->l('Round type'),
+					'cast' => 'intval',
+					'type' => 'select',
+					'list' => array(
+						array(
+							'name' => $this->l('Round on each item'),
+							'id' => Order::ROUND_ITEM
+							),
+						array(
+							'name' => $this->l('Round on each line'),
+							'id' => Order::ROUND_LINE
+							),
+						array(
+							'name' => $this->l('Round on the total'),
+							'id' => Order::ROUND_TOTAL
+							),
+						),
+					'identifier' => 'id'
+				),
+				'PS_PRICE_DISPLAY_PRECISION' => array(
+					'title' => $this->l('Number of decimals'),
+					'desc' => $this->l('Choose how many decimals you want to display'),
+					'validation' => 'isUnsignedInt',
+					'cast' => 'intval',
+					'type' => 'text',
+					'class' => 'fixed-width-xxl'
 				),
 				'PS_DISPLAY_SUPPLIERS' => array(
 					'title' => $this->l('Display suppliers and manufacturers'),

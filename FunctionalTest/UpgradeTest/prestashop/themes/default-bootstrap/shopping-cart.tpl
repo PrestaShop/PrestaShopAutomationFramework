@@ -1,5 +1,5 @@
 {*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -86,21 +86,45 @@
 					<th class="cart_description item">{l s='Description'}</th>
 					{if $PS_STOCK_MANAGEMENT}
 						{assign var='col_span_subtotal' value='3'}
-						<th class="cart_avail item">{l s='Avail.'}</th>
+						<th class="cart_avail item text-center">{l s='Availability'}</th>
 					{else}
 						{assign var='col_span_subtotal' value='2'}
 					{/if}
-					<th class="cart_unit item">{l s='Unit price'}</th>
-					<th class="cart_quantity item">{l s='Qty'}</th>
-					<th class="cart_total item">{l s='Total'}</th>
+					<th class="cart_unit item text-right">{l s='Unit price'}</th>
+					<th class="cart_quantity item text-center">{l s='Qty'}</th>
 					<th class="cart_delete last_item">&nbsp;</th>
+					<th class="cart_total item text-right">{l s='Total'}</th>
 				</tr>
 			</thead>
 			<tfoot>
+				{assign var='rowspan_total' value=2+$total_discounts_num+$total_wrapping_taxes_num}
+
+				{if $use_taxes && $show_taxes && $total_tax != 0}
+					{assign var='rowspan_total' value=$rowspan_total+1}
+				{/if}
+
+				{if $priceDisplay != 0}
+					{assign var='rowspan_total' value=$rowspan_total+1}
+				{/if}
+
+				{if $total_shipping_tax_exc <= 0 && !isset($virtualCart)}
+					{assign var='rowspan_total' value=$rowspan_total+1}
+				{else}
+					{if $use_taxes && $total_shipping_tax_exc != $total_shipping}
+						{if $priceDisplay && $total_shipping_tax_exc > 0}
+							{assign var='rowspan_total' value=$rowspan_total+1}
+						{elseif $total_shipping > 0}
+							{assign var='rowspan_total' value=$rowspan_total+1}
+						{/if}
+					{elseif $total_shipping_tax_exc > 0}
+						{assign var='rowspan_total' value=$rowspan_total+1}
+					{/if}
+				{/if}
+
 				{if $use_taxes}
 					{if $priceDisplay}
 						<tr class="cart_total_price">
-							<td rowspan="{3+$total_discounts_num+$use_show_taxes+$total_wrapping_taxes_num}" colspan="3" id="cart_voucher" class="cart_voucher">
+							<td rowspan="{$rowspan_total}" colspan="3" id="cart_voucher" class="cart_voucher">
 								{if $voucherAllowed}
 									{if isset($errors_discount) && $errors_discount}
 										<ul class="alert alert-danger">
@@ -132,7 +156,7 @@
 						</tr>
 					{else}
 						<tr class="cart_total_price">
-							<td rowspan="{3+$total_discounts_num+$use_show_taxes+$total_wrapping_taxes_num}" colspan="2" id="cart_voucher" class="cart_voucher">
+							<td rowspan="{$rowspan_total}" colspan="2" id="cart_voucher" class="cart_voucher">
 								{if $voucherAllowed}
 									{if isset($errors_discount) && $errors_discount}
 										<ul class="alert alert-danger">
@@ -165,7 +189,7 @@
 					{/if}
 				{else}
 					<tr class="cart_total_price">
-						<td rowspan="{3+$total_discounts_num+$use_show_taxes+$total_wrapping_taxes_num}" colspan="2" id="cart_voucher" class="cart_voucher">
+						<td rowspan="{$rowspan_total}" colspan="2" id="cart_voucher" class="cart_voucher">
 							{if $voucherAllowed}
 								{if isset($errors_discount) && $errors_discount}
 									<ul class="alert alert-danger">
@@ -201,9 +225,9 @@
 				<tr{if $total_wrapping == 0} style="display: none;"{/if}>
 					<td colspan="3" class="text-right">
 						{if $use_taxes}
-							{if $display_tax_label}{l s='Total gift wrapping (tax incl.):'}{else}{l s='Total gift-wrapping cost:'}{/if}
+							{if $display_tax_label}{l s='Total gift wrapping (tax incl.)'}{else}{l s='Total gift-wrapping cost'}{/if}
 						{else}
-							{l s='Total gift-wrapping cost:'}
+							{l s='Total gift-wrapping cost'}
 						{/if}
 					</td>
 					<td colspan="2" class="price-discount price" id="total_wrapping">
@@ -220,7 +244,7 @@
 				</tr>
 				{if $total_shipping_tax_exc <= 0 && !isset($virtualCart)}
 					<tr class="cart_total_delivery" style="{if !isset($carrier->id) || is_null($carrier->id)}display:none;{/if}">
-						<td colspan="{$col_span_subtotal}" class="text-right">{l s='Shipping'}</td>
+						<td colspan="{$col_span_subtotal}" class="text-right">{l s='Total shipping'}</td>
 						<td colspan="2" class="price" id="total_shipping">{l s='Free Shipping!'}</td>
 					</tr>
 				{else}
@@ -247,7 +271,7 @@
 					<td colspan="{$col_span_subtotal}" class="text-right">
 						{if $display_tax_label}
 							{if $use_taxes && $priceDisplay == 0}
-								{l s='Total vouchers (tax incl.):'}
+								{l s='Total vouchers (tax incl.)'}
 							{else}
 								{l s='Total vouchers (tax excl.)'}
 							{/if}
@@ -264,11 +288,13 @@
 						{displayPrice price=$total_discounts_negative}
 					</td>
 				</tr>
-				{if $use_taxes && $show_taxes}
+				{if $use_taxes && $show_taxes && $total_tax != 0 }
+					{if $priceDisplay != 0}
 					<tr class="cart_total_price">
 						<td colspan="{$col_span_subtotal}" class="text-right">{if $display_tax_label}{l s='Total (tax excl.)'}{else}{l s='Total'}{/if}</td>
 						<td colspan="2" class="price" id="total_price_without_tax">{displayPrice price=$total_price_without_tax}</td>
 					</tr>
+					{/if}
 					<tr class="cart_total_tax">
 						<td colspan="{$col_span_subtotal}" class="text-right">{l s='Tax'}</td>
 						<td colspan="2" class="price" id="total_tax">{displayPrice price=$total_tax}</td>
@@ -336,7 +362,7 @@
 										{/if}
 									{/foreach}
 								</td>
-								<td class="cart_quantity" colspan="2">
+								<td class="cart_quantity" colspan="1">
 									{if isset($cannotModify) AND $cannotModify == 1}
 										<span>{if $quantityDisplayed == 0 AND isset($customizedDatas.$productId.$productAttributeId)}{$customizedDatas.$productId.$productAttributeId|@count}{else}{$product.cart_quantity-$quantityDisplayed}{/if}</span>
 									{else}
@@ -372,20 +398,20 @@
 										</div>
 									{/if}
 								</td>
-								<td class="cart_delete">
+								<td class="cart_delete text-center">
 									{if isset($cannotModify) AND $cannotModify == 1}
 									{else}
-										<div>
-											<a
-												id="{$product.id_product}_{$product.id_product_attribute}_{$id_customization}_{$product.id_address_delivery|intval}"
-												class="cart_quantity_delete"
-												href="{$link->getPageLink('cart', true, NULL, "delete=1&amp;id_product={$product.id_product|intval}&amp;ipa={$product.id_product_attribute|intval}&amp;id_customization={$id_customization}&amp;id_address_delivery={$product.id_address_delivery}&amp;token={$token_cart}")|escape:'html':'UTF-8'}"
-												rel="nofollow"
-												title="{l s='Delete'}">
-												<i class=" icon-trash"></i>
-											</a>
-										</div>
+										<a
+											id="{$product.id_product}_{$product.id_product_attribute}_{$id_customization}_{$product.id_address_delivery|intval}"
+											class="cart_quantity_delete"
+											href="{$link->getPageLink('cart', true, NULL, "delete=1&amp;id_product={$product.id_product|intval}&amp;ipa={$product.id_product_attribute|intval}&amp;id_customization={$id_customization}&amp;id_address_delivery={$product.id_address_delivery}&amp;token={$token_cart}")|escape:'html':'UTF-8'}"
+											rel="nofollow"
+											title="{l s='Delete'}">
+											<i class="icon-trash"></i>
+										</a>
 									{/if}
+								</td>
+								<td>
 								</td>
 							</tr>
 							{assign var='quantityDisplayed' value=$quantityDisplayed+$customization.quantity}
@@ -418,9 +444,6 @@
 								</span>
 							</td>
 							<td class="cart_discount_delete">1</td>
-							<td class="cart_discount_price">
-								<span class="price-discount price">{if !$priceDisplay}{displayPrice price=$discount.value_real*-1}{else}{displayPrice price=$discount.value_tax_exc*-1}{/if}</span>
-							</td>
 							<td class="price_discount_del text-center">
 								{if strlen($discount.code)}
 									<a
@@ -430,6 +453,9 @@
 										<i class="icon-trash"></i>
 									</a>
 								{/if}
+							</td>
+							<td class="cart_discount_price">
+								<span class="price-discount price">{if !$priceDisplay}{displayPrice price=$discount.value_real*-1}{else}{displayPrice price=$discount.value_tax_exc*-1}{/if}</span>
 							</td>
 						</tr>
 					{/foreach}
@@ -532,17 +558,11 @@
 	<div id="HOOK_SHOPPING_CART">{$HOOK_SHOPPING_CART}</div>
 	<p class="cart_navigation clearfix">
 		{if !$opc}
-			<a
-				href="{if $back}{$link->getPageLink('order', true, NULL, 'step=1&amp;back={$back}')|escape:'html':'UTF-8'}{else}{$link->getPageLink('order', true, NULL, 'step=1')|escape:'html':'UTF-8'}{/if}"
-				class="button btn btn-default standard-checkout button-medium"
-				title="{l s='Proceed to checkout'}">
+			<a  href="{if $back}{$link->getPageLink('order', true, NULL, 'step=1&amp;back={$back}')|escape:'html':'UTF-8'}{else}{$link->getPageLink('order', true, NULL, 'step=1')|escape:'html':'UTF-8'}{/if}" class="button btn btn-default standard-checkout button-medium" title="{l s='Proceed to checkout'}">
 				<span>{l s='Proceed to checkout'}<i class="icon-chevron-right right"></i></span>
 			</a>
 		{/if}
-		<a
-			href="{if (isset($smarty.server.HTTP_REFERER) && strstr($smarty.server.HTTP_REFERER, 'order.php')) || isset($smarty.server.HTTP_REFERER) && strstr($smarty.server.HTTP_REFERER, 'order-opc') || !isset($smarty.server.HTTP_REFERER)}{$link->getPageLink('index')}{else}{$smarty.server.HTTP_REFERER|escape:'html':'UTF-8'|secureReferrer}{/if}"
-			class="button-exclusive btn btn-default"
-			title="{l s='Continue shopping'}">
+		<a href="{if (isset($smarty.server.HTTP_REFERER) && ($smarty.server.HTTP_REFERER == $link->getPageLink('order', true) || $smarty.server.HTTP_REFERER == $link->getPageLink('order-opc', true) || strstr($smarty.server.HTTP_REFERER, 'step='))) || !isset($smarty.server.HTTP_REFERER)}{$link->getPageLink('index')}{else}{$smarty.server.HTTP_REFERER|escape:'html':'UTF-8'|secureReferrer}{/if}" class="button-exclusive btn btn-default" title="{l s='Continue shopping'}">
 			<i class="icon-chevron-left"></i>{l s='Continue shopping'}
 		</a>
 	</p>

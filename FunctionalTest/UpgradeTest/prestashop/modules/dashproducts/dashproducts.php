@@ -32,15 +32,15 @@ class DashProducts extends Module
 	public function __construct()
 	{
 		$this->name = 'dashproducts';
-		$this->displayName = 'Dashboard Products';
 		$this->tab = 'dashboard';
-		$this->version = '0.3.1';
+		$this->version = '0.3.2';
 		$this->author = 'PrestaShop';
 
 		$this->push_filename = _PS_CACHE_DIR_.'push/activity';
 		$this->allow_push = true;
 		
 		parent::__construct();
+		$this->displayName = $this->l('Dashboard Products');
 		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
 	}
 
@@ -120,7 +120,7 @@ class DashProducts extends Module
 				'class' => 'text-left',
 			);
 			$tr[] = array(
-				'id' => 'state_name',
+				'id' => 'total_products',
 				'value' => count(OrderDetail::getList((int)$order['id_order'])),
 				'class' => 'text-center',
 			);
@@ -128,7 +128,7 @@ class DashProducts extends Module
 				'id' => 'total_paid',
 				'value' => Tools::displayPrice((float)$order['total_paid'], $currency),
 				'class' => 'text-center',
-				'wrapper_start' => '<span class="badge badge-success">',
+				'wrapper_start' => $order['valid'] ? '<span class="badge badge-success">' : '',
 				'wrapper_end' => '<span>',
 			);
 			$tr[] = array(

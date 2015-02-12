@@ -225,7 +225,7 @@ class BlockCMSModel extends ObjectModel
 	public static function updateDisplayStores($display_store)
 	{
 		$sql = 'UPDATE `'._DB_PREFIX_.'cms_block`
-			SET `display_store` = '.$display_store;
+			SET `display_store` = '.(int)$display_store;
 
 		Db::getInstance()->execute($sql);
 	}

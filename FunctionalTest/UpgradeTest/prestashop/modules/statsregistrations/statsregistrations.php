@@ -36,7 +36,7 @@ class StatsRegistrations extends ModuleGraph
 	{
 		$this->name = 'statsregistrations';
 		$this->tab = 'analytics_stats';
-		$this->version = '1.2';
+		$this->version = '1.3.1';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -121,9 +121,10 @@ class StatsRegistrations extends ModuleGraph
 		<div class="alert alert-info">
 			<ul>
 				<li>
-					'.$this->l('Number of visitors who stopped at the registering step:').' <span class="totalStats">'.(int)$total_blocked.($total_registrations ? ' ('.number_format(100 * $total_blocked / ($total_registrations + $total_blocked), 2).'%)' : '').'</span><li/>
-					'.$this->l('Number of visitors who placed an order directly after registration:').' <span class="totalStats">'.(int)$total_buyers.($total_registrations ? ' ('.number_format(100 * $total_buyers / ($total_registrations), 2).'%)' : '').'</span>
-				<li>'.$this->l('Total customer accounts:').' <span class="totalStats">'.$total_registrations.'</span></li>
+					'.$this->l('Number of visitors who stopped at the registering step:').' <span class="totalStats">'.(int)$total_blocked.($total_registrations ? ' ('.number_format(100 * $total_blocked / ($total_registrations + $total_blocked), 2).'%)' : '').'</span></li>
+					<li>'.$this->l('Number of visitors who placed an order directly after registration:').' <span class="totalStats">'.(int)$total_buyers.($total_registrations ? ' ('.number_format(100 * $total_buyers / ($total_registrations), 2).'%)' : '').'</span></li>
+				<li>
+					'.$this->l('Total customer accounts:').' <span class="totalStats">'.$total_registrations.'</span></li>
 			</ul>
 		</div>
 		<h4>'.$this->l('Guide').'</h4>
@@ -149,7 +150,7 @@ class StatsRegistrations extends ModuleGraph
 					'.$this->engine(array('type' => 'line')).'
 				</div>
 				<div class="col-lg-4">
-					<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI']).'&export=1">
+					<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI'].'&export=1').'">
 						<i class="icon-cloud-upload"></i>'.$this->l('CSV Export').'
 					</a>
 				</div>

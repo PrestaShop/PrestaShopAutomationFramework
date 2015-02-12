@@ -23,7 +23,10 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{capture name=path}{l s='Bank-wire payment.' mod='bankwire'}{/capture}
+{capture name=path}
+	<a href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html':'UTF-8'}" title="{l s='Go back to the Checkout' mod='bankwire'}">{l s='Checkout' mod='bankwire'}</a><span class="navigation-pipe">{$navigationPipe}</span>{l s='Bank-wire payment' mod='bankwire'}
+{/capture}
+
 {include file="$tpl_dir./breadcrumb.tpl"}
 
 <h2>{l s='Order summary' mod='bankwire'}</h2>
@@ -35,7 +38,7 @@
 	<p class="warning">{l s='Your shopping cart is empty.' mod='bankwire'}</p>
 {else}
 
-<h3>{l s='Bank-wire payment.' mod='bankwire'}</h3>
+<h3>{l s='Bank-wire payment' mod='bankwire'}</h3>
 <form action="{$link->getModuleLink('bankwire', 'validation', [], true)|escape:'html'}" method="post">
 <p>
 	<img src="{$this_path_bw}bankwire.jpg" alt="{l s='Bank wire' mod='bankwire'}" width="86" height="49" style="float:left; margin: 0px 10px 5px 0px;" />
@@ -69,7 +72,7 @@
 <p>
 	{l s='Bank wire account information will be displayed on the next page.' mod='bankwire'}
 	<br /><br />
-	<b>{l s='Please confirm your order by clicking "I confirm my order."' mod='bankwire'}.</b>
+	<b>{l s='Please confirm your order by clicking "I confirm my order".' mod='bankwire'}</b>
 </p>
 <p class="cart_navigation" id="cart_navigation">
 	<input type="submit" value="{l s='I confirm my order' mod='bankwire'}" class="exclusive_large" />

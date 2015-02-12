@@ -36,7 +36,7 @@ class StatsPersonalInfos extends ModuleGraph
 	{
 		$this->name = 'statspersonalinfos';
 		$this->tab = 'analytics_stats';
-		$this->version = '1.2';
+		$this->version = '1.3.1';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -70,13 +70,13 @@ class StatsPersonalInfos extends ModuleGraph
 					'<br>'.
 					$this->l('Storing registered customer information allows you to accurately define customer profiles so you can adapt your special deals and promotions.').'
 				</p>
-				<p>
+				<div>
 					'.$this->l('You can increase your sales by:').'
 					<ul>
 						<li class="bullet">'.$this->l('Launching targeted advertisement campaigns.').'</li>
 						<li class="bullet">'.$this->l('Contacting a group of clients by email or newsletter.').'</li>
 					</ul>
-				</p>
+				</div>
 			</div>';
 		$has_customers = (bool)Db::getInstance()->getValue('SELECT id_customer FROM '._DB_PREFIX_.'customer');
 		if ($has_customers)
@@ -120,7 +120,7 @@ class StatsPersonalInfos extends ModuleGraph
 						<div class="col-lg-4">
 							<p>'.$this->l('Gender distribution allows you to determine the percentage of men and women shoppers on your store.').'</p>
 							<hr/>
-							<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI']).'&export=1&exportType=gender">
+							<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI'].'&export=1&exportType=gender').'">
 								<i class="icon-cloud-upload"></i> '.$this->l('CSV Export').'
 							</a>
 						</div>
@@ -137,7 +137,7 @@ class StatsPersonalInfos extends ModuleGraph
 						<div class="col-lg-4">
 							<p>'.$this->l('Age ranges allow you to better understand target demographics.').'</p>
 							<hr/>
-							<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI']).'&export=1&exportType=age">
+							<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI'].'&export=1&exportType=age').'">
 								<i class="icon-cloud-upload"></i> '.$this->l('CSV Export').'
 							</a>
 						</div>
@@ -154,7 +154,7 @@ class StatsPersonalInfos extends ModuleGraph
 						<div class="col-lg-4">
 							<p>'.$this->l('Country distribution allows you to analyze which part of the World your customers are shopping from.').'</p>
 							<hr/>
-							<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI']).'&export=1&exportType=country">
+							<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI'].'&export=1&exportType=country').'">
 								<i class="icon-cloud-upload"></i> '.$this->l('CSV Export').'
 							</a>
 						</div>
@@ -171,7 +171,7 @@ class StatsPersonalInfos extends ModuleGraph
 						<div class="col-lg-4">
 							<p>'.$this->l('Currency range allows you to determine which currency your customers are using.').'</p>
 							<hr/>
-							<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI']).'&export=1&exportType=currency">
+							<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI'].'&export=1&exportType=currency').'">
 								<i class="icon-cloud-upload"></i> '.$this->l('CSV Export').'
 							</a>
 						</div>
@@ -188,7 +188,7 @@ class StatsPersonalInfos extends ModuleGraph
 						<div class="col-lg-4">
 							<p>'.$this->l('Language distribution allows you to analyze the browsing language used by your customers.').'</p>
 							<hr/>
-							<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI']).'&export=1&exportType=language">
+							<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI'].'&export=1&exportType=language').'">
 								<i class="icon-cloud-upload"></i> '.$this->l('CSV Export').'
 							</a>
 						</div>

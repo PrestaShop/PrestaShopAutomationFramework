@@ -40,9 +40,10 @@ class Cheque extends PaymentModule
 	{
 		$this->name = 'cheque';
 		$this->tab = 'payments_gateways';
-		$this->version = '2.5';
+		$this->version = '2.5.5';
 		$this->author = 'PrestaShop';
 		$this->controllers = array('payment', 'validation');
+		$this->is_eu_compatible = 1;
 
 		$this->currencies = true;
 		$this->currencies_mode = 'checkbox';
@@ -54,7 +55,7 @@ class Cheque extends PaymentModule
 			$this->address = $config['CHEQUE_ADDRESS'];
 
 		$this->bootstrap = true;
-		parent::__construct();	
+		parent::__construct();
 
 		$this->displayName = $this->l('Payments by check');
 		$this->description = $this->l('This module allows you to accept payments by check.');
@@ -64,7 +65,7 @@ class Cheque extends PaymentModule
 			$this->warning = $this->l('The "Pay to the order of" and "Address" fields must be configured before using this module.');
 		if (!count(Currency::checkPaymentCurrencies($this->id)))
 			$this->warning = $this->l('No currency has been set for this module.');
-	
+
 		$this->extra_mail_vars = array(
 											'{cheque_name}' => Configuration::get('CHEQUE_NAME'),
 											'{cheque_address}' => Configuration::get('CHEQUE_ADDRESS'),
@@ -74,7 +75,7 @@ class Cheque extends PaymentModule
 
 	public function install()
 	{
-		if (!parent::install() || !$this->registerHook('payment') || !$this->registerHook('paymentReturn'))
+		if (!parent::install() || !$this->registerHook('payment') || ! $this->registerHook('displayPaymentEU') || !$this->registerHook('paymentReturn'))
 			return false;
 		return true;
 	}
@@ -147,13 +148,27 @@ class Cheque extends PaymentModule
 		return $this->display(__FILE__, 'payment.tpl');
 	}
 
+	public function hookDisplayPaymentEU($params)
+	{
+		if (!$this->active)
+			return;
+		if (!$this->checkCurrency($params['cart']))
+			return;
+
+		return array(
+			'cta_text' => $this->l('Pay by Cheque'),
+			'logo' => Media::getMediaPath(dirname(__FILE__).'/cheque.png'),
+			'action' => $this->context->link->getModuleLink($this->name, 'validation', array(), true)
+		);
+	}
+
 	public function hookPaymentReturn($params)
 	{
 		if (!$this->active)
 			return;
 
 		$state = $params['objOrder']->getCurrentState();
-		if ($state == Configuration::get('PS_OS_CHEQUE') || $state == Configuration::get('PS_OS_OUTOFSTOCK'))
+		if (in_array($state, array(Configuration::get('PS_OS_CHEQUE'), Configuration::get('PS_OS_OUTOFSTOCK'), Configuration::get('PS_OS_OUTOFSTOCK_UNPAID'))))
 		{
 			$this->smarty->assign(array(
 				'total_to_pay' => Tools::displayPrice($params['total_to_pay'], $params['currencyObj'], false),
@@ -181,7 +196,7 @@ class Cheque extends PaymentModule
 					return true;
 		return false;
 	}
-	
+
 	public function renderForm()
 	{
 		$fields_form = array(
@@ -195,12 +210,14 @@ class Cheque extends PaymentModule
 						'type' => 'text',
 						'label' => $this->l('Pay to the order of (name)'),
 						'name' => 'CHEQUE_NAME',
+						'required' => true
 					),
 					array(
 						'type' => 'textarea',
 						'label' => $this->l('Address'),
 						'desc' => $this->l('Address where the check should be sent to.'),
 						'name' => 'CHEQUE_ADDRESS',
+						'required' => true
 					),
 				),
 				'submit' => array(
@@ -208,10 +225,10 @@ class Cheque extends PaymentModule
 				)
 			),
 		);
-		
+
 		$helper = new HelperForm();
 		$helper->show_toolbar = false;
-		$helper->table =  $this->table;
+		$helper->table = $this->table;
 		$lang = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
 		$helper->default_form_language = $lang->id;
 		$helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') ? Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') : 0;
@@ -229,7 +246,7 @@ class Cheque extends PaymentModule
 
 		return $helper->generateForm(array($fields_form));
 	}
-	
+
 	public function getConfigFieldsValues()
 	{
 		return array(

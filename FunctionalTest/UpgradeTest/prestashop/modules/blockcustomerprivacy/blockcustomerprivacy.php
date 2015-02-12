@@ -36,7 +36,7 @@ class Blockcustomerprivacy extends Module
 			$this->tab = 'front_office_features';
 		else
 			$this->tab = 'Blocks';
-		$this->version = '1.1.1';
+		$this->version = '1.1.2';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 			
@@ -135,8 +135,7 @@ class Blockcustomerprivacy extends Module
 						'autoload_rte' => true,
 						'label' => $this->l('Customer data privacy message:'),
 						'name' => 'custpriv_message',
-						'desc' => $this->l('The customer data privacy message will be displayed in the account creation form.').'<br>'.$this->l('
-Tip: If the customer privacy message is too long to be written directly in the form, you can add a link to one of your pages. This can easily be created via the "CMS" page under the "Preferences" menu.')
+						'desc' => $this->l('The customer data privacy message will be displayed in the account creation form.').'<br>'.$this->l('Tip: If the customer privacy message is too long to be written directly in the form, you can add a link to one of your pages. This can easily be created via the "CMS" page under the "Preferences" menu.')
 					),
 				),
 				'submit' => array(

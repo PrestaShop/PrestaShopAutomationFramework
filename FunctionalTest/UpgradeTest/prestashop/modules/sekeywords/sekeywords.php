@@ -37,7 +37,7 @@ class SEKeywords extends ModuleGraph
 	{
 		$this->name = 'sekeywords';
 		$this->tab = 'analytics_stats';
-		$this->version = '1.2.2';
+		$this->version = '1.2.4';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -114,7 +114,7 @@ class SEKeywords extends ModuleGraph
 		<div class="alert alert-warning">
 			<h4>'.$this->l('Identify external search engine keywords').'</h4>
 			<p>'
-			.$this->l('This is one of the most common ways of finding a website through a search engine.').
+			.$this->l('This is one of the most common ways of finding a website through a search engine.').'&nbsp;'.
 			$this->l('Identifying the most popular keywords entered by your new visitors allows you to see the products you should put in front if you want to achieve better visibility in search engines.').'
 			</p>
 			<p>&nbsp;</p>
@@ -173,7 +173,7 @@ class SEKeywords extends ModuleGraph
 			'.$form.'<br/>'.$table;
 		}
 		else
-			$this->html .= '<p>'.$form.'<strong>'.$this->l('No keywords').'</strong></p>';
+			$this->html .= $form.'<p><strong>'.$this->l('No keywords').'</strong></p>';
 
 		return $this->html;
 	}

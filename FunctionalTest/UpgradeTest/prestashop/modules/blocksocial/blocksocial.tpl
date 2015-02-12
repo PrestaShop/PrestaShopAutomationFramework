@@ -33,5 +33,7 @@
 		{if $youtube_url != ''}<li class="youtube"><a class="_blank" href="{$youtube_url|escape:html:'UTF-8'}">{l s='YouTube' mod='blocksocial'}</a></li>{/if}
 		{if $google_plus_url != ''}<li class="google_plus"><a class="_blank" href="{$google_plus_url|escape:html:'UTF-8'}">{l s='Google+' mod='blocksocial'}</a></li>{/if}
 		{if $pinterest_url != ''}<li class="pinterest"><a class="_blank" href="{$pinterest_url|escape:html:'UTF-8'}">{l s='Pinterest' mod='blocksocial'}</a></li>{/if}
+		{if $vimeo_url != ''}<li class="vimeo"><a href="{$vimeo_url|escape:html:'UTF-8'}">{l s='Vimeo' mod='blocksocial'}</a></li>{/if}
+		{if $instagram_url != ''}<li class="instagram"><a class="_blank" href="{$instagram_url|escape:html:'UTF-8'}">{l s='Instagram' mod='blocksocial'}</a></li>{/if}
 	</ul>
 </div>

@@ -35,7 +35,7 @@ class StatsCheckUp extends Module
 	{
 		$this->name = 'statscheckup';
 		$this->tab = 'analytics_stats';
-		$this->version = '1.2';
+		$this->version = '1.3.1';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -159,7 +159,7 @@ class StatsCheckUp extends Module
 		<div class="panel-heading">'
 			.$this->displayName.'
 		</div>
-		<form action="'.AdminController::$currentIndex.'&token='.Tools::safeOutput(Tools::getValue('token')).'&module='.$this->name.'" method="post" class="checkup form-horizontal">
+		<form action="'.Tools::safeOutput(AdminController::$currentIndex.'&token='.Tools::getValue('token').'&module='.$this->name).'" method="post" class="checkup form-horizontal">
 			<table class="table checkup">
 				<thead>
 					<tr>
@@ -200,7 +200,7 @@ class StatsCheckUp extends Module
 				<i class="icon-save"></i> '.$this->l('Save').'
 			</button> 
 		</form>
-		<form action="'.AdminController::$currentIndex.'&token='.Tools::safeOutput(Tools::getValue('token')).'&module='.$this->name.'" method="post" class="form-horizontal alert">
+		<form action="'.Tools::safeOutput(AdminController::$currentIndex.'&token='.Tools::getValue('token').'&module='.$this->name).'" method="post" class="form-horizontal alert">
 			<div class="row">
 				<div class="col-lg-12">
 					<label class="control-label pull-left">'.$this->l('Order by').'</label>
@@ -252,9 +252,13 @@ class StatsCheckUp extends Module
 				WHERE id_product = '.(int)$row['id_product'].Shop::addSqlRestrictionOnLang('pl'));
 			foreach ($descriptions as $description)
 			{
-				$row['desclength_'.$description['iso_code']] = Tools::strlen(strip_tags($description['description']));
-				$scores['description_'.$description['iso_code']] = ($row['desclength_'.$description['iso_code']] < Configuration::get('CHECKUP_DESCRIPTIONS_LT') ? 0 : ($row['desclength_'.$description['iso_code']] > Configuration::get('CHECKUP_DESCRIPTIONS_GT') ? 2 : 1));
-				$totals['description_'.$description['iso_code']] += $scores['description_'.$description['iso_code']];
+				if (isset($description['iso_code']) && isset($description['description']))
+					$row['desclength_'.$description['iso_code']] = Tools::strlen(strip_tags($description['description']));
+				if (isset($description['iso_code']))
+				{
+					$scores['description_'.$description['iso_code']] = ($row['desclength_'.$description['iso_code']] < Configuration::get('CHECKUP_DESCRIPTIONS_LT') ? 0 : ($row['desclength_'.$description['iso_code']] > Configuration::get('CHECKUP_DESCRIPTIONS_GT') ? 2 : 1));
+					$totals['description_'.$description['iso_code']] += $scores['description_'.$description['iso_code']];
+				}
 			}
 			$scores['average'] = array_sum($scores) / $divisor;
 			$scores['average'] = ($scores['average'] < 1 ? 0 : ($scores['average'] > 1.5 ? 2 : 1));
@@ -262,7 +266,7 @@ class StatsCheckUp extends Module
 			$this->html .= '
 				<tr>
 					<td>'.$row['id_product'].'</td>
-					<td><a href="index.php?tab=AdminProducts&updateproduct&id_product='.$row['id_product'].'&token='.$token_products.'">'.Tools::substr($row['name'], 0, 42).'</a></td>
+					<td><a href="'.Tools::safeOutput('index.php?tab=AdminProducts&updateproduct&id_product='.$row['id_product'].'&token='.$token_products).'">'.Tools::substr($row['name'], 0, 42).'</a></td>
 					<td class="center">'.$array_colors[$scores['active']].'</td>';
 				foreach ($languages as $language)
 					if (isset($row['desclength_'.$language['iso_code']]))

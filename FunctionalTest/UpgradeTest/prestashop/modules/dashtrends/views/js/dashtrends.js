@@ -3,6 +3,10 @@ var dashtrends_chart;
 
 function line_chart_trends(widget_name, chart_details)
 {
+	if (chart_details.data[0].values.length <= 1)
+		$('#dash_trends_chart1').hide();
+	else
+		$('#dash_trends_chart1').show();
 	nv.addGraph(function() {  
 		var chart = nv.models.lineChart()
 			.useInteractiveGuideline(true)
@@ -10,7 +14,8 @@ function line_chart_trends(widget_name, chart_details)
 			.y(function(d) { return (d !== undefined ? d[1] : 0); });
 	
 		chart.xAxis.tickFormat(function(d) {
-			return d3.time.format('%m/%d/%y')(new Date(d*1000))
+			date = new Date(d*1000);
+			return date.format(chart_details['date_format']);
 		});
 
 		first_data = new Array();
@@ -72,3 +77,7 @@ function selectDashtrendsChart(element, type)
 		.datum(current_charts)
 		.call(dashtrends_chart);
 }
+
+$(document).ready(function(){
+    $("dl").tooltip();
+});

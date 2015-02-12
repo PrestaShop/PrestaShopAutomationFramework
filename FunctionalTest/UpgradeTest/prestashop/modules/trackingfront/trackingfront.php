@@ -33,7 +33,7 @@ class TrackingFront extends Module
 	{
 		$this->name = 'trackingfront';
 		$this->tab = 'shipping_logistics';
-		$this->version = '1.7';
+		$this->version = '1.8.3';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -49,8 +49,17 @@ class TrackingFront extends Module
 		if (Tools::isSubmit('ajaxProductFilter'))
 		{
 			$fake_employee = new Employee();
+			$fake_employee->id = 424242;
 			$fake_employee->stats_date_from = $this->context->cookie->stats_date_from;
 			$fake_employee->stats_date_to = $this->context->cookie->stats_date_to;
+			
+			if (empty($fake_employee->stats_date_from) || empty($fake_employee->stats_date_to) || $fake_employee->stats_date_from == '0000-00-00' || $fake_employee->stats_date_to == '0000-00-00')
+			{
+				if (empty($fake_employee->stats_date_from) || $fake_employee->stats_date_from == '0000-00-00')
+					$fake_employee->stats_date_from = date('Y').'-01-01';
+				if (empty($fake_employee->stats_date_to) || $fake_employee->stats_date_to == '0000-00-00')
+					$fake_employee->stats_date_to = date('Y').'-12-31';
+			}
 
 			$result = Db::getInstance()->getRow('
 			SELECT `id_referrer`
@@ -59,7 +68,6 @@ class TrackingFront extends Module
 
 			if (isset($result['id_referrer']) && (int)$result['id_referrer'] > 0)
 				Referrer::getAjaxProduct((int)$result['id_referrer'], (int)Tools::getValue('id_product'), $fake_employee);
-
 		}
 		elseif (Tools::isSubmit('logout_tracking'))
 		{

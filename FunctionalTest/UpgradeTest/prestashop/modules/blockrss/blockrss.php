@@ -47,7 +47,7 @@ class Blockrss extends Module
 		$this->displayName = $this->l('RSS feed block');
 		$this->description = $this->l('Adds a block displaying a RSS feed.');
 
-		$this->version = '1.2.1';
+		$this->version = '1.2.2';
 		$this->author = 'PrestaShop';
 		$this->error = false;
 		$this->valid = false;
@@ -100,9 +100,12 @@ class Blockrss extends Module
 			/* Even if the feed was reachable, We need to make sure that the feed is well formated */
 			else
 			{
-				try {	
+				try
+				{	
 					$xmlFeed = new XML_Feed_Parser($contents);
-				} catch (XML_Feed_Parser_Exception $e) {
+				}
+				catch (XML_Feed_Parser_Exception $e)
+				{
 					$errors[] = $this->l('Invalid feed:').' '.$e->getMessage();
 				}
 			}
@@ -127,7 +130,6 @@ class Blockrss extends Module
 			if (sizeof($errors))
 				$output .= $this->displayError(implode('<br />', $errors));
 		}
-
 		return $output.$this->renderForm();
 	}
 
@@ -151,10 +153,24 @@ class Blockrss extends Module
 							if (@$item = $src->getEntryByOffset($i))
 							{
 								$xmlValues = array();
-								foreach(self::$xmlFields as $xmlField)
+								foreach (self::$xmlFields as $xmlField)
 									$xmlValues[$xmlField] = $item->__get($xmlField);
 								$xmlValues['enclosure'] = $item->getEnclosure();
-								# Compatibility
+								
+								// First image
+								if (isset($xmlValues['content']) && $xmlValues['content'])
+								{
+									preg_match('/< *img[^>]*src *= *["\']?([^"\']*)/', $xmlValues['content'], $image);
+									if (array_key_exists(1, $image) && $image[1])
+									{
+										// Try if distant image exist : timeout 0.3s
+										$context = stream_context_create(array('http' => array('timeout' => 0.3)));
+										if (file_get_contents($image[1], false, $context, -1, 1) !== false)
+											$xmlValues['image'] = $image[1];
+									}
+								}
+								
+								// Compatibility
 								$xmlValues['url'] = $xmlValues['link']; 
 								$rss_links[] = $xmlValues;
 							}
@@ -166,7 +182,6 @@ class Blockrss extends Module
 			// Display smarty
 			$this->smarty->assign(array('title' => ($title ? $title : $this->l('RSS feed')), 'rss_links' => $rss_links));
 		}
-
  	 	return $this->display(__FILE__, 'blockrss.tpl', $cacheId);
  	}
 

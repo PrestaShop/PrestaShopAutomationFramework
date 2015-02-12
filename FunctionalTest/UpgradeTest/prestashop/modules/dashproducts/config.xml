@@ -2,7 +2,7 @@
 <module>
 	<name>dashproducts</name>
 	<displayName><![CDATA[Dashboard Products]]></displayName>
-	<version><![CDATA[0.3.1]]></version>
+	<version><![CDATA[0.3.2]]></version>
 	<description><![CDATA[]]></description>
 	<author><![CDATA[PrestaShop]]></author>
 	<tab><![CDATA[dashboard]]></tab>

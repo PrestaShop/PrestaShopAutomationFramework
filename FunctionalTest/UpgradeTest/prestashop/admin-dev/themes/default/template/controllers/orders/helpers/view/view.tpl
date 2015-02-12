@@ -1,5 +1,5 @@
 {*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -49,10 +49,17 @@
 	var statesShipped = new Array();
 	var has_voucher = {if count($discounts)}1{else}0{/if};
 	{foreach from=$states item=state}
-		{if (!$currentState->shipped && $state['shipped'])}
+		{if (isset($currentState->shipped) && !$currentState->shipped && $state['shipped'])}
 			statesShipped.push({$state['id_order_state']});
 		{/if}
 	{/foreach}
+	var order_discount_price = {if ($order->getTaxCalculationMethod() == $smarty.const.PS_TAX_EXC)}
+									{$order->total_discounts_tax_excl}
+								{else}
+									{$order->total_discounts_tax_incl}
+								{/if};
+
+	var errorRefund = "{l s='Error. You cannot refund a negative amount.'}";
 	</script>
 
 	{assign var="hook_invoice" value={hook h="displayInvoice" id_order=$order->id}}
@@ -80,7 +87,7 @@
 				<div class="kpi-content">
 					<i class="icon-comments"></i>
 					<span class="title">{l s='Messages'}</span>
-					<span class="value"><a href="{$link->getAdminLink('AdminCustomerThreads')|escape:'html':'UTF-8'}">{sizeof($customer_thread_message)}</a></span>
+					<span class="value"><a href="{$link->getAdminLink('AdminCustomerThreads')|escape:'html':'UTF-8'}&amp;id_order={$order->id|intval}">{sizeof($customer_thread_message)}</a></span>
 				</div>
 			</div>
 			<div class="col-xs-6 col-sm-3 box-stats color1" >
@@ -105,10 +112,10 @@
 					<span class="badge">{l s="#"}{$order->id}</span>
 					<div class="panel-heading-action">
 						<div class="btn-group">
-							<a class="btn btn-default" href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$previousOrder|intval}">
+							<a class="btn btn-default{if !$previousOrder} disabled{/if}" href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$previousOrder|intval}">
 								<i class="icon-backward"></i>
 							</a>
-							<a class="btn btn-default" href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$nextOrder|intval}">
+							<a class="btn btn-default{if !$nextOrder} disabled{/if}" href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$nextOrder|intval}">
 								<i class="icon-forward"></i>
 							</a>
 						</div>
@@ -121,8 +128,8 @@
 						{l s='Print order'}
 					</a>
 					&nbsp;
-					{if Configuration::get('PS_INVOICE') && count($invoices_collection) && (($currentState && $currentState->invoice && $order->invoice_number) || $order->invoice_number)}
-						<a class="btn btn-default" href="{$link->getAdminLink('AdminPdf')|escape:'html':'UTF-8'}&amp;submitAction=generateInvoicePDF&amp;id_order={$order->id|intval}" target="_blank">
+					{if Configuration::get('PS_INVOICE') && count($invoices_collection) && $order->invoice_number}
+						<a data-selenium-id="view_invoice" class="btn btn-default _blank" href="{$link->getAdminLink('AdminPdf')|escape:'html':'UTF-8'}&amp;submitAction=generateInvoicePDF&amp;id_order={$order->id|intval}">
 							<i class="icon-file"></i>
 							{l s='View invoice'}
 						</a>
@@ -133,8 +140,8 @@
 						</span>
 					{/if}
 					&nbsp;
-					{if (($currentState && $currentState->delivery && $order->delivery_number) || $order->delivery_number)}
-						<a class="btn btn-default"  href="{$link->getAdminLink('AdminPdf')|escape:'html':'UTF-8'}&amp;submitAction=generateDeliverySlipPDF&amp;id_order={$order->id|intval}" target="_blank">
+					{if $order->delivery_number}
+						<a class="btn btn-default _blank"  href="{$link->getAdminLink('AdminPdf')|escape:'html':'UTF-8'}&amp;submitAction=generateDeliverySlipPDF&amp;id_order={$order->id|intval}">
 							<i class="icon-truck"></i>
 							{l s='View delivery slip'}
 						</a>
@@ -217,7 +224,7 @@
 								<div class="col-lg-9">
 									<select id="id_order_state" class="chosen form-control" name="id_order_state">
 									{foreach from=$states item=state}
-										<option value="{$state['id_order_state']|intval}"{if $state['id_order_state'] == $currentState->id} selected="selected" disabled="disabled"{/if}>{$state['name']|escape}</option>
+										<option value="{$state['id_order_state']|intval}"{if isset($currentState) && $state['id_order_state'] == $currentState->id} selected="selected" disabled="disabled"{/if}>{$state['name']|escape}</option>
 									{/foreach}
 									</select>
 									<input type="hidden" name="id_order" value="{$order->id}" />
@@ -319,7 +326,7 @@
 											<td>{$line.type}</td>
 											<td>{$line.state_name}</td>
 											<td class="actions">
-												<span id="shipping_number_show">{if isset($line.url) && isset($line.tracking_number)}<a href="{$line.url|replace:'@':$line.tracking_number|escape:'html':'UTF-8'}">{$line.tracking_number}</a>{elseif isset($line.tracking_number)}{$line.tracking_number}{/if}</span>
+												<span class="shipping_number_show">{if isset($line.url) && isset($line.tracking_number)}<a href="{$line.url|replace:'@':$line.tracking_number|escape:'html':'UTF-8'}">{$line.tracking_number}</a>{elseif isset($line.tracking_number)}{$line.tracking_number}{/if}</span>
 												{if $line.can_edit}
 												<form method="post" action="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}&amp;id_order_invoice={if $line.id_order_invoice}{$line.id_order_invoice|intval}{else}0{/if}&amp;id_carrier={if $line.id_carrier}{$line.id_carrier|escape:'html':'UTF-8'}{else}0{/if}">
 													<span class="shipping_number_edit" style="display:none;">
@@ -374,7 +381,7 @@
 					{l s="Payment"} <span class="badge">{$order->getOrderPayments()|@count}</span>
 				</div>
 				{if count($order->getOrderPayments()) > 0}
-					<p class="alert alert-danger" style="{if round($orders_total_paid_tax_incl, 2) == round($total_paid, 2) || $currentState->id == 6}display: none;{/if}">
+					<p class="alert alert-danger"{if round($orders_total_paid_tax_incl, 2) == round($total_paid, 2) || (isset($currentState) && $currentState->id == 6)} style="display: none;"{/if}>
 						{l s='Warning'}
 						<strong>{displayPrice price=$total_paid currency=$currency->id}</strong>
 						{l s='paid instead of'}
@@ -482,11 +489,12 @@
 										</div>
 									</td>
 									<td>
-										<select name="payment_method" class="payment_method">
+										<input name="payment_method" list="payment_method" class="payment_method">
+										<datalist id="payment_method">
 										{foreach from=$payment_methods item=payment_method}
-											<option value="{$payment_method}">{$payment_method}</option>
+											<option value="{$payment_method}">
 										{/foreach}
-										</select>
+										</datalist>
 									</td>
 									<td>
 										<input type="text" name="payment_transaction_id" value="" class="form-control fixed-width-sm"/>
@@ -766,9 +774,9 @@
 									</div>
 								</div>
 								<div class="message-body">
-									
+
 									<span class="message-date">&nbsp;<i class="icon-calendar"></i>
-										{dateFormat date=$message['date_add']} - 
+										{dateFormat date=$message['date_add']} -
 									</span>
 									<h4 class="message-item-heading">
 										{if ($message['elastname']|escape:'html':'UTF-8')}{$message['efirstname']|escape:'html':'UTF-8'}
@@ -820,7 +828,7 @@
 										<label for="visibility_on">
 											{l s='Yes'}
 										</label>
-										<input type="radio" name="visibility" id="visibility_off" value="1" checked="checked" /> 
+										<input type="radio" name="visibility" id="visibility_off" value="1" checked="checked" />
 										<label for="visibility_off">
 											{l s='No'}
 										</label>
@@ -843,7 +851,7 @@
 							<button type="submit" id="submitMessage" class="btn btn-primary pull-right" name="submitMessage">
 								{l s='Send message'}
 							</button>
-							<a class="btn btn-default" href="{$link->getAdminLink('AdminCustomerThreads')|escape:'html':'UTF-8'}">
+							<a class="btn btn-default" href="{$link->getAdminLink('AdminCustomerThreads')|escape:'html':'UTF-8'}&amp;id_order={$order->id|intval}">
 								{l s='Show all messages'}
 								<i class="icon-external-link"></i>
 							</a>
@@ -1059,6 +1067,7 @@
 													</div>
 													<input type="text" name="partialRefundShippingCost" value="0" />
 												</div>
+												<p class="help-block"><i class="icon-warning-sign"></i>{l s='(excl tax)'}</p>
 											</td>
 										</tr>
 										{if ($order->getTaxCalculationMethod() == $smarty.const.PS_TAX_EXC)}
@@ -1095,7 +1104,7 @@
 							<p class="checkbox">
 								<label for="generateCreditSlip">
 									<input type="checkbox" id="generateCreditSlip" name="generateCreditSlip" onclick="toggleShippingCost()" />
-									{l s='Generate a credit card slip'}
+									{l s='Generate a credit slip'}
 								</label>
 							</p>
 							<p class="checkbox">
@@ -1110,7 +1119,35 @@
 									{l s='Repay shipping costs'}
 								</label>
 							</p>
+							{if $order->total_discounts_tax_excl > 0 || $order->total_discounts_tax_incl > 0}
+							<br/><p>{l s='This order has been partially paid by voucher. Choose the amount you want to refund:'}</p>
+							<p class="radio">
+								<label id="lab_refund_total_1" for="refund_total_1">
+									<input type="radio" value="0" name="refund_total_voucher_off" id="refund_total_1" checked="checked" />
+									{l s='Include amount of initial voucher: '}
+								</label>
+							</p>
+							<p class="radio">
+								<label id="lab_refund_total_2" for="refund_total_2">
+									<input type="radio" value="1" name="refund_total_voucher_off" id="refund_total_2"/>
+									{l s='Exclude amount of initial voucher: '}
+								</label>
+							</p>
+							<div class="nowrap radio-inline">
+								<label id="lab_refund_total_3" class="pull-left" for="refund_total_3">
+									{l s='Amount of your choice: '}
+									<input type="radio" value="2" name="refund_total_voucher_off" id="refund_total_3"/>
+								</label>
+								<div class="input-group col-lg-1 pull-left">
+									<div class="input-group-addon">
+										{$currency->prefix}
+										{$currency->suffix}
+									</div>
+									<input type="text" class="input fixed-width-md" name="refund_total_voucher_choose" value="0"/>
+								</div>
+							</div>
 							{/if}
+						{/if}
 						</div>
 						{if (!$order->hasBeenDelivered() || ($order->hasBeenDelivered() && Configuration::get('PS_ORDER_RETURN')))}
 						<div class="row">
@@ -1131,6 +1168,35 @@
 								{l s='Generate a voucher'}
 							</label>
 						</p>
+						{if $order->total_discounts_tax_excl > 0 || $order->total_discounts_tax_incl > 0}
+						<p>{l s='This order has been partially paid by voucher. Choose the amount you want to refund:'}</p>
+						<p class="radio">
+							<label id="lab_refund_1" for="refund_1">
+								<input type="radio" value="0" name="refund_voucher_off" id="refund_1" checked="checked" />
+								{l s='Product(s) price: '}
+							</label>
+						</p>
+						<p class="radio">
+							<label id="lab_refund_2" for="refund_2">
+								<input type="radio" value="1" name="refund_voucher_off" id="refund_2"/>
+								{l s='Product(s) price, excluding amount of initial voucher: '}
+							</label>
+						</p>
+						<div class="nowrap radio-inline">
+								<label id="lab_refund_3" class="pull-left" for="refund_3">
+									{l s='Amount of your choice: '}
+									<input type="radio" value="2" name="refund_voucher_off" id="refund_3"/>
+								</label>
+								<div class="input-group col-lg-1 pull-left">
+									<div class="input-group-addon">
+										{$currency->prefix}
+										{$currency->suffix}
+									</div>
+									<input type="text" class="input fixed-width-md" name="refund_voucher_choose" value="0"/>
+								</div>
+							</div>
+						{/if}
+						<br/>
 						<button type="submit" name="partialRefund" class="btn btn-default">
 							<i class="icon-check"></i> {l s='Partial refund'}
 						</button>
@@ -1222,7 +1288,7 @@
 			$(".textarea-autosize").autosize();
 
 			geocoder.geocode({
-				address: '{$addresses.delivery->address1},{$addresses.delivery->postcode},{$addresses.delivery->city}{if ($addresses.delivery->id_state)},{$addresses.deliveryState->name}{/if},{$addresses.delivery->country}'
+				address: '{$addresses.delivery->address1|@addcslashes:'\''},{$addresses.delivery->postcode|@addcslashes:'\''},{$addresses.delivery->city|@addcslashes:'\''}{if isset($addresses.deliveryState->name) && $addresses.delivery->id_state},{$addresses.deliveryState->name|@addcslashes:'\''}{/if},{$addresses.delivery->country|@addcslashes:'\''}'
 				}, function(results, status) {
 				if (status === google.maps.GeocoderStatus.OK)
 				{
@@ -1234,7 +1300,7 @@
 					var delivery_marker = new google.maps.Marker({
 						map: delivery_map,
 						position: results[0].geometry.location,
-						url: 'http://maps.google.com?q={$addresses.delivery->address1|urlencode},{$addresses.delivery->postcode|urlencode},{$addresses.delivery->city|urlencode}{if ($addresses.delivery->id_state)},{$addresses.deliveryState->name|urlencode}{/if},{$addresses.delivery->country|urlencode}'
+						url: 'http://maps.google.com?q={$addresses.delivery->address1|urlencode},{$addresses.delivery->postcode|urlencode},{$addresses.delivery->city|urlencode}{if isset($addresses.deliveryState->name) && $addresses.delivery->id_state},{$addresses.deliveryState->name|urlencode}{/if},{$addresses.delivery->country|urlencode}'
 					});
 					google.maps.event.addListener(delivery_marker, 'click', function() {
 						window.open(delivery_marker.url);
@@ -1243,7 +1309,7 @@
 			});
 
 			geocoder.geocode({
-				address: '{$addresses.invoice->address1},{$addresses.invoice->postcode},{$addresses.invoice->city}{if ($addresses.invoice->id_state)},{$addresses.deliveryState->name}{/if},{$addresses.invoice->country}'
+				address: '{$addresses.invoice->address1|@addcslashes:'\''},{$addresses.invoice->postcode|@addcslashes:'\''},{$addresses.invoice->city|@addcslashes:'\''}{if isset($addresses.deliveryState->name) && $addresses.invoice->id_state},{$addresses.deliveryState->name|@addcslashes:'\''}{/if},{$addresses.invoice->country|@addcslashes:'\''}'
 				}, function(results, status) {
 				if (status === google.maps.GeocoderStatus.OK)
 				{
@@ -1255,14 +1321,14 @@
 					invoice_marker = new google.maps.Marker({
 						map: invoice_map,
 						position: results[0].geometry.location,
-						url: 'http://maps.google.com?q={$addresses.invoice->address1|urlencode},{$addresses.invoice->postcode|urlencode},{$addresses.invoice->city|urlencode}{if ($addresses.invoice->id_state)},{$addresses.deliveryState->name|urlencode}{/if},{$addresses.invoice->country|urlencode}'
+						url: 'http://maps.google.com?q={$addresses.invoice->address1|urlencode},{$addresses.invoice->postcode|urlencode},{$addresses.invoice->city|urlencode}{if isset($addresses.deliveryState->name) && $addresses.invoice->id_state},{$addresses.deliveryState->name|urlencode}{/if},{$addresses.invoice->country|urlencode}'
 					});
 					google.maps.event.addListener(invoice_marker, 'click', function() {
 						window.open(invoice_marker.url);
 					});
 				}
 			});
-			
+
 			var date = new Date();
 			var hours = date.getHours();
 			if (hours < 10)

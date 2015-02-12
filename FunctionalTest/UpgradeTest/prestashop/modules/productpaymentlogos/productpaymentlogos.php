@@ -33,7 +33,7 @@ class ProductPaymentLogos extends Module
 	{
 		$this->name = 'productpaymentlogos';
 		$this->tab = 'front_office_features';
-		$this->version = '1.3.5';
+		$this->version = '1.3.6';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -70,11 +70,12 @@ class ProductPaymentLogos extends Module
 			return;
 		if (!$this->isCached('productpaymentlogos.tpl', $this->getCacheId()))
 		{
-			$this->smarty->assign('banner_img', 'img/'.Configuration::get('PRODUCTPAYMENTLOGOS_IMG'));
-			$this->smarty->assign('banner_link', Configuration::get('PRODUCTPAYMENTLOGOS_LINK'));
-			$this->smarty->assign('banner_title', Configuration::get('PRODUCTPAYMENTLOGOS_TITLE'));
+			$this->smarty->assign(array(
+				'banner_img' => 'img/'.Configuration::get('PRODUCTPAYMENTLOGOS_IMG'),
+				'banner_link' => Configuration::get('PRODUCTPAYMENTLOGOS_LINK'),
+				'banner_title' => Configuration::get('PRODUCTPAYMENTLOGOS_TITLE')
+			));
 		}
-
 		return $this->display(__FILE__, 'productpaymentlogos.tpl', $this->getCacheId());
 	}
 

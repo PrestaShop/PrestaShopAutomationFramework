@@ -36,7 +36,7 @@ class BlockLink extends Module
 	{
 		$this->name = 'blocklink';
 		$this->tab = 'front_office_features';
-		$this->version = '1.5.4';
+		$this->version = '1.5.6';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -57,14 +57,14 @@ class BlockLink extends Module
 		$success = Configuration::updateValue('PS_BLOCKLINK_TITLE', array('1' => 'Block link', '2' => 'Bloc lien'));
 		$success &= Db::getInstance()->execute('
 		CREATE TABLE '._DB_PREFIX_.'blocklink (
-		`id_blocklink` int(10) NOT NULL AUTO_INCREMENT, 
+		`id_blocklink` int(10) NOT NULL AUTO_INCREMENT,
 		`url` varchar(254) NOT NULL,
 		`new_window` TINYINT(1) NOT NULL,
 		PRIMARY KEY(`id_blocklink`))
 		ENGINE='._MYSQL_ENGINE_.' default CHARSET=utf8');
 		$success &= Db::getInstance()->execute('
 		CREATE TABLE '._DB_PREFIX_.'blocklink_shop (
-		`id_blocklink` int(10) NOT NULL AUTO_INCREMENT, 
+		`id_blocklink` int(10) NOT NULL AUTO_INCREMENT,
 		`id_shop` int(10) NOT NULL,
 		PRIMARY KEY(`id_blocklink`, `id_shop`))
 		ENGINE='._MYSQL_ENGINE_.' default CHARSET=utf8');
@@ -147,7 +147,7 @@ class BlockLink extends Module
 	{
 		if ((int)$id > 0)
 		{
-			$sql = 'SELECT b.`id_blocklink`, b.`url`, b.`new_window` FROM `'._DB_PREFIX_.'blocklink` b WHERE b.id_blocklink='.$id;
+			$sql = 'SELECT b.`id_blocklink`, b.`url`, b.`new_window` FROM `'._DB_PREFIX_.'blocklink` b WHERE b.id_blocklink='.(int)$id;
 
 			if (!$results = Db::getInstance()->getRow($sql))
 				return false;
@@ -187,13 +187,17 @@ class BlockLink extends Module
 			$result[$i]['newWindow'] = $link['new_window'];
 			// Get multilingual text
 
-			if (!$texts = Db::getInstance()->executeS('SELECT `id_lang`, `text` 
-																	FROM '._DB_PREFIX_.'blocklink_lang 
-																	WHERE `id_blocklink`='.(int)$link['id_blocklink'])
+			if (!$texts = Db::getInstance()->executeS('
+					SELECT `id_lang`, `text`
+					FROM '._DB_PREFIX_.'blocklink_lang
+					WHERE `id_blocklink`='.(int)$link['id_blocklink']
+				)
 			)
 				return false;
+
 			foreach ($texts as $text)
 				$result[$i]['text_'.$text['id_lang']] = $text['text'];
+
 			$i++;
 		}
 
@@ -209,7 +213,7 @@ class BlockLink extends Module
 		if ((int)Tools::getValue('id_blocklink') > 0)
 		{
 			$id_link = (int)Tools::getValue('id_blocklink');
-			if (!Db::getInstance()->execute('UPDATE '._DB_PREFIX_.'blocklink SET `url` = \''.pSQL(Tools::getValue('url')).'\', `new_window` = '.(isset($_POST['newWindow']) ? 1 : 0).' WHERE `id_blocklink` = '.(int)$id_link))
+			if (!Db::getInstance()->execute('UPDATE '._DB_PREFIX_.'blocklink SET `url` = \''.pSQL(Tools::getValue('url')).'\', `new_window` = '.pSQL((int)Tools::getValue('newWindow')).' WHERE `id_blocklink` = '.(int)$id_link))
 				return false;
 			if (!Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.'blocklink_lang WHERE `id_blocklink` = '.(int)$id_link))
 				return false;
@@ -226,7 +230,7 @@ class BlockLink extends Module
 		}
 		else
 		{
-			if (!Db::getInstance()->execute('INSERT INTO '._DB_PREFIX_.'blocklink (`id_blocklink`, `url`, `new_window`) 
+			if (!Db::getInstance()->execute('INSERT INTO '._DB_PREFIX_.'blocklink (`id_blocklink`, `url`, `new_window`)
 														VALUES (NULL, \''.pSQL(Tools::getValue('url')).'\', '.((isset($_POST['newWindow']) && Tools::getValue('newWindow')) == 'on' ? 1 : 0).')') ||
 				!$id_link = Db::getInstance()->Insert_ID()
 			)
@@ -235,7 +239,7 @@ class BlockLink extends Module
 			foreach ($languages as $language)
 				if (!empty($_POST['text_'.$language['id_lang']]))
 				{
-					if (!Db::getInstance()->execute('INSERT INTO '._DB_PREFIX_.'blocklink_lang (`id_blocklink`, `id_lang`, `text`) 
+					if (!Db::getInstance()->execute('INSERT INTO '._DB_PREFIX_.'blocklink_lang (`id_blocklink`, `id_lang`, `text`)
 																VALUES ('.(int)$id_link.', '.(int)$language['id_lang'].', \''.pSQL(Tools::getValue('text_'.$language['id_lang'])).'\')')
 					)
 						return false;

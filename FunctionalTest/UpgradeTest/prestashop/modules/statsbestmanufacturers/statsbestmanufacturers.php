@@ -41,7 +41,7 @@ class StatsBestManufacturers extends ModuleGrid
 	{
 		$this->name = 'statsbestmanufacturers';
 		$this->tab = 'analytics_stats';
-		$this->version = '1.3';
+		$this->version = '1.4.1';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -103,9 +103,9 @@ class StatsBestManufacturers extends ModuleGrid
 
 		$this->html = '
 		<fieldset>
-			<legend><img src="../modules/'.$this->name.'/logo.gif" /> '.$this->displayName.'</legend>
+			<legend><img alt="'.$this->name.'" src="../modules/'.$this->name.'/logo.gif" /> '.$this->displayName.'</legend>
 			'.$this->engine($engine_params).'<br />
-			<a href="'.Tools::safeOutput($_SERVER['REQUEST_URI']).'&export=1"><img src="../img/admin/asterisk.gif" />'.$this->l('CSV Export').'</a>
+			<a href="'.Tools::safeOutput($_SERVER['REQUEST_URI'].'&export=1').'"><img alt="asterisk" src="../img/admin/asterisk.gif" />'.$this->l('CSV Export').'</a>
 		</fieldset>
 		';
 

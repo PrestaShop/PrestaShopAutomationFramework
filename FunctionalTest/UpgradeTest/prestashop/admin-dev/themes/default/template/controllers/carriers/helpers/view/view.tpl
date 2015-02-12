@@ -1,5 +1,5 @@
 {*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -38,7 +38,7 @@
 			<form action="" id="configuration_form" method="post" enctype="multipart/form-data" class="form-horizontal">
 				<div class="form-group">
 					<label class="control-label col-lg-3">{l s="Create a custom carrier"}</label>
-					<a class="btn btn-default" href="{$link->getAdminLink('AdminCarrierWizard')|escape:'html':'UTF-8'}">{l s="Add new carrier"}</a>
+					<a data-selenium-id="create_custom_carrier" class="btn btn-default" href="{$link->getAdminLink('AdminCarrierWizard')|escape:'html':'UTF-8'}">{l s="Add new carrier"}</a>
 					<div class="col-lg-9 col-lg-offset-3">
 						<p class="help-block">{l s="Use this tool to allow PrestaShop to know how an unknown carrier works. You can configure its shipping rates, its regional zones, its size and weight limits, etc."}</p>
 					</div>

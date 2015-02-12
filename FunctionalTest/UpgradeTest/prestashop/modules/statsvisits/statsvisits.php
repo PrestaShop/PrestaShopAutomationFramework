@@ -36,7 +36,7 @@ class StatsVisits extends ModuleGraph
 	{
 		$this->name = 'statsvisits';
 		$this->tab = 'analytics_stats';
-		$this->version = '1.4';
+		$this->version = '1.5.1';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -121,7 +121,7 @@ class StatsVisits extends ModuleGraph
 							<li>'.$this->l('Total visitors:').' <span class="totalStats">'.$total_guests.'</span></li>
 						</ul>
 						<hr/>
-						<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI']).'&export=1">
+						<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI'].'&export=1').'">
 							<i class="icon-cloud-upload"></i> '.$this->l('CSV Export').'
 						</a> ' : '').'
 					</div>

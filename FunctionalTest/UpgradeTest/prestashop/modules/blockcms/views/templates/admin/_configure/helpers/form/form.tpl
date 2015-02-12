@@ -121,7 +121,7 @@
 													{if (($key == (sizeof($cms_blocks_position) - 1)) || (sizeof($cms_blocks_position) == 1))}
 															style="display: none;"
 													{/if}
-															href="{$current}&amp;configure=blockcms&amp;id_cms_block={$cms_block['id_cms_block']}&amp;way=1&amp;position={(int)$cms_block['position'] + 1}&location=0&token={$token}">
+															href="{$current}&amp;configure=blockcms&amp;id_cms_block={$cms_block['id_cms_block']}&amp;way=1&amp;position={(int)$cms_block['position'] + 1}&location=0&amp;token={$token}">
 													<img src="{$smarty.const._PS_ADMIN_IMG_}down.gif" alt="{l s='Down' mod='blockcms'}" title="{l s='Down' mod='blockcms'}" />
 												</a>
 												<a

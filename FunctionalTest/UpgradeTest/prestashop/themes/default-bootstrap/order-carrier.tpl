@@ -1,5 +1,5 @@
 {*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -29,7 +29,7 @@
 		<h1 class="page-heading">{l s='Shipping:'}</h1>
 		{include file="$tpl_dir./order-steps.tpl"}
 		{include file="$tpl_dir./errors.tpl"}
-		<form id="form" action="{$link->getPageLink('order', true, NULL, "multi-shipping={$multi_shipping}")|escape:'html':'UTF-8'}" method="post" name="carrier_area">
+		<form id="form" action="{$link->getPageLink('order', true, NULL, "{if $multi_shipping}multi-shipping={$multi_shipping}{/if}")|escape:'html':'UTF-8'}" method="post" name="carrier_area">
 {else}
 	<div id="carrier_area" class="opc-main-block">
 		<h1 class="page-heading step-num"><span>2</span> {l s='Delivery methods'}</h1>
@@ -70,7 +70,7 @@
 							{foreach $option_list as $key => $option}
 								<div class="delivery_option {if ($option@index % 2)}alternate_{/if}item">
 									<div>
-										<table class="resume table table-bordered{if !$option.unique_carrier} not-displayable{/if}">
+										<table class="resume table table-bordered{if !$option.unique_carrier} hide{/if}">
 											<tr>
 												<td class="delivery_option_radio">
 													<input id="delivery_option_{$id_address|intval}_{$option@index}" class="delivery_option_radio" type="radio" name="delivery_option[{$id_address|intval}]" data-key="{$key}" data-id_address="{$id_address|intval}" value="{$key}"{if isset($delivery_option[$id_address]) && $delivery_option[$id_address] == $key} checked="checked"{/if} />
@@ -97,14 +97,12 @@
 													{if count($option_list) > 1}
 														{if $option.is_best_grade}
 															{if $option.is_best_price}
-																{l s='The best price and speed'}
+																<span class="best_grade best_grade_price best_grade_speed">{l s='The best price and speed'}</span>
 															{else}
-																{l s='The fastest'}
+																<span class="best_grade best_grade_speed">{l s='The fastest'}</span>
 															{/if}
-														{else}
-															{if $option.is_best_price}
-																{l s='The best price'}
-															{/if}
+														{else if $option.is_best_price}
+															<span class="best_grade best_grade_price">{l s='The best price'}</span>
 														{/if}
 													{/if}
 												</td>
@@ -128,7 +126,7 @@
 											</tr>
 										</table>
 										{if !$option.unique_carrier}
-											<table class="delivery_option_carrier{if isset($delivery_option[$id_address]) && $delivery_option[$id_address] == $key} selected{/if} resume table table-bordered{if $option.unique_carrier} not-displayable{/if}">
+											<table class="delivery_option_carrier{if isset($delivery_option[$id_address]) && $delivery_option[$id_address] == $key} selected{/if} resume table table-bordered{if $option.unique_carrier} hide{/if}">
 												<tr>
 													{if !$option.unique_carrier}
 														<td rowspan="{$option.carrier_list|@count}" class="delivery_option_radio first_item">
@@ -136,22 +134,26 @@
 														</td>
 													{/if}
 													{assign var="first" value=current($option.carrier_list)}
-													<td class="delivery_option_logo{if $first.product_list[0].carrier_list[0] eq 0} not-displayable{/if}">
+													<td class="delivery_option_logo{if $first.product_list[0].carrier_list[0] eq 0} hide{/if}">
 														{if $first.logo}
 															<img src="{$first.logo|escape:'htmlall':'UTF-8'}" alt="{$first.instance->name|escape:'htmlall':'UTF-8'}"/>
 														{else if !$option.unique_carrier}
 															{$first.instance->name|escape:'htmlall':'UTF-8'}
 														{/if}
 													</td>
-													<td class="{if $option.unique_carrier}first_item{/if}{if $first.product_list[0].carrier_list[0] eq 0} not-displayable{/if}">
+													<td class="{if $option.unique_carrier}first_item{/if}{if $first.product_list[0].carrier_list[0] eq 0} hide{/if}">
 														<input type="hidden" value="{$first.instance->id|intval}" name="id_carrier" />
 														{if isset($first.instance->delay[$cookie->id_lang])}
-															<i class="icon-info-sign"></i>{$first.instance->delay[$cookie->id_lang]|escape:'htmlall':'UTF-8'}
-															{if count($first.product_list) <= 1}
-																({l s='Product concerned:'}
-															{else}
-																({l s='Products concerned:'}
-															{/if}
+															<i class="icon-info-sign"></i>
+															{strip}
+																{$first.instance->delay[$cookie->id_lang]|escape:'htmlall':'UTF-8'}
+																&nbsp;
+																{if count($first.product_list) <= 1}
+																	({l s='For this product:'}
+																{else}
+																	({l s='For these products:'}
+																{/if}
+															{/strip}
 															{foreach $first.product_list as $product}
 																{if $product@index == 4}
 																	<acronym title="
@@ -201,7 +203,7 @@
 													</td>
 												</tr>
 												<tr>
-													<td class="delivery_option_logo{if $carrier.product_list[0].carrier_list[0] eq 0} not-displayable{/if}">
+													<td class="delivery_option_logo{if $carrier.product_list[0].carrier_list[0] eq 0} hide{/if}">
 														{foreach $option.carrier_list as $carrier}
 															{if $carrier@iteration != 1}
 																{if $carrier.logo}
@@ -212,16 +214,19 @@
 															{/if}
 														{/foreach}
 													</td>
-													<td class="{if $option.unique_carrier} first_item{/if}{if $carrier.product_list[0].carrier_list[0] eq 0} not-displayable{/if}">
+													<td class="{if $option.unique_carrier} first_item{/if}{if $carrier.product_list[0].carrier_list[0] eq 0} hide{/if}">
 														<input type="hidden" value="{$first.instance->id|intval}" name="id_carrier" />
 														{if isset($carrier.instance->delay[$cookie->id_lang])}
 															<i class="icon-info-sign"></i>
-															{$first.instance->delay[$cookie->id_lang]|escape:'htmlall':'UTF-8'}
-															{if count($carrier.product_list) <= 1}
-																({l s='Product concerned:'}
-															{else}
-																({l s='Products concerned:'}
-															{/if}
+															{strip}
+																{$first.instance->delay[$cookie->id_lang]|escape:'htmlall':'UTF-8'}
+																&nbsp;
+																{if count($first.product_list) <= 1}
+																	({l s='For this product:'}
+																{else}
+																	({l s='For these products:'}
+																{/if}
+															{/strip}
 															{foreach $carrier.product_list as $product}
 																{if $product@index == 4}
 																	<acronym title="
@@ -342,18 +347,18 @@
 					<input type="hidden" name="back" value="{$back}" />
 					{if !$is_guest}
 						{if $back}
-							<a href="{$link->getPageLink('order', true, NULL, "step=1&back={$back}&multi-shipping={$multi_shipping}")|escape:'html':'UTF-8'}" title="{l s='Previous'}" class="button-exclusive btn btn-default">
+							<a href="{$link->getPageLink('order', true, NULL, "step=1&back={$back}{if $multi_shipping}&multi-shipping={$multi_shipping}{/if}")|escape:'html':'UTF-8'}" title="{l s='Previous'}" class="button-exclusive btn btn-default">
 								<i class="icon-chevron-left"></i>
 								{l s='Continue shopping'}
 							</a>
 						{else}
-							<a href="{$link->getPageLink('order', true, NULL, "step=1&multi-shipping={$multi_shipping}")|escape:'html':'UTF-8'}" title="{l s='Previous'}" class="button-exclusive btn btn-default">
+							<a href="{$link->getPageLink('order', true, NULL, "step=1{if $multi_shipping}&multi-shipping={$multi_shipping}{/if}")|escape:'html':'UTF-8'}" title="{l s='Previous'}" class="button-exclusive btn btn-default">
 								<i class="icon-chevron-left"></i>
 								{l s='Continue shopping'}
 							</a>
 						{/if}
 					{else}
-						<a href="{$link->getPageLink('order', true, NULL, "multi-shipping={$multi_shipping}")|escape:'html':'UTF-8'}" title="{l s='Previous'}" class="button-exclusive btn btn-default">
+						<a href="{$link->getPageLink('order', true, NULL, "{if $multi_shipping}multi-shipping={$multi_shipping}{/if}")|escape:'html':'UTF-8'}" title="{l s='Previous'}" class="button-exclusive btn btn-default">
 							<i class="icon-chevron-left"></i>
 							{l s='Continue shopping'}
 						</a>

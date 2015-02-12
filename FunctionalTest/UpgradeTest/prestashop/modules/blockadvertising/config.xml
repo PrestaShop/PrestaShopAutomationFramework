@@ -2,7 +2,7 @@
 <module>
 	<name>blockadvertising</name>
 	<displayName><![CDATA[Advertising block]]></displayName>
-	<version><![CDATA[0.9.1]]></version>
+	<version><![CDATA[0.9.2]]></version>
 	<description><![CDATA[Adds an advertisement block to selected sections of your e-commerce website.]]></description>
 	<author><![CDATA[PrestaShop]]></author>
 	<tab><![CDATA[advertising_marketing]]></tab>

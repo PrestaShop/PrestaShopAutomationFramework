@@ -1,5 +1,5 @@
 /*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -369,10 +369,23 @@ if (mins < 10)
 var secs = date.getSeconds();
 if (secs < 10)
 	secs = "0" + secs;
-$('.datepicker').datepicker({
+
+$('.datepicker').datetimepicker({
 	prevText: '',
 	nextText: '',
-	dateFormat: 'yy-mm-dd ' + hours + ':' + mins + ':' + secs
+	dateFormat: 'yy-mm-dd',
+	// Define a custom regional settings in order to use PrestaShop translation tools
+	currentText: currentText,
+	closeText:closeText,
+	ampm: false,
+	amNames: ['AM', 'A'],
+	pmNames: ['PM', 'P'],
+	timeFormat: 'hh:mm:ss tt',
+	timeSuffix: '',
+	timeOnlyTitle: timeOnlyTitle,
+	timeText: timeText,
+	hourText: hourText,
+	minuteText: minuteText,
 });
 
 $('#giftProductFilter').typeWatch({

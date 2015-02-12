@@ -1,5 +1,5 @@
 {*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,13 +18,36 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 <script type="text/javascript">
 	$(document).ready(function() {
+		
+		var id_tab_parentmodule = {$id_tab_parentmodule|intval};
+		var id_tab_module = {$id_tab_module|intval};
+		
+		$('tr.child-'+id_tab_parentmodule+' > td > input.view.'+id_tab_module).change( function () {
 
+			if (!$(this).prop('checked'))
+			{
+				$('#table_module_2 thead th:eq(1) input').trigger('click');
+				if ($('#table_module_2 thead th:eq(1) input').prop('checked'))
+					$('#table_module_2 thead th:eq(1) input').trigger('click');
+			}
+		});
+		
+		$('tr.child-'+id_tab_parentmodule+' > td > input.edit.'+id_tab_module).change( function () {
+
+			if (!$(this).prop('checked'))
+			{
+				$('#table_module_2 thead th:eq(2) input').trigger('click');
+				if ($('#table_module_2 thead th:eq(2) input').prop('checked'))
+					$('#table_module_2 thead th:eq(2) input').trigger('click');
+			}
+		});
+		
 		$('div.productTabs').find('a').each(function() {
 			$(this).attr('href', '#');
 		});
@@ -296,7 +319,11 @@
 										<input type="checkbox"{if $access_edit == 1} class="changeModuleAccess" data-rel="-1||view||{$profile.id_profile}"{else} disabled="disabled"{/if}/> {l s='View'}
 									</th>
 									<th>
-										<input type="checkbox"{if $access_edit == 1} class="changeModuleAccess" data-rel="-1||configure||{$profile.id_profile}"{else} disabled="disabled"{/if}/> {l s='Configure'}</th>
+										<input type="checkbox"{if $access_edit == 1} class="changeModuleAccess" data-rel="-1||configure||{$profile.id_profile}"{else} disabled="disabled"{/if}/> {l s='Configure'}
+									</th>
+									<th>
+										<input type="checkbox"{if $access_edit == 1} class="changeModuleAccess" data-rel="-1||uninstall||{$profile.id_profile}"{else} disabled="disabled"{/if}/> {l s='Uninstall'}
+									</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -313,6 +340,9 @@
 											</td>
 											<td>
 												<input type="checkbox" value="1"{if $module.configure == true} checked="checked"{/if}{if $access_edit == 1} class="ajax-ma-configure changeModuleAccess" data-rel="{$module.id_module}||configure||{$profile.id_profile}"{else} class="ajax-ma-configure" disabled="disabled"{/if}/>
+											</td>
+											<td>
+												<input type="checkbox" value="1"{if $module.uninstall == true} checked="checked"{/if}{if $access_edit == 1} class="ajax-ma-uninstall changeModuleAccess" data-rel="{$module.id_module}||uninstall||{$profile.id_profile}"{else} class="ajax-ma-uninstall" disabled="disabled"{/if}/>
 											</td>
 										</tr>
 									{/foreach}

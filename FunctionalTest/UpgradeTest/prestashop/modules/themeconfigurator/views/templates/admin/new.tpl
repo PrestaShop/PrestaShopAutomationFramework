@@ -50,7 +50,7 @@
 					</div>
 				</div>
 				<div class="title item-field form-group">
-					<label class="control-label col-lg-3 ">{l s='Title' mod='themeconfigurator'}</label>
+					<label class="control-label col-lg-3 ">{l s='Image title' mod='themeconfigurator'}</label>
 					<div class="col-lg-7">
 						<input class="form-control" type="text" name="item_title"/>
 					</div>
@@ -126,9 +126,8 @@
 				</div>
 				<div class="form-group">
 					<div class="col-lg-7 col-lg-offset-3">
-						<input type="hidden" name="updateItem" value="" />
 						<button type="button" class="btn btn-default button-new-item-cancel"><i class="icon-remove"></i> {l s='Cancel' mod='themeconfigurator'}</button>
-						<button type="submit" name="newItem" class="button-new-item-save btn btn-default pull-right" onClick="this.form.submit();"><i class="icon-save"></i> {l s='Save' mod='themeconfigurator'}</button>
+						<button type="submit" name="newItem" class="btn btn-success button-save pull-right"><i class="icon-save"></i> {l s='Save' mod='themeconfigurator'}</button>
 					</div>
 				</div>
 			</div>

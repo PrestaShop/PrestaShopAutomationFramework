@@ -41,7 +41,7 @@ class StatsBestProducts extends ModuleGrid
 	{
 		$this->name = 'statsbestproducts';
 		$this->tab = 'analytics_stats';
-		$this->version = '1.3';
+		$this->version = '1.4.1';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
@@ -100,6 +100,12 @@ class StatsBestProducts extends ModuleGrid
 				'header' => $this->l('Available quantity for sale'),
 				'dataIndex' => 'quantity',
 				'align' => 'center'
+			),
+			array(
+				'id' => 'active',
+				'header' => $this->l('Active'),
+				'dataIndex' => 'active',
+				'align' => 'center'
 			)
 		);
 
@@ -128,16 +134,11 @@ class StatsBestProducts extends ModuleGrid
 		if (Tools::getValue('export'))
 			$this->csvExport($engine_params);
 
-		$this->html = '
-			<div class="panel-heading">
-				'.$this->displayName.'
-			</div>
-			'.$this->engine($engine_params).'
-			<a class="btn btn-default export-csv" href="'.htmlentities($_SERVER['REQUEST_URI']).'&export=1">
-				<i class="icon-cloud-upload"></i> '.$this->l('CSV Export').'
-			</a>';
-
-		return $this->html;
+		return '<div class="panel-heading">'.$this->displayName.'</div>
+		'.$this->engine($engine_params).'
+		<a class="btn btn-default export-csv" href="'.Tools::safeOutput($_SERVER['REQUEST_URI'].'&export=1').'">
+			<i class="icon-cloud-upload"></i> '.$this->l('CSV Export').'
+		</a>';
 	}
 
 	public function getData()
@@ -157,19 +158,20 @@ class StatsBestProducts extends ModuleGrid
 					FROM '._DB_PREFIX_.'page pa
 					LEFT JOIN '._DB_PREFIX_.'page_viewed pv ON pa.id_page = pv.id_page
 					LEFT JOIN '._DB_PREFIX_.'date_range dr ON pv.id_date_range = dr.id_date_range
-					WHERE pa.id_object = p.id_product AND pa.id_page_type = ('.(int)Page::getPageTypeByName('product').')
+					WHERE pa.id_object = p.id_product AND pa.id_page_type = '.(int)Page::getPageTypeByName('product').'
 					AND dr.time_start BETWEEN '.$date_between.'
 					AND dr.time_end BETWEEN '.$date_between.'
-				) AS totalPageViewed
+				) AS totalPageViewed,
+				product_shop.active
 				FROM '._DB_PREFIX_.'product p
 				'.Shop::addSqlAssociation('product', 'p').'
-				LEFT JOIN '._DB_PREFIX_.'product_lang pl ON (p.id_product = pl.id_product AND pl.id_lang = '.(int)$this->getLang().Shop::addSqlRestrictionOnLang('pl').')
+				LEFT JOIN '._DB_PREFIX_.'product_lang pl ON (p.id_product = pl.id_product AND pl.id_lang = '.(int)$this->getLang().' '.Shop::addSqlRestrictionOnLang('pl').')
 				LEFT JOIN '._DB_PREFIX_.'order_detail od ON od.product_id = p.id_product
 				LEFT JOIN '._DB_PREFIX_.'orders o ON od.id_order = o.id_order
+				'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
 				'.Product::sqlStock('p', 0).'
-				WHERE product_shop.active = 1
-					AND o.valid = 1
-					AND o.invoice_date BETWEEN '.$date_between.'
+				WHERE o.valid = 1
+				AND o.invoice_date BETWEEN '.$date_between.'
 				GROUP BY od.product_id';
 
 		if (Validate::IsName($this->_sort))
@@ -188,6 +190,7 @@ class StatsBestProducts extends ModuleGrid
 			$value['avgPriceSold'] = Tools::displayPrice($value['avgPriceSold'], $currency);
 			$value['totalPriceSold'] = Tools::displayPrice($value['totalPriceSold'], $currency);
 		}
+		unset($value);
 
 		$this->_values = $values;
 		$this->_totalCount = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('SELECT FOUND_ROWS()');

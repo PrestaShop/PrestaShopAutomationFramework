@@ -1,5 +1,5 @@
 {*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
@@ -37,7 +37,7 @@
 					- <span class="module-badge-bought help-tooltip text-warning" data-title="{l s="You bought this module on PrestaShop Addons. Thank You."}"><i class="icon-pushpin"></i> <small>{l s="Bought"}</small></span>
 				{elseif isset($module->type) && $module->type == 'addonsMustHave'}
 					- <span class="module-badge-popular help-tooltip text-primary" data-title="{l s="This module is available on PrestaShop Addons"}"><i class="icon-group"></i> <small>{l s="Popular"}</small></span>
-				{elseif isset($module->type) && ($module->type == 'addonsPartner' || $module->type == 'addonsNative')}
+				{elseif isset($module->type) && $module->type == 'addonsPartner'}
 					- <span class="module-badge-partner help-tooltip text-warning" data-title="{l s="This module is available for free thanks to our partner."}"><i class="icon-pushpin"></i> <small>{l s="Official"}</small></span>
 				{elseif isset($module->id) && $module->id gt 0}
 					{if isset($module->version_addons) && $module->version_addons}
@@ -60,7 +60,7 @@
 		<td>&nbsp;</td>
 		<td style="text-align: right;">
 			<p>
-				<a href="{$module->addons_buy_url|replace:' ':'+'|escape:'html':'UTF-8'}" target="_blank" class="button updated">
+				<a href="{$module->addons_buy_url|replace:' ':'+'|escape:'html':'UTF-8'}" class="button updated _blank">
 					<span class="btn btn-default">
 						<i class="icon-shopping-cart"></i>{if isset($module->price) && isset($module->id_currency)} &nbsp;&nbsp;{displayPrice price=$module->price currency=$module->id_currency}{/if}
 					</span>

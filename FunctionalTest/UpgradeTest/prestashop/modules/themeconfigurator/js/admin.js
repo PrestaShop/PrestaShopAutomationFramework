@@ -71,4 +71,32 @@ jQuery(document).ready(function() {
 		$('#live_conf_button').attr('disabled', false);
 	else
 		$('#live_conf_button').attr('disabled', 'disabled');
+
 });
+
+$(function() {
+	 $(".list-unstyled" ).sortable().bind('sortupdate', function() {
+		var test = $(this).sortable('toArray');
+		var h4_title = $(this).prev('h4').html();
+		$.ajax({
+			type: 'POST',
+			url: theme_url + '&configure=themeconfigurator&ajax',
+			headers: { "cache-control": "no-cache" },
+			dataType: 'json',
+			data: {
+				action: 'updateposition',
+				item: test,
+				title: h4_title,
+			},
+			success: function(msg)
+			{
+				if (msg.error)
+				{
+					showErrorMessage(msg.error);
+					return;
+				}
+				showSuccessMessage(msg.success);
+			}
+		});
+	 });
+ });

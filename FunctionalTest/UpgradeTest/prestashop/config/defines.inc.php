@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -29,7 +29,7 @@ if (!defined('_PS_MODE_DEV_'))
 define('_PS_MODE_DEV_', false);
 /* Compatibility warning */
 define('_PS_DISPLAY_COMPATIBILITY_WARNING_', false);
-if (_PS_MODE_DEV_)
+if (_PS_MODE_DEV_ === true)
 {
 	@ini_set('display_errors', 'on');
 	@error_reporting(E_ALL | E_STRICT);
@@ -63,13 +63,9 @@ if (!defined('_PS_ROOT_DIR_') && (getenv('_PS_ROOT_DIR_') || getenv('REDIRECT__P
 
 /* Directories */
 if (!defined('_PS_ROOT_DIR_'))
-{
 	define('_PS_ROOT_DIR_', realpath($currentDir.'/..'));
 
-	if (!defined('_PS_CORE_DIR_'))
-		define('_PS_CORE_DIR_', _PS_ROOT_DIR_);
-}
-elseif (!defined('_PS_CORE_DIR_'))
+if (!defined('_PS_CORE_DIR_'))
 	define('_PS_CORE_DIR_', realpath($currentDir.'/..'));
 
 define('_PS_ALL_THEMES_DIR_',        _PS_ROOT_DIR_.'/themes/');
@@ -138,7 +134,6 @@ define('PS_PRODUCT_TAX', 0);
 define('PS_STATE_TAX', 1);
 define('PS_BOTH_TAX', 2);
 
-define('_PS_PRICE_DISPLAY_PRECISION_', 2);
 define('PS_TAX_EXC', 1);
 define('PS_TAX_INC', 0);
 
@@ -147,7 +142,13 @@ define('PS_ORDER_PROCESS_OPC', 1);
 
 define('PS_ROUND_UP', 0);
 define('PS_ROUND_DOWN', 1);
-define('PS_ROUND_HALF', 2);
+define('PS_ROUND_HALF_UP', 2);
+define('PS_ROUND_HALF_DOWN', 3);
+define('PS_ROUND_HALF_EVEN', 4);
+define('PS_ROUND_HALF_ODD', 5);
+
+/* Backward compatibility */
+define('PS_ROUND_HALF', PS_ROUND_HALF_UP);
 
 /* Registration behavior */
 define('PS_REGISTRATION_PROCESS_STANDARD', 0);
@@ -194,3 +195,4 @@ define('_PS_SMARTY_CONSOLE_OPEN_BY_URL_', 1);
 define('_PS_SMARTY_CONSOLE_OPEN_', 2);
 
 define('_PS_JQUERY_VERSION_', '1.11.0');
+

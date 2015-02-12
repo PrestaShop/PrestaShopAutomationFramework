@@ -33,14 +33,14 @@ class BlockPaymentLogo extends Module
 	{
 		$this->name = 'blockpaymentlogo';
 		$this->tab = 'front_office_features';
-		$this->version = '0.3.1';
+		$this->version = '0.3.2';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
 		$this->bootstrap = true;
 		parent::__construct();	
 
-		$this->displayName = $this->l('Payment logos block.');
+		$this->displayName = $this->l('Payment logos block');
 		$this->description = $this->l('Adds a block which displays all of your payment logos.');
 		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
 	}

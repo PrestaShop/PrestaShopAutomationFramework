@@ -33,13 +33,13 @@ class BlockFacebook extends Module
 	{
 		$this->name = 'blockfacebook';
 		$this->tab = 'front_office_features';
-		$this->version = '1.3.1';
+		$this->version = '1.3.2';
 		$this->author = 'PrestaShop';
 
 		$this->bootstrap = true;
 		parent::__construct();
-		$this->displayName = $this->l('Facebook block');
-		$this->description = $this->l('Displays a block for subscribing to your Facebook page.');
+		$this->displayName = $this->l('Facebook Like Box block');
+		$this->description = $this->l('Displays a block for subscribing to your Facebook Page.');
 		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
 	}
 
@@ -90,6 +90,16 @@ class BlockFacebook extends Module
 			$this->context->smarty->assign('facebookurl', $facebookurl);
 		}
 		return $this->display(__FILE__, 'blockfacebook.tpl', $this->getCacheId());
+	}
+
+	public function hookDisplayLeftColumn()
+	{
+		return $this->hookDisplayHome();
+	}
+
+	public function hookDisplayRightColumn()
+	{
+		return $this->hookDisplayHome();
 	}
 
 	public function hookHeader()

@@ -1,6 +1,6 @@
 <?php
 /*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
+*  @copyright  2007-2015 PrestaShop SA
 *  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -57,9 +57,12 @@ class AdminImagesControllerCore extends AdminController
 			'categories' => array('title' => $this->l('Categories'), 'align' => 'center', 'type' => 'bool', 'callback' => 'printEntityActiveIcon', 'orderby' => false),
 			'manufacturers' => array('title' => $this->l('Manufacturers'), 'align' => 'center', 'type' => 'bool', 'callback' => 'printEntityActiveIcon', 'orderby' => false),
 			'suppliers' => array('title' => $this->l('Suppliers'), 'align' => 'center', 'type' => 'bool', 'callback' => 'printEntityActiveIcon', 'orderby' => false),
-			'scenes' => array('title' => $this->l('Scenes'), 'align' => 'center', 'type' => 'bool', 'callback' => 'printEntityActiveIcon', 'orderby' => false),
 			'stores' => array('title' => $this->l('Stores'), 'align' => 'center', 'type' => 'bool', 'callback' => 'printEntityActiveIcon', 'orderby' => false)
 		);
+
+		// Scenes tab has been removed by default from the installation, but may still exists in updates
+		if (Tab::getIdFromClassName('AdminScenes'))
+			$this->fields_list['scenes'] = array('title' => $this->l('Scenes'), 'align' => 'center', 'type' => 'bool', 'callback' => 'printEntityActiveIcon', 'orderby' => false);
 		
 		// No need to display the old image system migration tool except if product images are in _PS_PROD_IMG_DIR_
 		$this->display_move = false;
@@ -129,7 +132,7 @@ class AdminImagesControllerCore extends AdminController
 						'visibility' => Shop::CONTEXT_ALL
 					),
 					'PS_PRODUCT_PICTURE_MAX_SIZE' => array(
-						'title' => $this->l('Maximum file size of customer\'s pictures'),
+						'title' => $this->l('Maximum file size of customization pictures'),
 						'hint' => $this->l('The maximum file size of product customization pictures that customers can upload (in bytes).'),
 						'validation' => 'isUnsignedInt',
 						'required' => true,
@@ -335,7 +338,6 @@ class AdminImagesControllerCore extends AdminController
 			)
 		);
 
-
 		parent::__construct();
 	}
 
@@ -343,9 +345,7 @@ class AdminImagesControllerCore extends AdminController
 	{
 		// When moving images, if duplicate images were found they are moved to a folder named duplicates/
 		if (file_exists(_PS_PROD_IMG_DIR_.'duplicates/'))
-		{
 			$this->warnings[] = sprintf($this->l('Duplicate images were found when moving the product images. This is likely caused by unused demonstration images. Please make sure that the folder %s only contains demonstration images, and then delete it.'), _PS_PROD_IMG_DIR_.'duplicates/');
-		}
 
 		if (Tools::isSubmit('submitRegenerate'.$this->table))
 		{
@@ -383,7 +383,7 @@ class AdminImagesControllerCore extends AdminController
 					$this->errors[] = Tools::displayError('Unknown error.');
 				else
 					$this->confirmations[] = $this->_conf[6];
-					return parent::postProcess();
+				return parent::postProcess();
 			}
 			else
 				$this->errors[] = Tools::displayError('You do not have permission to edit this.');
@@ -478,7 +478,6 @@ class AdminImagesControllerCore extends AdminController
 		if (!is_dir($dir))
 			return false;
 
-		$errors = false;
 		if (!$productsImages)
 		{
 			foreach (scandir($dir) as $image)
@@ -494,15 +493,9 @@ class AdminImagesControllerCore extends AdminController
 						if (!file_exists($newDir.substr($image, 0, -4).'-'.stripslashes($imageType['name']).'.jpg'))
 						{
 							if (!file_exists($dir.$image) || !filesize($dir.$image))
-							{
-								$errors = true;
 								$this->errors[] = sprintf(Tools::displayError('Source file does not exist or is empty (%s)'), $dir.$image);
-							}
 							elseif (!ImageManager::resize($dir.$image, $newDir.substr($image, 0, -4).'-'.stripslashes($imageType['name']).'.jpg', (int)$imageType['width'], (int)$imageType['height']))
-							{
-								$errors = true;
 								$this->errors[] = sprintf(Tools::displayError('Failed to resize image file (%s)'), $dir.$image);
-							}
 						}
 						if (time() - $this->start_time > $this->max_execution_time - 4) // stop 4 seconds before the timeout, just enough time to process the end of the page on a slow server
 							return 'timeout';
@@ -519,22 +512,16 @@ class AdminImagesControllerCore extends AdminController
 					foreach ($type as $imageType)				
 						if (!file_exists($dir.$imageObj->getExistingImgPath().'-'.stripslashes($imageType['name']).'.jpg'))
 							if (!ImageManager::resize($existing_img, $dir.$imageObj->getExistingImgPath().'-'.stripslashes($imageType['name']).'.jpg', (int)($imageType['width']), (int)($imageType['height'])))
-							{
-								$errors = true;
 								$this->errors[] = Tools::displayError(sprintf('Original image is corrupt (%s) for product ID %2$d or bad permission on folder', $existing_img, (int)$imageObj->id_product));
-							}
 				}
 				else
-				{
-					$errors = true;
 					$this->errors[] = Tools::displayError(sprintf('Original image is missing or empty (%1$s) for product ID %2$d', $existing_img, (int)$imageObj->id_product));
-				}
 				if (time() - $this->start_time > $this->max_execution_time - 4) // stop 4 seconds before the tiemout, just enough time to process the end of the page on a slow server
 					return 'timeout';
 			}
 		}
 
-		return $errors;
+		return (bool)count($this->errors);
 	}
 
 	/**
@@ -586,8 +573,8 @@ class AdminImagesControllerCore extends AdminController
 						if (time() - $this->start_time > $this->max_execution_time - 4) // stop 4 seconds before the tiemout, just enough time to process the end of the page on a slow server
 							return 'timeout';
 					}
+			}
 		}
-	}
 	}
 
 	protected function _regenerateThumbnails($type = 'all', $deleteOldImages = false)
@@ -597,15 +584,14 @@ class AdminImagesControllerCore extends AdminController
 		$this->max_execution_time = (int)ini_get('max_execution_time');
 		$languages = Language::getLanguages(false);
 
-		$process =
-			array(
-				array('type' => 'categories', 'dir' => _PS_CAT_IMG_DIR_),
-				array('type' => 'manufacturers', 'dir' => _PS_MANU_IMG_DIR_),
-				array('type' => 'suppliers', 'dir' => _PS_SUPP_IMG_DIR_),
-				array('type' => 'scenes', 'dir' => _PS_SCENE_IMG_DIR_),
-				array('type' => 'products', 'dir' => _PS_PROD_IMG_DIR_),
-				array('type' => 'stores', 'dir' => _PS_STORE_IMG_DIR_)
-			);
+		$process = array(
+			array('type' => 'categories', 'dir' => _PS_CAT_IMG_DIR_),
+			array('type' => 'manufacturers', 'dir' => _PS_MANU_IMG_DIR_),
+			array('type' => 'suppliers', 'dir' => _PS_SUPP_IMG_DIR_),
+			array('type' => 'scenes', 'dir' => _PS_SCENE_IMG_DIR_),
+			array('type' => 'products', 'dir' => _PS_PROD_IMG_DIR_),
+			array('type' => 'stores', 'dir' => _PS_STORE_IMG_DIR_)
+		);
 
 		// Launching generation process
 		foreach ($process as $proc)
@@ -686,7 +672,7 @@ class AdminImagesControllerCore extends AdminController
 			$result = Image::moveToNewFileSystem($this->max_execution_time);
 			if ($result === 'timeout')
 				$this->errors[] = Tools::displayError('Not all images have been moved. The server timed out before finishing. Click on "Move images" again to resume the moving process.');
-			else if ($result === false)
+			elseif ($result === false)
 				$this->errors[] = Tools::displayError('Error: Some -- or all -- images cannot be moved.');
 		}
 		return (count($this->errors) > 0 ? false : true);

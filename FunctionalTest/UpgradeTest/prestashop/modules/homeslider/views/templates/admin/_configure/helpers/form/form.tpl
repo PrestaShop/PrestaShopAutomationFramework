@@ -35,8 +35,8 @@
 						{if isset($fields[0]['form']['images'])}
 						<img src="{$image_baseurl}{$fields[0]['form']['images'][$language.id_lang]}" class="img-thumbnail" />
 						{/if}
-						<input id="{$input.name}_{$language.id_lang}" type="file" name="{$input.name}_{$language.id_lang}" class="hide" />
 						<div class="dummyfile input-group">
+							<input id="{$input.name}_{$language.id_lang}" type="file" name="{$input.name}_{$language.id_lang}" class="hide-file-upload" />
 							<span class="input-group-addon"><i class="icon-file"></i></span>
 							<input id="{$input.name}_{$language.id_lang}-name" type="text" class="disabled" name="filename" readonly />
 							<span class="input-group-btn">
