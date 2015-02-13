@@ -59,9 +59,11 @@ class ProductManagement extends ShopCapability
             ->click('#link-Prices')
             ->waitFor('#priceTE');
 
+            $from_quantity = 1;
             $m = [];
-            if (preg_match('/^\s*(\d+(?:\.\d+)?)\s*%\s*$/', $options['specific_price'], $m)) {
+            if (preg_match('/^\s*(\d+(?:\.\d+)?)\s*%\s*(?:starting\s+at\s+unit\s+(\d+))?$/', $options['specific_price'], $m)) {
                 $percentage = $m[1];
+                $from_quantity = $m[2];
             } else {
                 throw new \Exception("Invalid specific price specified: {$options['specific_price']}.");
             }
@@ -70,6 +72,10 @@ class ProductManagement extends ShopCapability
             ->click('#show_specific_price')
             ->select('#sp_reduction_type', 'percentage')
             ->fillIn('#sp_reduction', $percentage);
+
+            if ($from_quantity > 1) {
+                $browser->fillIn('#sp_from_quantity', $from_quantity);
+            }
 
             $this->saveProduct();
         }
