@@ -87,7 +87,7 @@ class UpgradeTest extends TestCase
         ->click('#currentConfiguration input[type="submit"]')
         ->click('input[value*=Expert]')
         ->select('[name="channel"]', 'directory')
-        ->fillIn('[name="directory_num"]', '1.6.0.12')
+        ->fillIn('[name="directory_num"]', '1.6.1.0')
         ->click('[name="submitConf-channel"]')
         ->acceptAlert()
         ->click('#upgradeNow')
