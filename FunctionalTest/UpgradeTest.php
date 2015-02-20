@@ -14,7 +14,7 @@ class UpgradeTest extends TestCase
         return [
             'conf' => [
                 'shop.filesystem_path' => __DIR__.'/UpgradeTest/prestashop',
-                'shop.prestashop_version' => '1.6.0.9'
+                'shop.prestashop_version' => '1.6.0.11'
             ]
         ];
     }
@@ -60,7 +60,7 @@ class UpgradeTest extends TestCase
                         ->getAsAbsolutePath('shop.filesystem_path');
 
         // If we put an autoupgrade module in the source of the target version, use this one.
-        $autoupgradeSourceFolder = FS::join($sourceFolder, 'modules', 'autoupgrade'); 
+        $autoupgradeSourceFolder = FS::join($sourceFolder, 'modules', 'autoupgrade');
         if (FS::exists($autoupgradeSourceFolder)) {
             $autoupgradeTargetFolder = FS::join($this->shop->getFilesystemPath(), 'modules', 'autoupgrade');
             $this->shop->getFileManager()->webCopyShopFiles($autoupgradeSourceFolder,$autoupgradeTargetFolder);
@@ -87,7 +87,7 @@ class UpgradeTest extends TestCase
         ->click('#currentConfiguration input[type="submit"]')
         ->click('input[value*=Expert]')
         ->select('[name="channel"]', 'directory')
-        ->fillIn('[name="directory_num"]', '1.6.0.11')
+        ->fillIn('[name="directory_num"]', '1.6.0.12')
         ->click('[name="submitConf-channel"]')
         ->acceptAlert()
         ->click('#upgradeNow')
