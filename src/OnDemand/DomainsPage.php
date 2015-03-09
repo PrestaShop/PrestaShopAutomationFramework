@@ -8,10 +8,8 @@ class DomainsPage extends OnDemandPage
 {
 	public function isDomainActive($domain)
 	{
-		$xpath = '{xpath}//tr[.//a[contains(@href, "' . $domain . '")]]';
-		$row = $this->getBrowser()->find($xpath);
 		try {
-			$row->find('i.fa.fa-circle.green');
+			$this->getDomainWidgetRoot($domain)->find('i.fa.fa-circle.green');
 			return true;
 		} catch (Exception $e) {
 			return false;
