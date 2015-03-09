@@ -30,7 +30,7 @@ class DomainsPage extends OnDemandPage
 
 	public function getDomainWidgetRoot($domain)
 	{
-		return $this->getBrowser()->find('{xpath}//tr[.//td[contains(., "' . $domain . '")]]');
+		return $this->getBrowser()->find('{xpath}//tr[.//td[normalize-space(.) = "' . $domain . '"]]');
 	}
 
 	public function openDomainSettings($domain)
