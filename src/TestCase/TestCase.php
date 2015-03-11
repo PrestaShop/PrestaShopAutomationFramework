@@ -333,6 +333,18 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase implements \PrestaSh
         }
     }
 
+    public function finished($methodName, array $arguments = null)
+    {
+        if (isset($this->shop) && is_object($this->shop)) {
+            $sourceCoverage = FS::join($this->shop->getFilesystemPath(), 'aggregate.coverage.data');
+
+            if (file_exists($sourceCoverage)) {
+                copy($sourceCoverage, FS::join($this->getArtefactsDir(), basename($sourceCoverage)));
+                unlink($sourceCoverage);
+            }
+        }
+    }
+
     public function getShortName()
     {
         return $this->shortName;
