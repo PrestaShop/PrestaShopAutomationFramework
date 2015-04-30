@@ -93,7 +93,8 @@ In `/etc/apparmor.d/usr.sbin.mysqld`, add to the list of permissions:
 /run/mysqld/mysqld2.pid rw,
 /var/run/mysqld/mysqld2.sock w,
 /run/mysqld/mysqld2.sock w,
-/mysql/** rwk
+/mysql/** rwk,
+/mysql/ r
 ```
 
 Then run:
